@@ -1,0 +1,163 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* 顏色變數 */
+  --primary-color: #3490dc;
+  --secondary-color: #ffed4a;
+  --accent-color: #e3342f;
+  --button-bgc: #38c172;
+  --button-color: white;
+  --button-hover-color: #4cd38a;
+  --background: #ffffff;
+  --foreground: #171717;
+  --card-bgc: #e6f4ea;
+  --card-hover-bgc: #d6eadb;
+  --icon-color: #2b2b2b;
+  --text-color: #333333;
+  --step-color: #87bc56;
+  --border-color: #ccc;
+  --border-checked-color: #2ca84a;
+  --navbar-bgc: #f3f4f6;
+  --nav-link-hover-color: #38b1d4;
+  --nav-link-active-bgc: #4cc2e9;
+  --navLink-bgc: #f0f3f5;
+
+  /* 全局樣式變數 */
+  --font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  --border-radius: 8px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #3c3b3b;
+    --foreground: #302a2a;
+    --primary-color: #1e3a8a;
+    --secondary-color: #fbbf24;
+    --accent-color: #ef4444;
+    --login-bgc: #3f5592;
+    --navbar-bgc: #6faed3;
+    --nav-link-hover-color: #92e15d;
+    --nav-link-active-bgc: #4bc5c1;
+    --navLink-bgc: #d1c3c3;
+    /* --button-bgc: #d1c62a; */
+    --button-bgc: #35d650;
+    --button-color: #ffffff;
+    --button-hover-color: #e2d84e;
+    --card-bgc: #488b7d;
+    --card-hover-bgc: #2e8567;
+    --icon-color: #3b371f;
+    --title-color: #e2e88d;
+    /* --text-color: #d3e1d1; */
+    --text-color: #f1f6f0;
+    --step-color: #c3d442;
+    --border-color: #35bb8c;
+    --border-checked-color: #9eba23;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background-color: var(--background);
+  font-family: var(--font-family);
+  margin: 0;
+  padding: 0;
+}
+
+/* 標題樣式 */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--title-color);
+  margin: 0;
+  font-weight: bold;
+}
+
+label {
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+p {
+  color: var(--text-color);
+}
+
+/* 按鈕樣式 */
+button {
+  background-color: var(--button-bgc);
+  color: var(--button-color);
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: var(--button-hover-color);
+}
+
+/* input */
+input,
+select {
+  background-color: rgb(198, 224, 224);
+}
+
+input[type="checkbox"] {
+  cursor: pointer;
+}
+
+/* 卡片樣式 */
+.card {
+  background-color: var(--card-bgc);
+  color: var(--foreground);
+}
+
+/* 標頭（標題）樣式 */
+.header {
+  background-color: var(--secondary-color);
+  color: var(--foreground);
+  padding: 1rem;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+/* 顯著文字樣式 */
+.accent-text {
+  color: var(--accent-color);
+  font-weight: bold;
+}
+
+/* 工具樣式 */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+@layer components {
+}
+
+@layer base {
+  input::placeholder {
+    font-size: 1rem;
+  }
+  @media (min-width: 768px) {
+    /* md 以上 */
+    input::placeholder {
+      font-size: 1rem;
+    }
+  }
+  @media (max-width: 640px) {
+    /* xs 或小螢幕 */
+    input::placeholder {
+      font-size: 0.5rem;
+    }
+  }
+}
