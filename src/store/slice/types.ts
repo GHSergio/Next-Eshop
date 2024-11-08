@@ -17,6 +17,9 @@ export interface UserInfo {
   id: string;
   name: string;
   email: string;
+  phone: string;
+  address: string;
+  creditCardLast4: string;
 }
 
 // User 狀態接口
@@ -24,7 +27,7 @@ export interface UserState {
   isLoggedIn: boolean;
   userInfo: UserInfo | null;
   cart: CartItem[];
-  orders: OrderItem[]; // 用於存儲用戶的訂單列表
+  ordersHistory: OrderItem[];
   isAuthModalOpen: boolean;
 }
 

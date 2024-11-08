@@ -5,7 +5,7 @@ const initialState: UserState = {
   isLoggedIn: false,
   userInfo: null,
   cart: [],
-  orders: [],
+  ordersHistory: [],
   isAuthModalOpen: false,
 };
 
@@ -27,7 +27,7 @@ const userSlice = createSlice({
       state.userInfo = null;
       state.isLoggedIn = false;
       state.cart = [];
-      state.orders = [];
+      state.ordersHistory = [];
     },
     // 添加商品至購物車
     addToCart(state, action: PayloadAction<CartItem>) {
@@ -58,7 +58,7 @@ const userSlice = createSlice({
     },
     // 新增訂單
     addOrder(state, action: PayloadAction<OrderItem>) {
-      state.orders.push(action.payload);
+      state.ordersHistory.push(action.payload);
       state.cart = []; // 清空購物車
     },
   },

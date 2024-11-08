@@ -4,11 +4,7 @@ import React, { useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../store/store";
-import {
-  openCart,
-  closeCart,
-  selectCartItemCount,
-} from "../store/slice/productSlice";
+import { selectCartItemCount, setShowCart } from "../store/slice/productSlice";
 // import NavBar from "./NavBar";
 // import Footer from "./Footer";
 import NavLinks from "./NavLinks";
@@ -26,11 +22,11 @@ const ClientLayout: React.FC<{ children: React.ReactNode }> = ({
   const cartItemCount = useSelector(selectCartItemCount);
 
   const handleMouseEnter = useCallback(() => {
-    dispatch(openCart());
+    dispatch(setShowCart(true));
   }, [dispatch]);
 
   const handleMouseLeave = useCallback(() => {
-    dispatch(closeCart());
+    dispatch(setShowCart(false));
   }, [dispatch]);
 
   return (
