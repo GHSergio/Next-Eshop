@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import { RootState } from "../store";
-import { Product, fetchAllProducts, fetchAllCategories } from "@/api";
+import { fetchAllProducts, fetchAllCategories } from "@/api";
 import { createSelector } from "reselect";
 import { CartItem, ProductState } from "@/store/slice/types";
 
