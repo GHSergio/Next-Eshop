@@ -103,13 +103,6 @@ const productSlice = createSlice({
     setShowCart(state, action: PayloadAction<boolean>) {
       state.showCart = action.payload;
     },
-
-    openCart(state) {
-      state.showCart = true;
-    },
-    closeCart(state) {
-      state.showCart = false;
-    },
   },
   // 處理 Thunk 狀態變化
   extraReducers: (builder) => {
