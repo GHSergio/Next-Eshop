@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
-import { useSelector } from "react-redux";
-import { RootState } from "../../store/store";
+// import { useSelector } from "react-redux";
+// import { RootState } from "../../store/store";
 import Image from "next/image";
 import { ShippingInfo, PaymentInfo, SelectedItem } from "./types";
 

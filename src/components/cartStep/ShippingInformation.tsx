@@ -33,9 +33,9 @@ const ShippingInformation: React.FC<ShippingInformationProps> = ({
       }
 
       setErrors(newErrors);
-      onInfoChange((prevInfo: any) => ({ ...prevInfo, [name]: value }));
+      onInfoChange({ ...shippingInfo, [name]: value });
     },
-    [errors, onInfoChange, setErrors]
+    [errors, onInfoChange, setErrors, shippingInfo]
   );
 
   const handleSelectChange = useCallback(
@@ -46,9 +46,9 @@ const ShippingInformation: React.FC<ShippingInformationProps> = ({
       newErrors[name as keyof typeof errors] = value.trim() === "";
 
       setErrors(newErrors);
-      onInfoChange((prevInfo: any) => ({ ...prevInfo, [name]: value }));
+      onInfoChange({ ...shippingInfo, [name]: value });
     },
-    [errors, onInfoChange, setErrors]
+    [errors, onInfoChange, setErrors, shippingInfo]
   );
 
   return (
