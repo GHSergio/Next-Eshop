@@ -2,27 +2,28 @@ import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import { RootState } from "../store";
 import { Product, fetchAllProducts, fetchAllCategories } from "@/api";
 import { createSelector } from "reselect";
+import { CartItem, ProductState } from "@/store/slice/types";
 
-interface CartItem {
-  id: string;
-  image: string;
-  title: string;
-  price: number;
-  quantity: number;
-  color: string;
-  size: string;
-}
+// interface CartItem {
+//   id: string;
+//   image: string;
+//   title: string;
+//   price: number;
+//   quantity: number;
+//   color: string;
+//   size: string;
+// }
 
-//定義狀態
-interface ProductState {
-  products: Product[];
-  categories: string[];
-  loading: boolean;
-  error: string | null;
-  searchQuery: string;
-  cart: CartItem[];
-  showCart: boolean;
-}
+// //定義狀態
+// interface ProductState {
+//   products: Product[];
+//   categories: string[];
+//   loading: boolean;
+//   error: string | null;
+//   searchQuery: string;
+//   cart: CartItem[];
+//   showCart: boolean;
+// }
 
 //定義 狀態 初始值
 const initialState: ProductState = {

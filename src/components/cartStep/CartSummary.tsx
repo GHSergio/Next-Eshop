@@ -7,12 +7,7 @@ import {
   updateCartItemQuantity,
 } from "../../store/slice/productSlice";
 import Image from "next/image";
-
-interface SelectedItem {
-  id: string;
-  color: string;
-  size: string;
-}
+import { SelectedItem } from "./types";
 
 interface CartSummaryProps {
   selectAll: boolean;
@@ -28,22 +23,26 @@ const CartSummary: React.FC<CartSummaryProps> = ({
   setSelectedItems,
 }) => {
   const dispatch = useDispatch();
-  const { cart } = useSelector((state: RootState) => state.products);
-  // console.log(cart);
+  const cart = useSelector((state: RootState) => state.products.cart);
+
   // 購物車的商品
   const cartItems = useMemo(
     () =>
       cart.map((item) => ({
         id: item.id,
+        title: item.title,
+        image: item.image,
         color: item.color,
         size: item.size,
+        quantity: item.quantity,
+        price: item.price,
       })),
     [cart]
   );
 
   // 判斷商品是否被選中
-  const isItemSelected = useMemo(
-    () => (id: string, color: string, size: string) =>
+  const isItemSelected = useCallback(
+    (id: string, color: string, size: string) =>
       selectedItems.some(
         (item) => item.id === id && item.color === color && item.size === size
       ),
@@ -57,16 +56,45 @@ const CartSummary: React.FC<CartSummaryProps> = ({
   }, [selectAll, setSelectAll, setSelectedItems, cartItems]);
 
   // 處理單個商品選擇
+  // const handleSelectItem = useCallback(
+  //   (id: string, color: string, size: string) => {
+  //     const isSelected = isItemSelected(id, color, size);
+  //     setSelectedItems(
+  //       isSelected
+  //         ? selectedItems.filter(
+  //             (item: SelectedItem) =>
+  //               !(item.id === id && item.color === color && item.size === size)
+  //           )
+  //         : [
+  //             ...selectedItems,
+  //             {
+  //               id: item.id,
+  //               title: item.title,
+  //               image: item.image,
+  //               color: item.color,
+  //               size: item.size,
+  //               quantity: item.quantity,
+  //               price: item.price,
+  //             },
+  //           ]
+  //     );
+  //   },
+  //   [isItemSelected, selectedItems, setSelectedItems]
+  // );
   const handleSelectItem = useCallback(
-    (id: string, color: string, size: string) => {
-      const isSelected = isItemSelected(id, color, size);
+    (item: SelectedItem) => {
+      const isSelected = isItemSelected(item.id, item.color, item.size);
       setSelectedItems(
         isSelected
           ? selectedItems.filter(
-              (item) =>
-                !(item.id === id && item.color === color && item.size === size)
+              (selectedItem) =>
+                !(
+                  selectedItem.id === item.id &&
+                  selectedItem.color === item.color &&
+                  selectedItem.size === item.size
+                )
             )
-          : [...selectedItems, { id, color, size }]
+          : [...selectedItems, item]
       );
     },
     [isItemSelected, selectedItems, setSelectedItems]
@@ -74,19 +102,36 @@ const CartSummary: React.FC<CartSummaryProps> = ({
 
   //單個商品總額
   const singleProductTotal = (price: number, quantity: number) => {
-    return price * quantity;
+    return (price * quantity).toFixed(2);
   };
 
   // 改變商品數量
+  // const handleQuantityChange = useCallback(
+  //   (id: string, color: string, size: string, newQuantity: number) => {
+  //     if (newQuantity > 0) {
+  //       dispatch(
+  //         updateCartItemQuantity({ id, color, size, quantity: newQuantity })
+  //       );
+  //     }
+  //   },
+  //   [dispatch]
+  // );
   const handleQuantityChange = useCallback(
     (id: string, color: string, size: string, newQuantity: number) => {
       if (newQuantity > 0) {
         dispatch(
           updateCartItemQuantity({ id, color, size, quantity: newQuantity })
         );
+        setSelectedItems(
+          selectedItems.map((item) =>
+            item.id === id && item.color === color && item.size === size
+              ? { ...item, quantity: newQuantity }
+              : item
+          )
+        );
       }
     },
-    [dispatch]
+    [dispatch, setSelectedItems, selectedItems]
   );
 
   // 計算總金額
@@ -111,7 +156,8 @@ const CartSummary: React.FC<CartSummaryProps> = ({
   const shippingCost = 2;
   const discount = totalAmount > 30 ? shippingCost : 0;
   const finalTotal = totalAmount + shippingCost - discount;
-
+  // console.log(cart);
+  // console.log(cartItems);
   return (
     <div className="xs:p-0 md:p-4">
       {/* Header */}
@@ -148,9 +194,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({
                     selectedItem.color === item.color &&
                     selectedItem.size === item.size
                 )}
-                onChange={() =>
-                  handleSelectItem(item.id, item.color, item.size)
-                }
+                onChange={() => handleSelectItem(item)}
                 className="xs:h-3 xs:w-3 md:h-4 md:w-4 focus:ring-blue-500 border-gray-300 rounded checked:border-borderChecked"
               />
             </div>

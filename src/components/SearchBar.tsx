@@ -23,17 +23,17 @@ const SearchBar: React.FC<SearchBarProps> = ({ height, width }) => {
   // }, [dispatch]);
 
   // 使用 lodash 的 debounce 函數
-  const debounceSearch = useCallback(
-    debounce((query: string) => {
-      dispatch(setSearchQuery(query));
-    }, 100), // 延遲 100 毫秒
-    [dispatch]
-  );
+  const debounceSearch = debounce((query: string) => {
+    dispatch(setSearchQuery(query));
+  }, 100);
 
   // 當輸入內容變更時觸發 debounce 搜尋
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    debounceSearch(e.target.value);
-  };
+  const handleChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      debounceSearch(e.target.value);
+    },
+    [debounceSearch]
+  );
 
   return (
     <div

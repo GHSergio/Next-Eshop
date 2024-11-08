@@ -1,28 +1,21 @@
 "use client";
 
 import React, { useCallback } from "react";
+import { PaymentInfo, Errors } from "./types";
 
 interface PaymentDetailsProps {
-  onPaymentChange: (info: any) => void;
-  paymentInfo: {
-    cardNumber: string;
-    expiryDate: string;
-    cvv: string;
-  };
+  onPaymentChange: (info: PaymentInfo) => void;
+  paymentInfo: PaymentInfo;
   submitted: boolean;
-  errors: {
-    cardNumber: boolean;
-    expiryDate: boolean;
-    cvv: boolean;
-  };
-  setErrors: (errors: any) => void;
+  errors: Errors["payment"];
+  setErrors: (errors: Errors["payment"]) => void;
 }
 
 const PaymentDetails: React.FC<PaymentDetailsProps> = ({
   onPaymentChange,
-  paymentInfo,
   submitted,
   errors,
+  paymentInfo,
   setErrors,
 }) => {
   const handleChange = useCallback(
@@ -42,9 +35,10 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({
       }
 
       setErrors(newErrors);
-      onPaymentChange((prevInfo: any) => ({ ...prevInfo, [name]: value }));
+
+      onPaymentChange({ ...paymentInfo, [name]: value } as PaymentInfo);
     },
-    [errors, onPaymentChange, setErrors]
+    [errors, onPaymentChange, paymentInfo, setErrors]
   );
 
   return (

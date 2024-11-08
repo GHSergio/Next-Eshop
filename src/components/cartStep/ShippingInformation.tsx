@@ -1,27 +1,14 @@
 "use client";
 
 import React, { useCallback } from "react";
+import { ShippingInfo, Errors } from "./types";
 
 interface ShippingInformationProps {
-  onInfoChange: (info: any) => void;
-  shippingInfo: {
-    fullName: string;
-    phone: string;
-    email: string;
-    city: string;
-    area: string;
-    address: string;
-  };
+  onInfoChange: (info: ShippingInfo) => void;
+  shippingInfo: ShippingInfo;
   submitted: boolean;
-  errors: {
-    fullName: boolean;
-    phone: boolean;
-    email: boolean;
-    city: boolean;
-    area: boolean;
-    address: boolean;
-  };
-  setErrors: (errors: any) => void;
+  errors: Errors["shipping"];
+  setErrors: (errors: Errors["shipping"]) => void;
 }
 
 const ShippingInformation: React.FC<ShippingInformationProps> = ({

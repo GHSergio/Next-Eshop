@@ -2,30 +2,32 @@ import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import Image from "next/image";
+import { ShippingInfo, PaymentInfo, SelectedItem } from "./types";
 
 interface ReviewOrderProps {
-  shippingInfo: any;
-  paymentInfo: any;
+  shippingInfo: ShippingInfo;
+  paymentInfo: PaymentInfo;
+  selectedItems: SelectedItem[];
 }
 
 const ReviewOrder: React.FC<ReviewOrderProps> = ({
   shippingInfo,
   paymentInfo,
+  selectedItems,
 }) => {
-  const { cart } = useSelector((state: RootState) => state.products);
-
   const totalAmount = useMemo(() => {
-    return cart.reduce(
+    return selectedItems.reduce(
       (total, item) => total + Math.floor(item.price * item.quantity),
       0
     );
-  }, [cart]);
+  }, [selectedItems]);
 
   const commonTextClasses = () => "xs:text-xs md:text-sm";
 
   const commonSpanClasses = () =>
     "md:col-start-auto md:row-start-auto text-center text-textColor font-semibold xs:text-[0.5rem] md:text-sm";
 
+  // console.log(selectedItems);
   return (
     <div className="xs:p-0 md:p-6">
       <h2 className="xs:text-md md:text-xl font-semibold mb-4">確認您的訂單</h2>
@@ -54,7 +56,7 @@ const ReviewOrder: React.FC<ReviewOrderProps> = ({
       {/* 購物車內容 */}
       <h3 className="xs:text-md md:text-lg font-semibold mb-2">訂單內容</h3>
       <div className="grid gap-4 xs:text-start md:text-center">
-        {cart.map((item) => (
+        {selectedItems.map((item) => (
           <div
             key={item.id}
             className="grid xs:grid-cols-4 xs:grid-rows-4 md:grid-cols-12 md:grid-rows-1 items-center p-2 rounded-lg border border-gray-300"

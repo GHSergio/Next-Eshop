@@ -35,8 +35,9 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ params }) => {
         setProduct(updatedProduct);
         setSelectedColor(updatedProduct.colors[0]);
         setSelectedSize(updatedProduct.sizes[0]);
-      } catch (err) {
+      } catch (err: unknown) {
         setError("商品資訊獲取失敗");
+        console.error(err);
       } finally {
         setLoading(false);
       }

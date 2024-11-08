@@ -7,21 +7,21 @@ import PaymentDetails from "../../components/cartStep/PaymentDetails";
 import ReviewOrder from "../../components/cartStep/ReviewOrder";
 import { useDispatch } from "react-redux";
 import { clearCart } from "../../store/slice/productSlice";
-import { useRouter } from "next/navigation"; // 使用 Next.js 的 useRouter
+import { useRouter } from "next/navigation";
+import {
+  PaymentInfo,
+  ShippingInfo,
+  Errors,
+  SelectedItem,
+} from "@/components/cartStep/types";
 
 const steps = ["確認購物車", "運送資訊", "付費方式", "確認訂單"];
-
-interface SelectedItem {
-  id: string;
-  color: string;
-  size: string;
-}
 
 const CartPage: React.FC = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [selectAll, setSelectAll] = useState(false);
   const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([]);
-  const [shippingInfo, setShippingInfo] = useState({
+  const [shippingInfo, setShippingInfo] = useState<ShippingInfo>({
     fullName: "",
     phone: "",
     email: "",
@@ -29,12 +29,12 @@ const CartPage: React.FC = () => {
     area: "",
     address: "",
   });
-  const [paymentInfo, setPaymentInfo] = useState({
+  const [paymentInfo, setPaymentInfo] = useState<PaymentInfo>({
     cardNumber: "",
     expiryDate: "",
     cvv: "",
   });
-  const [errors, setErrors] = useState({
+  const [errors, setErrors] = useState<Errors>({
     shipping: {
       fullName: true,
       phone: true,
@@ -147,6 +147,7 @@ const CartPage: React.FC = () => {
             <ReviewOrder
               paymentInfo={paymentInfo}
               shippingInfo={shippingInfo}
+              selectedItems={selectedItems}
             />
           );
         default:
@@ -204,6 +205,7 @@ const CartPage: React.FC = () => {
     }
   }, [activeStep, handleClearCart, router]);
 
+  console.log("選擇的商品: ", selectedItems);
   return (
     <div className="max-w-4xl mx-auto xs:p-2 md:p-4">
       {/* 步驟流程 - 顯示在流程內容上方 */}

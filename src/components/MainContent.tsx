@@ -18,7 +18,7 @@ interface MainContentProps {
 
 const MainContent: React.FC<MainContentProps> = ({ category }) => {
   const [isModalOpen, setModalOpen] = useState(true);
-  const [authType, setAuthType] = useState<"login" | "register">("login");
+
   const dispatch: AppDispatch = useDispatch();
   const loading = useSelector((state: RootState) => state.products.loading);
   const error = useSelector((state: RootState) => state.products.error);
