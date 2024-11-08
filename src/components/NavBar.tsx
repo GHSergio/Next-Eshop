@@ -4,11 +4,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../store/store";
-import {
-  selectCartItemCount,
-  openCart,
-  closeCart,
-} from "../store/slice/productSlice";
+import { selectCartItemCount, setShowCart } from "../store/slice/productSlice";
+import { setIsAuthModalOpen } from "../store/slice/userSlice";
 import CartDropdown from "./CartDropdown";
 import NavLinks from "./NavLinks";
 
@@ -20,14 +17,23 @@ const NavBar: React.FC = () => {
   );
   const showCart = useSelector((state: RootState) => state.products.showCart);
   const cartItemCount = useSelector(selectCartItemCount);
+  const isLoggedIn = useSelector((state: RootState) => state.user.isLoggedIn);
 
   const handleMouseEnter = useCallback(() => {
-    dispatch(openCart());
+    dispatch(setShowCart(true));
   }, [dispatch]);
 
   const handleMouseLeave = useCallback(() => {
-    dispatch(closeCart());
+    dispatch(setShowCart(false));
   }, [dispatch]);
+
+  const handleCartClick = () => {
+    if (isLoggedIn) {
+      router.push("/cart");
+    } else {
+      dispatch(setIsAuthModalOpen(true));
+    }
+  };
 
   return (
     <nav className="bg-navbarBgc">
@@ -58,7 +64,7 @@ const NavBar: React.FC = () => {
             >
               <button
                 className="focus:outline-none p-1"
-                onClick={() => router.push("/cart")}
+                onClick={handleCartClick}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

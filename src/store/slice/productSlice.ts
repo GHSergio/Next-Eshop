@@ -4,27 +4,6 @@ import { fetchAllProducts, fetchAllCategories } from "@/api";
 import { createSelector } from "reselect";
 import { CartItem, ProductState } from "@/store/slice/types";
 
-// interface CartItem {
-//   id: string;
-//   image: string;
-//   title: string;
-//   price: number;
-//   quantity: number;
-//   color: string;
-//   size: string;
-// }
-
-// //定義狀態
-// interface ProductState {
-//   products: Product[];
-//   categories: string[];
-//   loading: boolean;
-//   error: string | null;
-//   searchQuery: string;
-//   cart: CartItem[];
-//   showCart: boolean;
-// }
-
 //定義 狀態 初始值
 const initialState: ProductState = {
   products: [],
@@ -124,6 +103,7 @@ const productSlice = createSlice({
     setShowCart(state, action: PayloadAction<boolean>) {
       state.showCart = action.payload;
     },
+
     openCart(state) {
       state.showCart = true;
     },
@@ -186,8 +166,8 @@ export const {
   clearCart,
   setSearchQuery,
   setShowCart,
-  openCart,
-  closeCart,
+  // openCart,
+  // closeCart,
 } = productSlice.actions;
 
 // 導出 reducer 給 store 使用

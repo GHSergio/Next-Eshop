@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useEffect, useCallback } from "react";
 import SearchBar from "./SearchBar";
 import ProductCard from "./ProductCard";
 // import Sidebar from "./SideBar";
@@ -17,8 +17,6 @@ interface MainContentProps {
 }
 
 const MainContent: React.FC<MainContentProps> = ({ category }) => {
-  const [isModalOpen, setModalOpen] = useState(true);
-
   const dispatch: AppDispatch = useDispatch();
   const loading = useSelector((state: RootState) => state.products.loading);
   const error = useSelector((state: RootState) => state.products.error);
@@ -63,9 +61,7 @@ const MainContent: React.FC<MainContentProps> = ({ category }) => {
   return (
     <>
       {/* Modal */}
-      {/* <div className=""> */}
-      {isModalOpen && <AuthModal onClose={() => setModalOpen(false)} />}
-      {/* </div> */}
+      {<AuthModal />}
 
       <div className="w-11/12 mx-auto my-5 flex flex-col">
         {/* Search Bar */}
