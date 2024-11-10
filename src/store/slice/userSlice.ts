@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { UserState, UserInfo, CartItem, OrderItem } from "@/store/slice/types";
 
 const initialState: UserState = {
-  isLoggedIn: false,
+  isLoggedIn: true,
   userInfo: null,
   cart: [],
   ordersHistory: [],

@@ -35,6 +35,14 @@ const NavBar: React.FC = () => {
     }
   };
 
+  const handleUserClick = () => {
+    if (isLoggedIn) {
+      router.push("/member");
+    } else {
+      router.push("/auth");
+    }
+  };
+
   return (
     <nav className="bg-navbarBgc">
       <div className="mx-auto px-3 ">
@@ -87,7 +95,7 @@ const NavBar: React.FC = () => {
             {/* 使用者 登入 */}
             <button
               className="focus:outline-none p-1"
-              onClick={() => router.push("/auth")}
+              onClick={handleUserClick}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"

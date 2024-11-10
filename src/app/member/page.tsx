@@ -1,3 +1,4 @@
+"use client";
 import React, { useState } from "react";
 import UserProfile from "@/components/members/UserProfile";
 import OrderHistory from "@/components/members/OrderHistory";
