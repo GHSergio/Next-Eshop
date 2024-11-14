@@ -16,6 +16,3 @@ export * from "./cart/addItemToCart";
 export * from "./cart/removeCartItem";
 export * from "./orders/fetchAllOrders";
 export * from "./orders/fetchOrderById";
-
-// 匯出 types，方便在元件中直接使用
-export * from "./types";
