@@ -1,15 +1,14 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
+// import { Product } from "@/store/slice/types";
 
 interface ProductCardProps {
   id: number;
   image: string;
   title: string;
   price: number;
-  discountPrice?: string;
-  category?: string;
-  description?: string;
+  discountPrice: number | undefined;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({
@@ -24,13 +23,14 @@ const ProductCard: React.FC<ProductCardProps> = ({
     <Link href={`/products/${id}`} passHref title={title}>
       <div className="card p-6 rounded-lg shadow-md transition-all duration-300 hover:shadow-lg hover:bg-cardHoverBgc cursor-pointer">
         <div className="w-full h-48 overflow-hidden">
-        {/* 使用 Next.js 的 Image 來優化圖片 */}
+          {/* 使用 Next.js 的 Image 來優化圖片 */}
           <Image
-            src={image}
-            alt={title}
+            src={image || "/path/to/default-image.jpg"}
+            alt={title || "Default Title"}
             width={300}
             height={200}
             className="object-contain w-full h-full"
+            priority
           />
         </div>
 

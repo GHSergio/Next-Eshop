@@ -1,14 +1,24 @@
-import React from "react";
+import React, { useEffect } from "react";
 import AuthForm from "./AuthForm";
 import { RootState } from "@/store/store";
 import { useSelector, useDispatch } from "react-redux";
+import { useRouter } from "next/navigation";
 import { setIsAuthModalOpen } from "@/store/slice/userSlice";
 
 const AuthModal: React.FC = () => {
   const isAuthModalOpen = useSelector(
     (state: RootState) => state.user.isAuthModalOpen
   );
+  const isLoggedIn = useSelector((state: RootState) => state.user.isLoggedIn);
+
   const dispatch = useDispatch();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      dispatch(setIsAuthModalOpen(false));
+    }
+  }, [isLoggedIn, dispatch, router]);
 
   const handleOnCloseModal = () => {
     dispatch(setIsAuthModalOpen(false));

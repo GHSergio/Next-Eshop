@@ -27,9 +27,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <NavBar />
           </header>
 
-          {/* 部份小螢幕專屬 ClientLayout */}
+          {/* 小螢幕專屬 ClientLayout & 全局AuthModal */}
           <ClientLayout>
-            {/* 切換路徑 頁面被渲染的位置 */}
+            {/* 根據路徑 顯示pages內容 */}
             <main>{children}</main>
           </ClientLayout>
 

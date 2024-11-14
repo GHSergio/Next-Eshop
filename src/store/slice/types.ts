@@ -1,7 +1,34 @@
 // src/types/globalTypes.ts
-import { Product } from "@/api";
 
-// 共用
+// 註冊
+export interface RegisterUserPayload {
+  email: string;
+  password: string;
+}
+
+// 登入
+export interface LoginUserPayload {
+  email: string;
+  password: string;
+}
+
+export interface Product {
+  id: number;
+  title: string;
+  image: string;
+  price: number;
+  description: string;
+  category?: string;
+  colors?: string[];
+  sizes?: string[];
+  rating?: {
+    rate: number;
+    count: number;
+  };
+  discountPrice?: number;
+}
+
+// 購物車
 export interface CartItem {
   id: string;
   image: string;
@@ -15,11 +42,11 @@ export interface CartItem {
 // 使用者資料
 export interface UserInfo {
   id: string;
-  name: string;
   email: string;
-  phone: string;
-  address: string;
-  creditCardLast4: string;
+  password: string;
+  phone?: string;
+  address?: string;
+  creditCardLast4?: string;
 }
 
 // User 狀態接口
@@ -29,6 +56,7 @@ export interface UserState {
   cart: CartItem[];
   ordersHistory: OrderItem[];
   isAuthModalOpen: boolean;
+  alert: AlertState;
 }
 
 // Product 狀態接口
@@ -42,15 +70,9 @@ export interface ProductState {
   showCart: boolean;
 }
 
-// UI 狀態接口
-export interface UIState {
-  isAuthModalOpen: boolean;
-  isLoading: boolean; //
-}
-
 // 訂單數據接口
 export interface OrderItem {
-  orderId: string;
+  id: string;
   items: CartItem[];
   totalAmount: number;
   date: string;
@@ -64,10 +86,28 @@ export interface OrderState {
   error: string | null;
 }
 
-// AppState：包含所有 slice 狀態的接口（可選）
-export interface AppState {
-  user: UserState;
-  products: ProductState;
-  ui: UIState;
-  orders: OrderState;
+// export interface severityItem {
+//   severity: "success" | "error" | "info" | "warning";
+// }
+
+// Alert
+export interface AlertState {
+  open: boolean;
+  message: string;
+  // severity: severityItem;
+  severity: "success" | "error" | "info" | "warning";
 }
+
+// // UI 狀態接口
+// export interface UIState {
+//   isAuthModalOpen: boolean;
+//   isLoading: boolean; //
+// }
+
+// // AppState：包含所有 slice 狀態的接口（可選）
+// export interface AppState {
+//   user: UserState;
+//   products: ProductState;
+//   ui: UIState;
+//   orders: OrderState;
+// }

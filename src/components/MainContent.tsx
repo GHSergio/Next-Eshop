@@ -2,7 +2,6 @@
 import React, { useEffect, useCallback } from "react";
 import SearchBar from "./SearchBar";
 import ProductCard from "./ProductCard";
-// import Sidebar from "./SideBar";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "../store/store";
 import {
@@ -10,7 +9,6 @@ import {
   fetchProductsAndCategories,
   selectFilteredProducts,
 } from "../store/slice/productSlice";
-import AuthModal from "./AuthModal";
 
 interface MainContentProps {
   category?: string;
@@ -60,9 +58,6 @@ const MainContent: React.FC<MainContentProps> = ({ category }) => {
 
   return (
     <>
-      {/* Modal */}
-      {<AuthModal />}
-
       <div className="w-11/12 mx-auto my-5 flex flex-col">
         {/* Search Bar */}
         <div className="w-full md:w-1/3 lg:w-1/4 mb-4">
@@ -88,6 +83,7 @@ const MainContent: React.FC<MainContentProps> = ({ category }) => {
                 image={product.image}
                 title={product.title}
                 price={product.price}
+                discountPrice={product.discountPrice}
               />
             ))
           )}

@@ -13,6 +13,7 @@
     "@savvywombat/tailwindcss-grid-areas": "^4.0.0",
     "@tippyjs/react": "^4.2.6",
     "axios": "^1.7.7",
+    "daisyui": "^4.12.14",
     "lodash.debounce": "^4.0.8",
     "next": "14.2.16",
     "react": "^18",

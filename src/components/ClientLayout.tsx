@@ -4,11 +4,11 @@ import React, { useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../store/store";
-import { selectCartItemCount, setShowCart } from "../store/slice/productSlice";
-// import NavBar from "./NavBar";
-// import Footer from "./Footer";
+import { selectCartItemCount, setShowCart } from "@/store/slice/productSlice";
 import NavLinks from "./NavLinks";
 import CartDropdown from "./CartDropdown";
+import AuthModal from "@/components/AuthModal";
+import Alert from "@/components/Alert";
 
 const ClientLayout: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -29,8 +29,14 @@ const ClientLayout: React.FC<{ children: React.ReactNode }> = ({
     dispatch(setShowCart(false));
   }, [dispatch]);
 
+  // console.log("alert state內容", alert);
+
   return (
     <div className="min-h-screen flex flex-col relative">
+      <Alert />
+
+      {/* 全局的 AuthModal */}
+      <AuthModal />
       {/* 小螢幕才出現 NavLinks */}
       <div className="xs:flex justify-center sm:hidden sticky top-16 bg-white w-full z-50 p-1">
         <NavLinks links={categories} />

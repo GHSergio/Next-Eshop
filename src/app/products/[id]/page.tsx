@@ -1,9 +1,11 @@
 "use client";
 import React, { useEffect, useState, useCallback } from "react";
-import { Product, fetchProductById } from "@/api";
+import { Product } from "@/store/slice/types";
+import { fetchProductById } from "@/api";
 import { useDispatch } from "react-redux";
 import { addToCart } from "@/store/slice/productSlice";
 import Image from "next/image";
+import AuthModal from "@/components/AuthModal";
 
 interface ProductDetailProps {
   params: {
@@ -89,14 +91,17 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ params }) => {
 
   return (
     <div className="max-w-5xl mx-auto p-4">
+      <AuthModal />
       <div className="flex flex-col md:flex-row gap-6">
         <div className="flex-1 flex justify-center items-center">
           <Image
-            src={product.image}
-            alt={product.title}
+            src={product.image || "/path/to/default-image.jpg"}
+            alt={product.title || "Default Title"}
             width={500}
             height={400}
+            style={{ width: "auto", height: "100%" }}
             className="object-contain"
+            priority // 優化圖片的加載 提高LCP性能
           />
         </div>
         {/* Product Content */}

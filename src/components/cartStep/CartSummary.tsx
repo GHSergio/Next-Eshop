@@ -211,7 +211,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({
             </div>
 
             {/* Product Info */}
-            <div className="xs:col-start-3 xs:row-start-2 xs:row-span-2 xs:col-span-2 md:col-span-4 md:col-start-auto md:row-start-auto flex flex-col justify-center xs:item-start md:items-center">
+            <div className="xs:col-start-3 xs:row-start-2 xs:row-span-2 xs:col-span-2 md:col-span-4 md:col-start-auto md:row-start-auto flex flex-col justify-center ">
               <h4
                 className="xs:text-[0.8rem] md:text-lg font-semibold truncate"
                 title={item.title}

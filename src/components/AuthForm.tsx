@@ -1,19 +1,37 @@
 "use client";
 import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState, AppDispatch } from "@/store/store";
+import { registerUserThunk, loginUserThunk } from "@/store/slice/userSlice";
 
 const AuthForm: React.FC = () => {
+  // 顯示 register / login form
   const [isLogin, setIsLogin] = useState(true);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const dispatch: AppDispatch = useDispatch();
+  const error = useSelector((state: RootState) => state.user.error);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    const userData = { email, password };
+    await dispatch(loginUserThunk(userData));
     // 處理登入邏輯
-    console.log("User is trying to login...");
+    console.log("login的userData:", userData);
   };
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    const userData = { email, password };
+    await dispatch(registerUserThunk(userData));
     // 處理註冊邏輯
-    console.log("User is trying to register...");
+    // console.log("register的userData:", userData);
+  };
+
+  const handleToggleForm = () => {
+    setIsLogin(!isLogin);
+    setEmail("");
+    setPassword("");
   };
 
   const labelClasses = "block xs:text-[0.5rem] md:text-lg font-bold";
@@ -31,34 +49,35 @@ const AuthForm: React.FC = () => {
         onSubmit={isLogin ? handleLogin : handleRegister}
         className="space-y-4"
       >
-        {!isLogin && (
-          <div>
-            <label className={`${labelClasses}`} htmlFor="username">
-              使用者名稱
-            </label>
-            <input
-              type="text"
-              id="username"
-              className={`${inputClasses}`}
-              placeholder="輸入使用者名稱"
-              required={!isLogin}
-            />
-          </div>
-        )}
+        {/* 錯誤訊息顯示 */}
+        {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+        {/* <div>
+          <label className={`${labelClasses}`} htmlFor="username">
+            使用者名稱
+          </label>
+          <input
+            type="text"
+            id="username"
+            className={`${inputClasses}`}
+            placeholder="輸入使用者名稱"
+            required={!isLogin}
+          />
+        </div> */}
 
         <div>
           <label className={`${labelClasses}`} htmlFor="email">
-            帳號
+            信箱
           </label>
           <input
             type="email"
             id="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className={`${inputClasses}`}
             placeholder="輸入電子郵件"
             required
           />
         </div>
-
         <div>
           <label className={`${labelClasses}`} htmlFor="password">
             密碼
@@ -66,12 +85,13 @@ const AuthForm: React.FC = () => {
           <input
             type="password"
             id="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             className={`${inputClasses} `}
             placeholder="輸入密碼"
             required
           />
         </div>
-
         <button
           type="submit"
           className="w-full xs:text-xs md:text-lg xs:p-0 md:p-1 xs:rounded-sm md:rounded-md"
@@ -84,7 +104,8 @@ const AuthForm: React.FC = () => {
         <p className="xs:text-[0.4rem] md:text-sm">
           {isLogin ? "還沒有帳號？" : "已經有帳號？"}{" "}
           <button
-            onClick={() => setIsLogin(!isLogin)}
+            // onClick={() => setIsLogin(!isLogin)}
+            onClick={handleToggleForm}
             className="xs:text-[0.5rem] md:text-lg p-1 xs:rounded-sm md:rounded-md  font-bold"
           >
             {isLogin ? "前往註冊" : "前往登入"}
