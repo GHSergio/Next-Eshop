@@ -142,7 +142,7 @@ export const selectFilteredProducts = createSelector(
     // 基於提取的狀態和參數進行計算
     return products.filter((product) => {
       const matchesCategory =
-        !category || product.category.toLowerCase() === category.toLowerCase();
+        !category || product.category?.toLowerCase() === category.toLowerCase();
       const matchesSearch =
         searchQuery === "" ||
         product.title.toLowerCase().includes(searchQuery.toLowerCase());
