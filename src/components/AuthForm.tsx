@@ -10,7 +10,7 @@ const AuthForm: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const dispatch: AppDispatch = useDispatch();
-  const error = useSelector((state: RootState) => state.user.error);
+  const { message } = useSelector((state: RootState) => state.user.alert);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,7 +50,9 @@ const AuthForm: React.FC = () => {
         className="space-y-4"
       >
         {/* 錯誤訊息顯示 */}
-        {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+        {message && (
+          <p className="text-red-500 text-sm text-center">{message}</p>
+        )}
         {/* <div>
           <label className={`${labelClasses}`} htmlFor="username">
             使用者名稱
