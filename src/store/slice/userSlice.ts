@@ -7,7 +7,6 @@ import {
   RegisterUserPayload,
   LoginUserPayload,
   AlertState,
-  // severityItem,
 } from "@/store/slice/types";
 import { registerUser, loginUser } from "@/api";
 import axios from "axios";
@@ -32,9 +31,9 @@ export const registerUserThunk = createAsyncThunk(
     try {
       const response = await registerUser(userData);
       // 若註冊成功（`status` 為 201 且 `success` 為 true），回傳使用者資料
-      // console.log("thunk接收到的: ", response);
+      console.log("thunk接收到的: ", response);
       if (response.status === 201) {
-        // console.log("201接收到的: ", response.data);
+        console.log("201接收到的: ", response.data);
         return response.data;
       }
     } catch (error: unknown) {
@@ -49,7 +48,7 @@ export const loginUserThunk = createAsyncThunk(
   async (userData: LoginUserPayload, { rejectWithValue }) => {
     try {
       const response = await loginUser(userData);
-      // console.log("thunk接收到的: ", response);
+      console.log("thunk接收到的: ", response);
       if (response.status === 200) {
         console.log("200接收到的: ", response.data);
         return response.data;

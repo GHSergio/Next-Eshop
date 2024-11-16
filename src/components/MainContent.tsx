@@ -48,13 +48,13 @@ const MainContent: React.FC<MainContentProps> = ({ category }) => {
     );
   }
 
-  if (error) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <p className="text-lg text-red-600">{error}</p>
-      </div>
-    );
-  }
+  // if (error) {
+  //   return (
+  //     <div className="flex justify-center items-center h-screen">
+  //       <p className="text-lg text-red-600">{error} / 可能fakeAPI出現問題</p>
+  //     </div>
+  //   );
+  // }
 
   return (
     <>

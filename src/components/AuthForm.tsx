@@ -53,18 +53,20 @@ const AuthForm: React.FC = () => {
         {message && (
           <p className="text-red-500 text-sm text-center">{message}</p>
         )}
-        {/* <div>
-          <label className={`${labelClasses}`} htmlFor="username">
-            使用者名稱
-          </label>
-          <input
-            type="text"
-            id="username"
-            className={`${inputClasses}`}
-            placeholder="輸入使用者名稱"
-            required={!isLogin}
-          />
-        </div> */}
+        {/* {!isLogin && (
+          <div>
+            <label className={`${labelClasses}`} htmlFor="username">
+              使用者名稱
+            </label>
+            <input
+              type="text"
+              id="username"
+              className={`${inputClasses}`}
+              placeholder="輸入使用者名稱"
+              required={!isLogin}
+            />
+          </div>
+        )} */}
 
         <div>
           <label className={`${labelClasses}`} htmlFor="email">
