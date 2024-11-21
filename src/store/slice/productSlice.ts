@@ -100,9 +100,9 @@ const productSlice = createSlice({
     setSearchQuery(state, action: PayloadAction<string>) {
       state.searchQuery = action.payload;
     },
-    setShowCart(state, action: PayloadAction<boolean>) {
-      state.showCart = action.payload;
-    },
+    // setShowCart(state, action: PayloadAction<boolean>) {
+    //   state.showCart = action.payload;
+    // },
   },
   // 處理 Thunk 狀態變化
   extraReducers: (builder) => {
@@ -158,7 +158,7 @@ export const {
   updateCartItemQuantity,
   clearCart,
   setSearchQuery,
-  setShowCart,
+  // setShowCart,
   // openCart,
   // closeCart,
 } = productSlice.actions;

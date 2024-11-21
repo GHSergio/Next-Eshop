@@ -7,12 +7,13 @@ const CartDropdown: React.FC = () => {
   const cart = useSelector((state: RootState) => state.products.cart);
 
   // 標題樣式
-  const headerStyle = "font-bold text-center text-sm text-black";
+  const headerStyle =
+    "font-bold text-center xs:text-[0.6rem] sm:text-sm text-black";
 
   // 單元格樣式，使用 useMemo 避免不必要的重渲染
   const cellStyle = useMemo(
     () =>
-      "overflow-hidden text-ellipsis whitespace-nowrap text-center text-black",
+      "overflow-hidden text-ellipsis whitespace-nowrap text-center text-black xs:text-[0.6rem] sm:text-sm",
     []
   );
 
@@ -31,7 +32,7 @@ const CartDropdown: React.FC = () => {
   }, [cart, cellStyle]);
 
   return (
-    <div className="absolute top-auto sm:top-full right-0 w-72 bg-white shadow-lg p-4 z-30 max-h-96 overflow-y-auto rounded-md">
+    <div className="absolute xs:bottom-[60]  sm:bottom-0 sm:top-9 sm:top-full right-0 xs:w-30 sm:w-72 bg-white shadow-lg xs:p-[0.2rem] sm:p-2 z-10 xs:max-h-24 sm:max-h-96 sm:min-h-[7rem] sm:overflow-y-auto rounded-md">
       {/* 標題區 */}
       <div className="flex justify-between">
         <div className={`w-1/2 ${headerStyle}`}>商品名稱</div>

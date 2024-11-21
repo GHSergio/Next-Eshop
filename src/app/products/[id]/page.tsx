@@ -5,7 +5,6 @@ import { fetchProductById } from "@/api";
 import { useDispatch } from "react-redux";
 import { addToCart } from "@/store/slice/productSlice";
 import Image from "next/image";
-import AuthModal from "@/components/AuthModal";
 
 interface ProductDetailProps {
   params: {
@@ -91,7 +90,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ params }) => {
 
   return (
     <div className="max-w-5xl mx-auto p-4">
-      <AuthModal />
+      {/* <AuthModal /> */}
       <div className="flex flex-col md:flex-row gap-6">
         <div className="flex-1 flex justify-center items-center">
           <Image

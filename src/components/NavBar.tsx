@@ -4,9 +4,10 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../store/store";
-import { selectCartItemCount, setShowCart } from "../store/slice/productSlice";
-import { setIsAuthModalOpen } from "../store/slice/userSlice";
+import { selectCartItemCount } from "../store/slice/productSlice";
+import { setShowCart, setShowMember } from "../store/slice/userSlice";
 import CartDropdown from "./CartDropdown";
+import MemberDropdown from "./MemberDropdown";
 import NavLinks from "./NavLinks";
 
 const NavBar: React.FC = () => {
@@ -15,23 +16,32 @@ const NavBar: React.FC = () => {
   const categories = useSelector(
     (state: RootState) => state.products.categories
   );
-  const showCart = useSelector((state: RootState) => state.products.showCart);
+  const showCart = useSelector((state: RootState) => state.user.showCart);
+  const showMember = useSelector((state: RootState) => state.user.showMember);
   const cartItemCount = useSelector(selectCartItemCount);
   const isLoggedIn = useSelector((state: RootState) => state.user.isLoggedIn);
 
-  const handleMouseEnter = useCallback(() => {
+  const handleCartMouseEnter = useCallback(() => {
     dispatch(setShowCart(true));
   }, [dispatch]);
 
-  const handleMouseLeave = useCallback(() => {
+  const handleCartMouseLeave = useCallback(() => {
     dispatch(setShowCart(false));
+  }, [dispatch]);
+
+  const handleMemberMouseEnter = useCallback(() => {
+    dispatch(setShowMember(true));
+  }, [dispatch]);
+
+  const handleMemberMouseLeave = useCallback(() => {
+    dispatch(setShowMember(false));
   }, [dispatch]);
 
   const handleCartClick = () => {
     if (isLoggedIn) {
       router.push("/cart");
     } else {
-      dispatch(setIsAuthModalOpen(true));
+      router.push("/login");
     }
   };
 
@@ -39,7 +49,7 @@ const NavBar: React.FC = () => {
     if (isLoggedIn) {
       router.push("/member");
     } else {
-      router.push("/auth");
+      router.push("/login");
     }
   };
 
@@ -67,8 +77,8 @@ const NavBar: React.FC = () => {
           <div className="xs:hidden sm:flex justify-end items-center space-x-4">
             <div
               className="relative"
-              onMouseEnter={handleMouseEnter}
-              onMouseLeave={handleMouseLeave}
+              onMouseEnter={handleCartMouseEnter}
+              onMouseLeave={handleCartMouseLeave}
             >
               <button
                 className="focus:outline-none p-1"
@@ -93,19 +103,26 @@ const NavBar: React.FC = () => {
               {showCart && <CartDropdown />}
             </div>
             {/* 使用者 登入 */}
-            <button
-              className="focus:outline-none p-1"
-              onClick={handleUserClick}
+            <div
+              className="relative"
+              onMouseEnter={handleMemberMouseEnter}
+              onMouseLeave={handleMemberMouseLeave}
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-                className="sm:w-5 sm:h-5 md:w-6 md:h-6 lg:w-7 lg:h-7 text-iconColor"
+              <button
+                className="focus:outline-none p-1"
+                // onClick={handleUserClick}
               >
-                <path d="M12 12a5 5 0 100-10 5 5 0 000 10zm0 2a7 7 0 00-7 7h2a5 5 0 0110 0h2a7 7 0 00-7-7z" />
-              </svg>
-            </button>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                  className="sm:w-5 sm:h-5 md:w-6 md:h-6 lg:w-7 lg:h-7 text-iconColor"
+                >
+                  <path d="M12 12a5 5 0 100-10 5 5 0 000 10zm0 2a7 7 0 00-7 7h2a5 5 0 0110 0h2a7 7 0 00-7-7z" />
+                </svg>
+              </button>
+              {showMember && <MemberDropdown />}
+            </div>
           </div>
         </div>
       </div>

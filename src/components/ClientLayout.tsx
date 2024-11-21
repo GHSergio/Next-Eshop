@@ -4,10 +4,11 @@ import React, { useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../store/store";
-import { selectCartItemCount, setShowCart } from "@/store/slice/productSlice";
+import { selectCartItemCount } from "@/store/slice/productSlice";
+import { setShowCart, setShowMember } from "../store/slice/userSlice";
 import NavLinks from "./NavLinks";
 import CartDropdown from "./CartDropdown";
-import AuthModal from "@/components/AuthModal";
+import MemberDropdown from "./MemberDropdown";
 import Alert from "@/components/Alert";
 
 const ClientLayout: React.FC<{ children: React.ReactNode }> = ({
@@ -18,16 +19,42 @@ const ClientLayout: React.FC<{ children: React.ReactNode }> = ({
   const categories = useSelector(
     (state: RootState) => state.products.categories
   );
-  const showCart = useSelector((state: RootState) => state.products.showCart);
+  const showCart = useSelector((state: RootState) => state.user.showCart);
+  const showMember = useSelector((state: RootState) => state.user.showMember);
   const cartItemCount = useSelector(selectCartItemCount);
+  const isLoggedIn = useSelector((state: RootState) => state.user.isLoggedIn);
 
-  const handleMouseEnter = useCallback(() => {
+  const handleCartMouseEnter = useCallback(() => {
     dispatch(setShowCart(true));
   }, [dispatch]);
 
-  const handleMouseLeave = useCallback(() => {
+  const handleCartMouseLeave = useCallback(() => {
     dispatch(setShowCart(false));
   }, [dispatch]);
+
+  const handleMemberMouseEnter = useCallback(() => {
+    dispatch(setShowMember(true));
+  }, [dispatch]);
+
+  const handleMemberMouseLeave = useCallback(() => {
+    dispatch(setShowMember(false));
+  }, [dispatch]);
+
+  const handleCartClick = () => {
+    if (isLoggedIn) {
+      router.push("/cart");
+    } else {
+      router.push("/login");
+    }
+  };
+
+  // const handleUserClick = () => {
+  //   if (isLoggedIn) {
+  //     router.push("/member");
+  //   } else {
+  //     router.push("/login");
+  //   }
+  // };
 
   // console.log("alert state內容", alert);
 
@@ -36,9 +63,9 @@ const ClientLayout: React.FC<{ children: React.ReactNode }> = ({
       <Alert />
 
       {/* 全局的 AuthModal */}
-      <AuthModal />
+      {/* <AuthModal /> */}
       {/* 小螢幕才出現 NavLinks */}
-      <div className="xs:flex justify-center sm:hidden sticky top-16 bg-white w-full z-50 p-1">
+      <div className="xs:flex justify-center sm:hidden sticky top-16 bg-white w-full z-10 p-1">
         <NavLinks links={categories} />
       </div>
 
@@ -68,11 +95,11 @@ const ClientLayout: React.FC<{ children: React.ReactNode }> = ({
         {/* Cart Icon */}
         <div
           className="flex flex-col items-center"
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
+          onMouseEnter={handleCartMouseEnter}
+          onMouseLeave={handleCartMouseLeave}
         >
           <button
-            onClick={() => router.push("/cart")}
+            onClick={handleCartClick}
             className="text-inherit p-0 text-lg mb-[-1px] relative"
           >
             {/* Shopping Cart Icon */}
@@ -97,8 +124,10 @@ const ClientLayout: React.FC<{ children: React.ReactNode }> = ({
         {/* User Icon */}
         <div className="flex flex-col items-center">
           <button
-            onClick={() => router.push("/profile")}
-            className="text-inherit p-0 text-lg mb-[-1px]"
+            // onClick={handleUserClick}
+            onMouseEnter={handleMemberMouseEnter}
+            onMouseLeave={handleMemberMouseLeave}
+            className="text-inherit p-0 text-lg mb-[-1px] relative"
           >
             {/* User Icon */}
             <svg
@@ -111,6 +140,7 @@ const ClientLayout: React.FC<{ children: React.ReactNode }> = ({
             </svg>
           </button>
           <span className="text-xs">個人</span>
+          {showMember && <MemberDropdown />}
         </div>
       </div>
     </div>

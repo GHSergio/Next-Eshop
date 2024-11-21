@@ -1,83 +1,88 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { Pool } from "pg";
-
-// 設定資料庫連接池
-const pool = new Pool({
-  user: process.env.DATABASE_USER,
-  host: process.env.DATABASE_HOST,
-  database: process.env.DATABASE_NAME,
-  password: process.env.DATABASE_PASSWORD,
-  port: parseInt(process.env.DATABASE_PORT || "5432", 10),
-});
+import { supabase } from "@/supabaseClient";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const { id } = req.query;
+  const { id } = req.query; // 從查詢參數中獲取用戶 ID
+
+  if (!id || typeof id !== "string") {
+    return res.status(400).json({
+      success: false,
+      message: "用戶 ID 是必填的",
+    });
+  }
 
   if (req.method === "GET") {
+    // **查詢使用者資料**
     try {
-      // 從資料庫查詢使用者資料
-      const result = await pool.query("SELECT * FROM users WHERE id = $1", [
-        id,
-      ]);
+      const { data: user, error } = await supabase
+        .from("users")
+        .select("*")
+        .eq("id", id)
+        .single();
 
-      if (result.rows.length === 0) {
-        return res
-          .status(404)
-          .json({ success: false, message: "User not found" });
+      if (error || !user) {
+        return res.status(404).json({
+          success: false,
+          message: "找不到該用戶",
+        });
       }
 
-      return res.status(200).json({ success: true, data: result.rows[0] });
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.error("Database error:", error.message);
-        return res
-          .status(500)
-          .json({ success: false, message: "Server error: " + error.message });
-      } else {
-        console.error("Unexpected error:", error);
-        return res
-          .status(500)
-          .json({ success: false, message: "Unexpected server error" });
-      }
+      return res.status(200).json({
+        success: true,
+        data: user,
+      });
+    } catch (error: any) {
+      console.error("Supabase error:", error.message);
+      return res.status(500).json({
+        success: false,
+        message: "伺服器發生錯誤，請稍後再試",
+      });
     }
   } else if (req.method === "PUT") {
+    // **更新使用者資料**
     const { name, email } = req.body;
 
+    if (!name || !email) {
+      return res.status(400).json({
+        success: false,
+        message: "名稱和 Email 為必填項",
+      });
+    }
+
     try {
-      // 更新資料庫中的使用者資料
-      const result = await pool.query(
-        "UPDATE users SET name = $1, email = $2 WHERE id = $3 RETURNING *",
-        [name, email, id]
-      );
+      const { data: updatedUser, error } = await supabase
+        .from("users")
+        .update({ name, email })
+        .eq("id", id)
+        .select()
+        .single();
 
-      if (result.rows.length === 0) {
-        return res
-          .status(404)
-          .json({ success: false, message: "User not found" });
+      if (error || !updatedUser) {
+        return res.status(404).json({
+          success: false,
+          message: "用戶更新失敗或不存在",
+        });
       }
 
-      return res.status(200).json({ success: true, data: result.rows[0] });
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.error("Database error:", error.message);
-        return res
-          .status(500)
-          .json({ success: false, message: "Server error: " + error.message });
-      } else {
-        console.error("Unexpected error:", error);
-        return res
-          .status(500)
-          .json({ success: false, message: "Unexpected server error" });
-      }
+      return res.status(200).json({
+        success: true,
+        data: updatedUser,
+      });
+    } catch (error: any) {
+      console.error("Supabase error:", error.message);
+      return res.status(500).json({
+        success: false,
+        message: "伺服器發生錯誤，請稍後再試",
+      });
     }
   } else {
-    // 其他請求方法不允許
     res.setHeader("Allow", ["GET", "PUT"]);
-    return res
-      .status(405)
-      .json({ success: false, message: `Method ${req.method} Not Allowed` });
+    return res.status(405).json({
+      success: false,
+      message: `Method ${req.method} 不被允許`,
+    });
   }
 }

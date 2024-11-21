@@ -1,7 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ["fakestoreapi.com"], // 加入允許的圖像域
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "fakestoreapi.com",
+        port: "",
+        pathname: "/**",
+      },
+    ],
   },
 };
 

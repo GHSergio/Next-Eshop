@@ -2,6 +2,7 @@
 "use client";
 import React from "react";
 import MainContent from "../components/MainContent";
+
 import "../styles/globals.css";
 
 const HomePage: React.FC = () => {

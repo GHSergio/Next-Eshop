@@ -43,7 +43,7 @@ export interface CartItem {
 export interface UserInfo {
   id: string;
   email: string;
-  password: string;
+  password?: string;
   phone?: string;
   address?: string;
   creditCardLast4?: string;
@@ -57,6 +57,9 @@ export interface UserState {
   ordersHistory: OrderItem[];
   isAuthModalOpen: boolean;
   alert: AlertState;
+  // emailVerified: boolean;
+  showCart: boolean;
+  showMember: boolean;
 }
 
 // Product 狀態接口

@@ -17,7 +17,6 @@ interface MainContentProps {
 const MainContent: React.FC<MainContentProps> = ({ category }) => {
   const dispatch: AppDispatch = useDispatch();
   const loading = useSelector((state: RootState) => state.products.loading);
-  const error = useSelector((state: RootState) => state.products.error);
 
   // 使用 useCallback 確保這些函數只有在 dispatch 改變時才重新創建
   const fetchProducts = useCallback(() => {
@@ -47,14 +46,6 @@ const MainContent: React.FC<MainContentProps> = ({ category }) => {
       </div>
     );
   }
-
-  // if (error) {
-  //   return (
-  //     <div className="flex justify-center items-center h-screen">
-  //       <p className="text-lg text-red-600">{error} / 可能fakeAPI出現問題</p>
-  //     </div>
-  //   );
-  // }
 
   return (
     <>
