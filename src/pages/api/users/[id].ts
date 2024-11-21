@@ -34,8 +34,10 @@ export default async function handler(
         success: true,
         data: user,
       });
-    } catch (error: any) {
-      console.error("Supabase error:", error.message);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error("Supabase error:", error.message);
+      }
       return res.status(500).json({
         success: false,
         message: "伺服器發生錯誤，請稍後再試",
@@ -71,8 +73,10 @@ export default async function handler(
         success: true,
         data: updatedUser,
       });
-    } catch (error: any) {
-      console.error("Supabase error:", error.message);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error("Supabase error:", error.message);
+      }
       return res.status(500).json({
         success: false,
         message: "伺服器發生錯誤，請稍後再試",

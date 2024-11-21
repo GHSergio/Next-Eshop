@@ -43,8 +43,10 @@ const ModifyPassword: React.FC = () => {
       setTimeout(() => {
         router.push("/login"); // 更新成功後重定向到登入頁面
       }, 2000);
-    } catch (error) {
-      setError("伺服器發生錯誤，請稍後再試！");
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setError("伺服器發生錯誤，請稍後再試！");
+      }
     } finally {
       setIsSubmitting(false);
     }

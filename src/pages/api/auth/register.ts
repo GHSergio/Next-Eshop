@@ -83,8 +83,10 @@ export default async function handler(
         },
         severity: "success",
       });
-    } catch (error: any) {
-      console.error("Supabase Error: ", error.message);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error("Supabase Error: ", error.message);
+      }
       return res.status(500).json({
         success: false,
         message: "伺服器發生錯誤，請稍後再試",

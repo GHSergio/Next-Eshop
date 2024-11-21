@@ -53,8 +53,10 @@ export default async function handler(
       emailVerified: !!email_confirmed_at,
       message: email_confirmed_at ? "該 Email 已認證。" : "該 Email 尚未認證。",
     });
-  } catch (error: any) {
-    console.error("API Error:", error.message);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error("API Error:", error.message);
+    }
     return res.status(500).json({
       success: false,
       message: "伺服器錯誤，請稍後再試。",

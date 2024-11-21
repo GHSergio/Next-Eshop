@@ -45,14 +45,6 @@ const NavBar: React.FC = () => {
     }
   };
 
-  const handleUserClick = () => {
-    if (isLoggedIn) {
-      router.push("/member");
-    } else {
-      router.push("/login");
-    }
-  };
-
   return (
     <nav className="bg-navbarBgc">
       <div className="mx-auto px-3 ">
