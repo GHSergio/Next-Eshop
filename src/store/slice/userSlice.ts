@@ -23,7 +23,7 @@ const initialState: UserState = {
   },
   // emailVerified: false,
   showCart: false,
-  showMember: true,
+  showMember: false,
 };
 
 // 檢查 檢查信箱 是否已存在auth.user
