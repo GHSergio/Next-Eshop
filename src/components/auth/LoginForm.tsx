@@ -1,16 +1,19 @@
 "use client";
 import React, { useState } from "react";
-import { supabase } from "@/supabaseClient";
+// import { supabase } from "@/supabaseClient";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
-import { setAlert } from "@/store/slice/userSlice";
-import { RootState } from "@/store/store";
-import { setIsLoggedIn } from "@/store/slice/userSlice";
+// import { setAlert } from "@/store/slice/userSlice";
+import { RootState, AppDispatch } from "@/store/store";
+import {
+  loginUserThunk,
+  loginWithGoogleThunk,
+} from "@/store/slice/userSlice";
 const LoginForm: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const isLoggedIn = useSelector((state: RootState) => state.user.isLoggedIn);
-  const dispatch = useDispatch();
+  const dispatch: AppDispatch = useDispatch();
   const router = useRouter();
   // 信箱輸入處理
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -27,115 +30,180 @@ const LoginForm: React.FC = () => {
   // 一般登入
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      if (error) {
+      await dispatch(loginUserThunk({ email, password })).unwrap();
+      router.push("/");
+    } catch (error: unknown) {
+      // 檢查 error 是否為標準的 Error 實例。
+      if (error instanceof Error) {
         console.error("登入失敗：", error.message);
-        dispatch(
-          setAlert({
-            open: true,
-            severity: "error",
-            message: "登入失敗：" + error.message,
-          })
-        );
       } else {
-        dispatch(
-          setAlert({ open: true, severity: "success", message: "登入成功！" })
-        );
-        dispatch(setIsLoggedIn(true));
-        router.push("/"); // 導向首頁
+        // 如果不是 Error，可以將其當作普通物件記錄。
+        console.error("未知錯誤：", error);
       }
-    } catch (error) {
-      console.error("意外錯誤：", error);
-      dispatch(
-        setAlert({
-          open: true,
-          severity: "error",
-          message: "發生意外錯誤，請稍後再試。",
-        })
-      );
     }
   };
 
   // Google 登入
   const handleGoogleLogin = async () => {
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-      });
-      if (error) {
-        console.error("Google 登入失敗：", error.message);
-        dispatch(
-          setAlert({
-            open: true,
-            severity: "error",
-            message: "Google 登入失敗：" + error.message,
-          })
-        );
-      } else {
-        dispatch(
-          setAlert({
-            open: true,
-            severity: "success",
-            message: "Google 登入成功！",
-          })
-        );
-        dispatch(setIsLoggedIn(true));
-        router.push("/"); // 導向首頁
-      }
+      await dispatch(loginWithGoogleThunk()).unwrap();
+      router.push("/");
     } catch (error) {
-      console.error("意外錯誤：", error);
-      dispatch(
-        setAlert({
-          open: true,
-          severity: "error",
-          message: "發生意外錯誤，請稍後再試。",
-        })
-      );
+      if (error instanceof Error) {
+        console.error("Google 登入失敗：", error.message);
+      } else {
+        console.error("未知錯誤：", error);
+      }
     }
   };
 
-  // 訪客登入
-  const handleGuestLogin = async () => {
+  // 遊客(固定)登入
+  const handleGuestLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email: "guest@example.com",
-        password: "guestpassword123",
-      });
-      if (error) {
-        console.error("訪客登入失敗：", error.message);
-        dispatch(
-          setAlert({
-            open: true,
-            severity: "error",
-            message: "訪客登入失敗：" + error.message,
-          })
-        );
-      } else {
-        dispatch(
-          setAlert({
-            open: true,
-            severity: "success",
-            message: "訪客登入成功！",
-          })
-        );
-        dispatch(setIsLoggedIn(true));
-        router.push("/"); // 導向首頁
-      }
-    } catch (error) {
-      console.error("意外錯誤：", error);
-      dispatch(
-        setAlert({
-          open: true,
-          severity: "error",
-          message: "發生意外錯誤，請稍後再試。",
+      await dispatch(
+        loginUserThunk({
+          email: "guest@example.com",
+          password: "guestpassword123",
         })
-      );
+      ).unwrap();
+      router.push("/");
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error("訪客登入失敗：", error.message);
+      } else {
+        console.error("未知錯誤：", error);
+      }
     }
   };
+
+  // const handleLogin = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   try {
+  //     const { error } = await supabase.auth.signInWithPassword({
+  //       email,
+  //       password,
+  //     });
+  //     console.log(error);
+  //     if (error) {
+  //       if (error.status === 400) {
+  //         console.error("無效憑證：", error.message);
+  //         dispatch(
+  //           setAlert({
+  //             open: true,
+  //             severity: "error",
+  //             message: "無效憑證：" + error.message,
+  //           })
+  //         );
+  //       } else if (error.status === 404) {
+  //         console.error("登入失敗：", error.message);
+  //         dispatch(
+  //           setAlert({
+  //             open: true,
+  //             severity: "error",
+  //             message: "帳號不存在：" + error.message,
+  //           })
+  //         );
+  //       }
+  //     } else {
+  //       //成功
+  //       dispatch(
+  //         setAlert({ open: true, severity: "success", message: "登入成功！" })
+  //       );
+  //       dispatch(setIsLoggedIn(true));
+  //       router.push("/"); // 導向首頁
+  //     }
+  //   } catch (error) {
+  //     console.error("意外錯誤：", error);
+  //     dispatch(
+  //       setAlert({
+  //         open: true,
+  //         severity: "error",
+  //         message: "發生意外錯誤，請稍後再試。",
+  //       })
+  //     );
+  //   }
+  // };
+
+  // Google 登入
+  // const handleGoogleLogin = async () => {
+  //   try {
+  //     const { error } = await supabase.auth.signInWithOAuth({
+  //       provider: "google",
+  //     });
+  //     if (error) {
+  //       console.error("Google 登入失敗：", error.message);
+  //       dispatch(
+  //         setAlert({
+  //           open: true,
+  //           severity: "error",
+  //           message: "Google 登入失敗：" + error.message,
+  //         })
+  //       );
+  //     } else {
+  //       dispatch(
+  //         setAlert({
+  //           open: true,
+  //           severity: "success",
+  //           message: "Google 登入成功！",
+  //         })
+  //       );
+  //       dispatch(setIsLoggedIn(true));
+  //       router.push("/"); // 導向首頁
+  //     }
+  //   } catch (error) {
+  //     console.error("意外錯誤：", error);
+  //     dispatch(
+  //       setAlert({
+  //         open: true,
+  //         severity: "error",
+  //         message: "發生意外錯誤，請稍後再試。",
+  //       })
+  //     );
+  //   }
+  // };
+
+  // // 訪客登入
+  // const handleGuestLogin = async () => {
+  //   try {
+  //     const { error } = await supabase.auth.signInWithPassword({
+  //       email: "guest@example.com",
+  //       password: "guestpassword123",
+  //     });
+  //     if (error) {
+  //       console.error("訪客登入失敗：", error.message);
+  //       dispatch(
+  //         setAlert({
+  //           open: true,
+  //           severity: "error",
+  //           message: "訪客登入失敗：" + error.message,
+  //         })
+  //       );
+  //     } else {
+  //       dispatch(
+  //         setAlert({
+  //           open: true,
+  //           severity: "success",
+  //           message: "訪客登入成功！",
+  //         })
+  //       );
+  //       dispatch(setIsLoggedIn(true));
+  //       router.push("/"); // 導向首頁
+  //     }
+  //   } catch (error) {
+  //     console.error("意外錯誤：", error);
+  //     dispatch(
+  //       setAlert({
+  //         open: true,
+  //         severity: "error",
+  //         message: "發生意外錯誤，請稍後再試。",
+  //       })
+  //     );
+  //   }
+  // };
 
   const labelClasses = "block xs:text-[0.5rem] md:text-lg font-bold";
   const inputClasses =

@@ -1,28 +1,174 @@
 // components/ClientLayout.tsx
 "use client";
-import React, { useCallback } from "react";
+import React, { useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "../store/store";
-import { selectCartItemCount } from "@/store/slice/productSlice";
-import { setShowCart, setShowMember } from "../store/slice/userSlice";
+import { AppDispatch, RootState } from "../store/store";
+import {
+  setIsLoggedIn,
+  setShowCart,
+  setShowMember,
+  clearUserInfo,
+  fetchUserData,
+  initializeUserThunk,
+} from "../store/slice/userSlice";
 import NavLinks from "./NavLinks";
 import CartDropdown from "./CartDropdown";
 import MemberDropdown from "./MemberDropdown";
 import Alert from "@/components/Alert";
+import { supabase } from "@/supabaseClient";
 
 const ClientLayout: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const router = useRouter();
-  const dispatch = useDispatch();
+  const dispatch: AppDispatch = useDispatch();
   const categories = useSelector(
     (state: RootState) => state.products.categories
   );
   const showCart = useSelector((state: RootState) => state.user.showCart);
   const showMember = useSelector((state: RootState) => state.user.showMember);
-  const cartItemCount = useSelector(selectCartItemCount);
   const isLoggedIn = useSelector((state: RootState) => state.user.isLoggedIn);
+  // const userInfo = useSelector((state: RootState) => state.user.userInfo);
+  const cartItemCount = useSelector(
+    (state: RootState) => state.user.cart?.length
+  );
+
+  // 檢查是否需要初始化 & 調用初始化
+  const handleInitialization = useCallback(
+    async (authId: string) => {
+      const cacheKey = `initialized_${authId}`;
+      const isInitialized = localStorage.getItem(cacheKey);
+
+      if (isInitialized) {
+        console.log("該用戶不需再次初始化");
+        return;
+      }
+
+      try {
+        await dispatch(initializeUserThunk(authId)).unwrap();
+        localStorage.setItem(cacheKey, "true");
+      } catch (error) {
+        console.error("初始化用戶數據失敗：", error);
+      }
+    },
+    [dispatch]
+  );
+
+  // 檢查使用者 登入狀態
+  const checkSessionAndInitialize = useCallback(async () => {
+    const { data } = await supabase.auth.getSession();
+    const session = data?.session;
+
+    if (session?.user) {
+      const authId = session.user.id;
+      // 檢查初始化
+      await handleInitialization(authId);
+      dispatch(fetchUserData());
+      dispatch(setIsLoggedIn(true));
+    } else {
+      dispatch(clearUserInfo());
+      dispatch(setIsLoggedIn(false));
+    }
+  }, [dispatch, handleInitialization]);
+
+  useEffect(() => {
+    checkSessionAndInitialize();
+
+    const { data: subscription } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (event === "SIGNED_IN" && session?.user) {
+          const authId = session.user.id;
+          await handleInitialization(authId);
+          dispatch(fetchUserData());
+          dispatch(setIsLoggedIn(true));
+        } else if (event === "SIGNED_OUT") {
+          dispatch(clearUserInfo());
+          dispatch(setIsLoggedIn(false));
+        }
+      }
+    );
+
+    return () => {
+      subscription?.subscription.unsubscribe();
+    };
+  }, [dispatch, checkSessionAndInitialize, handleInitialization]);
+
+  // // 檢查使用者登入狀態 & 獲取使用者數據
+  // useEffect(() => {
+  //   const checkSessionAndInitialize = async () => {
+  //     const { data } = await supabase.auth.getSession();
+  //     const session = data?.session;
+
+  //     if (session?.user) {
+  //       const authId = session.user.id;
+
+  //       // // 檢查 localStorage 是否已有初始化標記
+  //       // const cacheKey = `initialized_${authId}`;
+  //       // if (!localStorage.getItem(cacheKey)) {
+  //       //   // 如果尚未初始化，執行初始化邏輯
+  //       //   await dispatch(initializeUserThunk(authId)).unwrap();
+  //       // }
+
+  //       // 檢查 localStorage 是否已經初始化過
+  //       const cacheKey = `initialized_${authId}`;
+  //       const isInitialized = localStorage.getItem(cacheKey);
+
+  //       if (isInitialized) {
+  //         console.log("該用戶不需再次初始化");
+  //         return;
+  //       }
+
+  //       try {
+  //         // 如果尚未初始化，執行初始化邏輯
+  //         await dispatch(initializeUserThunk(authId)).unwrap();
+  //         // 初始化成功則 設置 LocalStorage 標記為已初始化
+  //         localStorage.setItem(cacheKey, "true");
+  //       } catch (error) {
+  //         console.error("初始化用戶數據失敗：", error);
+  //       }
+
+  //       // 獲取用戶數據
+  //       dispatch(fetchUserData());
+  //       dispatch(setIsLoggedIn(true));
+  //     } else {
+  //       // 若無會話，清理用戶狀態
+  //       dispatch(clearUserInfo());
+  //       dispatch(setIsLoggedIn(false));
+  //     }
+  //   };
+
+  //   checkSessionAndInitialize();
+
+  //   // 登入 & 登出 事件發生 才會觸發
+  //   const { data: subscription } = supabase.auth.onAuthStateChange(
+  //     (event, session) => {
+  //       if (event === "SIGNED_IN" && session?.user) {
+  //         const authId = session.user.id;
+
+  //         // 檢查 localStorage 並初始化
+  //         const cacheKey = `initialized_${authId}`;
+  //         if (!localStorage.getItem(cacheKey)) {
+  //           dispatch(initializeUserThunk(authId));
+  //         }
+
+  //         // 更新 Redux 狀態
+  //         dispatch(fetchUserData());
+  //         dispatch(setIsLoggedIn(true));
+  //       } else if (event === "SIGNED_OUT") {
+  //         // 清理登出狀態
+  //         dispatch(clearUserInfo());
+  //         dispatch(setIsLoggedIn(false));
+  //       }
+  //     }
+  //   );
+
+  //   return () => {
+  //     subscription?.subscription.unsubscribe();
+  //   };
+  // }, [dispatch]);
+
+  // console.log("userInfo state: ", userInfo);
 
   const handleCartMouseEnter = useCallback(() => {
     dispatch(setShowCart(true));
@@ -47,14 +193,6 @@ const ClientLayout: React.FC<{ children: React.ReactNode }> = ({
       router.push("/login");
     }
   };
-
-  // const handleUserClick = () => {
-  //   if (isLoggedIn) {
-  //     router.push("/member");
-  //   } else {
-  //     router.push("/login");
-  //   }
-  // };
 
   // console.log("alert state內容", alert);
 
@@ -111,7 +249,7 @@ const ClientLayout: React.FC<{ children: React.ReactNode }> = ({
             >
               <path d="M7 18c-.667 0-1.333.667-1.333 1.333S6.333 21 7 21s1.333-.667 1.333-1.333S7.667 18 7 18zm10 0c-.667 0-1.333.667-1.333 1.333S16.333 21 17 21s1.333-.667 1.333-1.333S17.667 18 17 18zm1.917-4.778L21 5.333c.056-.333-.111-.667-.444-.667H6.111L5.222 2.333C5.167 2.222 5.056 2 4.889 2H1.333c-.333 0-.333.444 0 .444H4.111L5.333 6.5l1.222 9.222c.056.333.389.611.722.611h10.667c.333 0 .611-.167.667-.5l1.611-7.444c.056-.333-.167-.611-.5-.611z" />
             </svg>
-            {cartItemCount > 0 && (
+            {cartItemCount && cartItemCount > 0 && (
               <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full px-1">
                 {cartItemCount}
               </span>
@@ -122,7 +260,7 @@ const ClientLayout: React.FC<{ children: React.ReactNode }> = ({
         </div>
 
         {/* User Icon */}
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center relative">
           <button
             // onClick={handleUserClick}
             onMouseEnter={handleMemberMouseEnter}
