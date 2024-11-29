@@ -15,8 +15,10 @@ const MemberDropdown: React.FC = () => {
   const handleLogout = () => {
     localStorage.removeItem("authToken");
     localStorage.removeItem("userInfo");
-    dispatch(logoutUserThunk());
-    router.push("/");
+    dispatch(logoutUserThunk()).unwrap();
+    try {
+      router.push("/");
+    } catch {}
   };
 
   const ulStyled =

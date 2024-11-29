@@ -12,8 +12,9 @@ export interface LoginUserPayload {
   password: string;
 }
 
+// Product 介面
 export interface Product {
-  id: number;
+  id: number; // 是否轉換成string
   title: string;
   image: string;
   price: number;
@@ -30,13 +31,17 @@ export interface Product {
 
 // 購物車
 export interface CartItem {
-  id: string;
-  image: string;
-  title: string;
-  price: number;
-  quantity: number;
-  color: string;
-  size: string;
+  id: string; // 對應資料庫的 id
+  user_id: string; // 對應資料庫的 user_id
+  product_id: string; // 對應資料庫的 product_id
+  product_image: string; // 對應資料庫的 product_image
+  product_name: string; // 對應資料庫的 product_name
+  product_price: number; // 對應資料庫的 product_price
+  color: string; // 對應資料庫的 color
+  size: string; // 對應資料庫的 size
+  quantity: number; // 對應資料庫的 quantity
+  added_at: string; // 對應資料庫的 added_at，日期型別
+  updated_at: string; // 對應資料庫的 updated_at，日期型別
 }
 
 export interface Address {
@@ -82,7 +87,9 @@ export interface UserState {
   isLoggedIn: boolean;
   // isInitialized:boolean;
   userInfo: UserInfo | null;
-  cart?: CartItem[];
+  cart: CartItem[] | [];
+  selectedItems: CartItem[] | [];
+  shippingCost: number;
   ordersHistory?: OrderItem[];
   alert: AlertState;
   showCart: boolean;

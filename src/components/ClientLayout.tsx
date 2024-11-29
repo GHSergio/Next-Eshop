@@ -10,6 +10,7 @@ import {
   setShowMember,
   clearUserInfo,
   fetchUserData,
+  fetchCartThunk,
   initializeUserThunk,
 } from "../store/slice/userSlice";
 import NavLinks from "./NavLinks";
@@ -65,6 +66,7 @@ const ClientLayout: React.FC<{ children: React.ReactNode }> = ({
       // 檢查初始化
       await handleInitialization(authId);
       dispatch(fetchUserData());
+      dispatch(fetchCartThunk(authId));
       dispatch(setIsLoggedIn(true));
     } else {
       dispatch(clearUserInfo());
@@ -81,6 +83,7 @@ const ClientLayout: React.FC<{ children: React.ReactNode }> = ({
           const authId = session.user.id;
           await handleInitialization(authId);
           dispatch(fetchUserData());
+          dispatch(fetchCartThunk(authId));
           dispatch(setIsLoggedIn(true));
         } else if (event === "SIGNED_OUT") {
           dispatch(clearUserInfo());

@@ -1,26 +1,26 @@
 // src/app/cart/CartPage.tsx
 "use client";
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import CartSummary from "../../components/cartStep/CartSummary";
-import ShippingInformation from "../../components/cartStep/ShippingInformation";
-import PaymentDetails from "../../components/cartStep/PaymentDetails";
-import ReviewOrder from "../../components/cartStep/ReviewOrder";
-import { useDispatch } from "react-redux";
-import { clearCart } from "../../store/slice/productSlice";
+import CartSummary from "@/components/cartStep/CartSummary";
+import DeliveryAndPayment from "@/components/cartStep/DeliveryAndPayment";
+import ShippingInformation from "@/components/cartStep/ShippingInformation";
+import PaymentDetails from "@/components/cartStep/PaymentDetails";
+import ReviewOrder from "@/components/cartStep/ReviewOrder";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store/store";
 import { useRouter } from "next/navigation";
-import {
-  PaymentInfo,
-  ShippingInfo,
-  Errors,
-  SelectedItem,
-} from "@/components/cartStep/types";
+import { PaymentInfo, ShippingInfo, Errors } from "@/components/cartStep/types";
+// import { CartItem } from "@/store/slice/types";
+import { clearCart } from "@/store/slice/userSlice";
 
-const steps = ["確認購物車", "運送資訊", "付費方式", "確認訂單"];
+const steps = ["確認購物車", "付費方式&運送資訊", "填寫資料", "確認訂單"];
 
 const CartPage: React.FC = () => {
+  const selectedItems = useSelector(
+    (state: RootState) => state.user.selectedItems
+  );
   const [activeStep, setActiveStep] = useState(0);
-  const [selectAll, setSelectAll] = useState(false);
-  const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([]);
+
   const [shippingInfo, setShippingInfo] = useState<ShippingInfo>({
     fullName: "",
     phone: "",
@@ -52,7 +52,7 @@ const CartPage: React.FC = () => {
   const [submitted, setSubmitted] = useState(false);
 
   const router = useRouter();
-  const dispatch = useDispatch();
+  const dispatch: AppDispatch = useDispatch();
 
   const validateShippingInfo = useCallback((): boolean => {
     const newErrors = {
@@ -101,35 +101,26 @@ const CartPage: React.FC = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
 
-  const handleClearCart = useCallback(() => {
-    dispatch(clearCart());
-  }, [dispatch]);
-
   // 渲染內容
   const renderStepContent = useCallback(
     (step: number) => {
       switch (step) {
         case 0:
-          return (
-            <CartSummary
-              selectAll={selectAll}
-              setSelectAll={setSelectAll}
-              selectedItems={selectedItems}
-              setSelectedItems={setSelectedItems}
-            />
-          );
+          return <CartSummary />;
         case 1:
-          return (
-            <ShippingInformation
-              onInfoChange={setShippingInfo}
-              shippingInfo={shippingInfo}
-              submitted={submitted}
-              errors={errors.shipping}
-              setErrors={(newErrors) =>
-                setErrors((prev) => ({ ...prev, shipping: newErrors }))
-              }
-            />
-          );
+          return <DeliveryAndPayment />;
+        // return (
+        //   <ShippingInformation
+        //     onInfoChange={setShippingInfo}
+        //     shippingInfo={shippingInfo}
+        //     submitted={submitted}
+        //     errors={errors.shipping}
+        //     setErrors={(newErrors) =>
+        //       setErrors((prev) => ({ ...prev, shipping: newErrors }))
+        //     }
+        //   />
+        // );
+
         case 2:
           return (
             <PaymentDetails
@@ -147,7 +138,7 @@ const CartPage: React.FC = () => {
             <ReviewOrder
               paymentInfo={paymentInfo}
               shippingInfo={shippingInfo}
-              selectedItems={selectedItems}
+              // selectedItems={selectedItems}
             />
           );
         default:
@@ -155,7 +146,7 @@ const CartPage: React.FC = () => {
             <div className="text-center mt-4">
               <h2 className="text-xl mb-2">成功完成訂單流程！</h2>
               <button
-                onClick={handleClearCart}
+                onClick={() => clearCart()}
                 className="bg-blue-500 text-white px-4 py-2 rounded-md"
               >
                 返回主頁面
@@ -166,46 +157,30 @@ const CartPage: React.FC = () => {
     },
     [
       errors.payment,
-      errors.shipping,
-      handleClearCart,
+      // errors.shipping,
       paymentInfo,
-      selectAll,
-      selectedItems,
       shippingInfo,
       submitted,
     ]
   );
-  // const renderStepContent = () => {
-  //   return (
-  //     <ReviewOrder paymentInfo={paymentInfo} shippingInfo={shippingInfo} />
-  //   );
-  // };
 
   const stepContent = useMemo(
     () => renderStepContent(activeStep),
-    [
-      activeStep,
-      // selectedItems,
-      // shippingInfo,
-      // paymentInfo,
-      // errors,
-      // submitted,
-      renderStepContent,
-    ]
+    [activeStep, renderStepContent]
   );
 
   useEffect(() => {
     if (activeStep === steps.length) {
-      handleClearCart();
+      dispatch(clearCart());
       const timer = setTimeout(() => {
         router.push("/");
       }, 2000);
 
       return () => clearTimeout(timer);
     }
-  }, [activeStep, handleClearCart, router]);
+  }, [activeStep, router, dispatch]);
 
-  console.log("選擇的商品: ", selectedItems);
+  // console.log("選擇的商品: ", selectedItems);
   return (
     <div className="max-w-4xl mx-auto xs:p-2 md:p-4">
       {/* 步驟流程 - 顯示在流程內容上方 */}

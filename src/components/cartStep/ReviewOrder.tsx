@@ -1,26 +1,35 @@
 import React, { useMemo } from "react";
-// import { useSelector } from "react-redux";
-// import { RootState } from "../../store/store";
 import Image from "next/image";
-import { ShippingInfo, PaymentInfo, SelectedItem } from "./types";
+import { ShippingInfo, PaymentInfo } from "./types";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
+// import { CartItem } from "@/store/slice/types";
+// import CartFooter from "./CartFooter";
 
 interface ReviewOrderProps {
   shippingInfo: ShippingInfo;
   paymentInfo: PaymentInfo;
-  selectedItems: SelectedItem[];
 }
 
 const ReviewOrder: React.FC<ReviewOrderProps> = ({
   shippingInfo,
   paymentInfo,
-  selectedItems,
 }) => {
+  const selectedItems = useSelector(
+    (state: RootState) => state.user.selectedItems
+  );
+  const shippingCost = useSelector(
+    (state: RootState) => state.user.shippingCost
+  );
   const totalAmount = useMemo(() => {
     return selectedItems.reduce(
-      (total, item) => total + Math.floor(item.price * item.quantity),
+      (total, item) => total + Math.floor(item.product_price * item.quantity),
       0
     );
   }, [selectedItems]);
+
+  const discount = totalAmount > 1000 ? shippingCost : 0;
+  const finalTotal = totalAmount + shippingCost - discount;
 
   const commonTextClasses = () => "xs:text-xs md:text-sm";
 
@@ -63,10 +72,10 @@ const ReviewOrder: React.FC<ReviewOrderProps> = ({
           >
             {/* 商品名稱及顏色/尺寸 */}
             <div
-              className={`xs:col-start-1 xs:row-start-1 xs:row-span-1 xs:col-span-2 md:col-span-4 md:col-start-auto md:row-start-auto md:col-span-auto md:row-span-auto flex flex-col justify-center`}
+              className={`w-[100px] xs:col-start-1 xs:row-start-1 xs:row-span-1 xs:col-span-2 md:col-span-4 md:col-start-auto md:row-start-auto md:col-span-auto md:row-span-auto flex flex-col justify-center`}
             >
               <span className="font-semibold text-textColor truncate xs:text-[0.5rem] md:text-sm">
-                {item.title}
+                {item.product_name}
               </span>
               <span className="text-xs text-textColor xs:text-[0.5rem] md:text-sm">
                 {item.color || "N/A"} - {item.size || "N/A"}
@@ -78,8 +87,8 @@ const ReviewOrder: React.FC<ReviewOrderProps> = ({
               className={`xs:col-start-1 xs:row-start-2 xs:row-span-3 xs:col-span-2 md:col-span-2 md:col-start-auto md:row-start-auto md:col-span-auto md:row-span-auto`}
             >
               <Image
-                src={item.image}
-                alt={item.title}
+                src={item.product_image || "/path/to/default-image.jpg"}
+                alt={item.product_name || "Image"}
                 width={80}
                 height={80}
                 className="object-contain h-16 w-16 sm:h-20 sm:w-20"
@@ -95,7 +104,7 @@ const ReviewOrder: React.FC<ReviewOrderProps> = ({
             <span
               className={`xs:col-start-4 xs:row-start-2 xs:row-span-1 xs:col-span-1 md:col-span-2 ${commonSpanClasses()}`}
             >
-              $ {item.price}
+              $ {item.product_price}
             </span>
 
             {/* 數量 */}
@@ -119,7 +128,7 @@ const ReviewOrder: React.FC<ReviewOrderProps> = ({
             <span
               className={`xs:col-start-4 xs:row-start-4 xs:row-span-1 xs:col-span-1 md:col-span-2 ${commonSpanClasses()}`}
             >
-              $ {Math.floor(item.price * item.quantity)}
+              $ {Math.floor(item.product_price * item.quantity)}
             </span>
           </div>
         ))}
@@ -128,6 +137,7 @@ const ReviewOrder: React.FC<ReviewOrderProps> = ({
       <div className="mt-6 text-right">
         <h3 className="xs:text-[0.8rem] md:text-lg font-bold text-textColor">
           總計: ${totalAmount}
+          總計: ${finalTotal}
         </h3>
       </div>
     </div>

@@ -1,10 +1,9 @@
 "use client";
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../store/store";
-import { selectCartItemCount } from "../store/slice/productSlice";
 import { setShowCart, setShowMember } from "../store/slice/userSlice";
 import CartDropdown from "./CartDropdown";
 import MemberDropdown from "./MemberDropdown";
@@ -18,8 +17,13 @@ const NavBar: React.FC = () => {
   );
   const showCart = useSelector((state: RootState) => state.user.showCart);
   const showMember = useSelector((state: RootState) => state.user.showMember);
-  const cartItemCount = useSelector(selectCartItemCount);
+  // const cartItemCount = useSelector(selectCartItemCount);
   const isLoggedIn = useSelector((state: RootState) => state.user.isLoggedIn);
+  const cart = useSelector((state: RootState) => state.user.cart);
+
+  const totalItems = useMemo(() => {
+    return cart && cart.reduce((sum, item) => sum + item.quantity, 0);
+  }, [cart]);
 
   const handleCartMouseEnter = useCallback(() => {
     dispatch(setShowCart(true));
@@ -85,9 +89,9 @@ const NavBar: React.FC = () => {
                   <path d="M7 18c-.667 0-1.333.667-1.333 1.333S6.333 21 7 21s1.333-.667 1.333-1.333S7.667 18 7 18zm10 0c-.667 0-1.333.667-1.333 1.333S16.333 21 17 21s1.333-.667 1.333-1.333S17.667 18 17 18zm1.917-4.778L21 5.333c.056-.333-.111-.667-.444-.667H6.111L5.222 2.333C5.167 2.222 5.056 2 4.889 2H1.333c-.333 0-.333.444 0 .444H4.111L5.333 6.5l1.222 9.222c.056.333.389.611.722.611h10.667c.333 0 .611-.167.667-.5l1.611-7.444c.056-.333-.167-.611-.5-.611z" />
                 </svg>
                 {/* 購物車有物品時 */}
-                {cartItemCount > 0 && (
+                {cart && cart.length > 0 && (
                   <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full px-1">
-                    {cartItemCount}
+                    {totalItems}
                   </span>
                 )}
               </button>
@@ -100,10 +104,7 @@ const NavBar: React.FC = () => {
               onMouseEnter={handleMemberMouseEnter}
               onMouseLeave={handleMemberMouseLeave}
             >
-              <button
-                className="focus:outline-none p-1"
-                // onClick={handleUserClick}
-              >
+              <button className="focus:outline-none p-1">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="currentColor"

@@ -31,12 +31,12 @@ export interface Errors {
   };
 }
 
-export interface SelectedItem {
-  id: string;
-  title: string;
-  image: string;
-  color: string;
-  size: string;
-  quantity: number;
-  price: number;
-}
+// export interface SelectedItem {
+//   id: string;
+//   name: string;
+//   image: string;
+//   price: number;
+//   color: string;
+//   size: string;
+//   quantity: number;
+// }

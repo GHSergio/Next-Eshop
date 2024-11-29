@@ -19,6 +19,8 @@ const initialState: UserState = {
   // isInitialized: false,
   userInfo: null,
   cart: [],
+  selectedItems: [],
+  shippingCost: 0,
   ordersHistory: [],
   alert: {
     open: false,
@@ -55,9 +57,12 @@ export const loginUserThunk = createAsyncThunk<
   void,
   { email: string; password: string },
   { rejectValue: RejectValue }
->("user/loginUser", async ({email,password}, { rejectWithValue }) => {
+>("user/loginUser", async ({ email, password }, { rejectWithValue }) => {
   try {
-    const { error } = await supabase.auth.signInWithPassword({email,password});
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
     // console.log(error?.message);
 
     if (error) {
@@ -78,7 +83,7 @@ export const loginUserThunk = createAsyncThunk<
         severity: "error",
       });
     }
-  
+
     // 登入成功的處理
     // SDK會自動setItem 所以只設置通知
     return;
@@ -92,7 +97,6 @@ export const loginUserThunk = createAsyncThunk<
   }
 });
 
-
 export const loginWithGoogleThunk = createAsyncThunk<
   void,
   void,
@@ -100,19 +104,22 @@ export const loginWithGoogleThunk = createAsyncThunk<
 >("user/loginWithGoogle", async (_, { rejectWithValue }) => {
   try {
     // 啟動 Google OAuth 流程
-    const { error } = await supabase.auth.signInWithOAuth({ provider: "google" });
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+    });
 
     if (error) {
       console.error("Google 登入失敗：", error.message);
       return rejectWithValue({ message: error.message, severity: "error" });
     }
-   
   } catch (error) {
     console.error("Google 登入失敗：", error);
-    return rejectWithValue({ message: "Google 登入失敗，請稍後再試。", severity: "error" });
+    return rejectWithValue({
+      message: "Google 登入失敗，請稍後再試。",
+      severity: "error",
+    });
   }
 });
-
 
 // 定義初始化用戶數據的 thunk
 export const initializeUserThunk = createAsyncThunk<
@@ -140,10 +147,10 @@ export const initializeUserThunk = createAsyncThunk<
         membership_type: "普通會員",
         username: "",
         avatar_url: "",
-        phone:null,
+        phone: null,
         address: null,
-        preferred_payment_method:  null,
-        default_shipping_address:  null,
+        preferred_payment_method: null,
+        default_shipping_address: null,
       });
 
       if (insertError) {
@@ -156,8 +163,7 @@ export const initializeUserThunk = createAsyncThunk<
       // table數據已存在，
       console.log("用戶數據已存在，跳過初始化");
     }
-
-  } catch (error:unknown) {
+  } catch (error: unknown) {
     console.error("初始化用戶數據時發生錯誤：", error);
     return rejectWithValue("初始化用戶數據時發生錯誤");
   }
@@ -181,6 +187,7 @@ export const logoutUserThunk = createAsyncThunk<
     localStorage.clear();
     // 重置 Redux 狀態
     dispatch(clearUserInfo());
+    dispatch(clearCart());
   } catch (error: unknown) {
     console.log(error);
     return rejectWithValue({
@@ -190,7 +197,7 @@ export const logoutUserThunk = createAsyncThunk<
   }
 });
 
-// fetchUserProfile
+// 獲取用戶 DB 資訊
 export const fetchUserData = createAsyncThunk<
   UserInfo,
   void,
@@ -258,6 +265,113 @@ export const fetchUserData = createAsyncThunk<
   }
 });
 
+// 獲取用戶 DB 購物車數據
+export const fetchCartThunk = createAsyncThunk<
+  CartItem[], // 返回的數據類型
+  string, // 傳入的用戶 ID
+  { rejectValue: string }
+>("cart/fetchCart", async (authId, { rejectWithValue }) => {
+  try {
+    const { data, error } = await supabase
+      .from("cart_items")
+      .select("*")
+      .eq("user_id", authId);
+
+    if (error) {
+      return rejectWithValue("獲取購物車數據失敗：" + error.message);
+    }
+    // 更新本地存儲
+    localStorage.setItem("cart", JSON.stringify(data || []));
+    return (data as CartItem[]) || [];
+  } catch (error) {
+    console.error("獲取購物車數據時發生錯誤：", error);
+    return rejectWithValue("獲取購物車數據時發生未知錯誤");
+  }
+});
+
+// 添加購物車項目
+export const addToCartThunk = createAsyncThunk<
+  CartItem, // 返回類型
+  CartItem, // 接收的完整商品數據
+  { rejectValue: string }
+>("cart/addToCart", async (cartItem, { rejectWithValue }) => {
+  try {
+    const { data, error } = await supabase
+      .from("cart_items")
+      .insert({
+        user_id: cartItem.user_id,
+        product_id: cartItem.product_id,
+        product_name: cartItem.product_name,
+        product_price: cartItem.product_price,
+        product_image: cartItem.product_image,
+        color: cartItem.color,
+        size: cartItem.size,
+        quantity: cartItem.quantity,
+        added_at: new Date().toISOString(),
+      })
+      .select("*")
+      .single();
+
+    if (error) {
+      return rejectWithValue("添加到購物車失敗：" + error.message);
+    }
+
+    return data as CartItem;
+  } catch (error) {
+    console.error("添加購物車項目時發生錯誤：", error);
+    return rejectWithValue("添加購物車時發生未知錯誤");
+  }
+});
+
+// 更新購物車數據
+export const updateCartItemThunk = createAsyncThunk<
+  CartItem, // 返回的數據類型
+  Partial<CartItem> & { id: string }, // 傳入的更新數據類型
+  { rejectValue: string }
+>("cart/updateCartItem", async (updatedItem, { rejectWithValue }) => {
+  try {
+    const { id, ...updateData } = updatedItem;
+    const { data, error } = await supabase
+      .from("cart_items")
+      .update(updateData) // 之後可能可以更改 尺寸/顏色?
+      .eq("id", id)
+      .select("*")
+      .single();
+
+    if (error) {
+      return rejectWithValue("更新購物車項目失敗：" + error.message);
+    }
+
+    return data as CartItem;
+  } catch (error) {
+    console.error("更新購物車項目時發生錯誤：", error);
+    return rejectWithValue("更新購物車項目時發生未知錯誤");
+  }
+});
+
+// 刪除購物車項目
+export const deleteCartItemThunk = createAsyncThunk<
+  string, // 返回刪除的項目 ID
+  string, // 傳入的項目 ID
+  { rejectValue: string }
+>("cart/deleteCartItem", async (cartItemId, { rejectWithValue }) => {
+  try {
+    const { error } = await supabase
+      .from("cart_items")
+      .delete()
+      .eq("id", cartItemId);
+
+    if (error) {
+      return rejectWithValue("刪除購物車項目失敗：" + error.message);
+    }
+
+    return cartItemId; // 返回已刪除的項目 ID
+  } catch (error) {
+    console.error("刪除購物車項目時發生錯誤：", error);
+    return rejectWithValue("刪除購物車項目時發生未知錯誤");
+  }
+});
+
 // 格式化 axios errorResponse
 // export const formatErrorResponse = (error: unknown) => {
 //   if (axios.isAxiosError(error) && error.response) {
@@ -304,44 +418,18 @@ const userSlice = createSlice({
     setIsLoggedIn(state, action: PayloadAction<boolean>) {
       state.isLoggedIn = action.payload;
     },
-    // // 登出，清除所有使用者相關資訊
-    // logout(state) {
-    //   state.userInfo = null;
-    //   // state.isLoggedIn = false;
-    //   // state.cart = [];
-    //   // state.ordersHistory = [];
-    //   localStorage.clear();
-    // },
-    // 添加商品至購物車
-    addToCart(state, action: PayloadAction<CartItem>) {
-      const item = action.payload;
-      const existingItem = state.cart.find(
-        (cartItem) => cartItem.id === item.id
-      );
-      if (existingItem) {
-        existingItem.quantity += item.quantity;
-      } else {
-        state.cart.push(item);
-      }
+
+    // 選中商品
+    setSelectedItems(state, action: PayloadAction<CartItem[]>) {
+      state.selectedItems = action.payload;
     },
-    // 從購物車移除商品
-    removeFromCart(state, action: PayloadAction<string>) {
-      state.cart = state.cart.filter((item) => item.id !== action.payload);
-    },
-    // 更新購物車中的商品數量
-    updateCartQuantity(
-      state,
-      action: PayloadAction<{ id: string; quantity: number }>
-    ) {
-      const { id, quantity } = action.payload;
-      const item = state.cart.find((cartItem) => cartItem.id === id);
-      if (item && quantity > 0) {
-        item.quantity = quantity;
-      }
+    // 運費
+    setShippingCost(state, action: PayloadAction<number>) {
+      state.shippingCost = action.payload;
     },
     // 新增訂單
     addOrder(state, action: PayloadAction<OrderItem>) {
-      state.ordersHistory.push(action.payload);
+      state.ordersHistory?.push(action.payload);
       state.cart = []; // 清空購物車
     },
     // Alert
@@ -363,12 +451,16 @@ const userSlice = createSlice({
     clearUserInfo(state) {
       state.userInfo = null;
     },
+    // 清除 使用者購物車紀錄
+    clearCart(state) {
+      state.cart = [];
+    },
   },
   extraReducers: (builder) => {
     // 一般 & 遊客 登入
     builder
       .addCase(loginUserThunk.fulfilled, (state) => {
-        state.isLoggedIn = true
+        state.isLoggedIn = true;
         setAlertState(state, "success", "用戶登入成功！");
       })
       .addCase(loginUserThunk.rejected, (state, action) => {
@@ -378,16 +470,16 @@ const userSlice = createSlice({
       });
     // Google 登入
     builder
-      .addCase(loginWithGoogleThunk.fulfilled, (state, action) => {                
+      .addCase(loginWithGoogleThunk.fulfilled, (state, action) => {
         console.log(action.payload);
-        state.isLoggedIn = true
+        state.isLoggedIn = true;
         setAlertState(state, "success", "用戶登入成功！");
       })
       .addCase(loginWithGoogleThunk.rejected, (state, action) => {
         console.log("rejected 收到什麼:", action.payload);
-        const { message, severity } = action.payload as RejectValue; 
+        const { message, severity } = action.payload as RejectValue;
         setAlertState(state, severity, message);
-      });     
+      });
     // 登出
     builder
       .addCase(logoutUserThunk.fulfilled, (state) => {
@@ -409,6 +501,66 @@ const userSlice = createSlice({
         const { message, severity } = action.payload as RejectValue;
         setAlertState(state, severity, message);
       });
+    // 添加購物車項目
+    builder
+      .addCase(addToCartThunk.fulfilled, (state, action) => {
+        state.cart = [...state.cart, action.payload];
+      })
+      .addCase(addToCartThunk.rejected, (state, action) => {
+        // setAlertState(state, "error", "購物車商品添加失敗！");
+        console.log("action", action.payload);
+      });
+
+    // 獲取購物車項目
+    builder
+      .addCase(fetchCartThunk.fulfilled, (state, action) => {
+        console.log("購物車資訊", action.payload);
+        state.cart = action.payload;
+      })
+      .addCase(fetchCartThunk.rejected, (_, action) => {
+        console.log("action", action.payload);
+        // setAlertState(state, "error", "購物車商品獲取失敗！");
+      });
+
+    // 更新購物車項目 && 也要更新被選中的商品 -> CartFooter是根據SelectedItems狀態變動
+    builder
+      .addCase(updateCartItemThunk.fulfilled, (state, action) => {
+        if (state.cart) {
+          const index = state.cart.findIndex(
+            (item) => item.id === action.payload.id
+          );
+
+          // 更新 cart 中的項目
+          if (index !== -1) {
+            state.cart[index] = action.payload;
+          }
+
+          // 同步更新 selectedItems 中的項目
+          const selectedIndex = state.selectedItems.findIndex(
+            (item) => item.id === action.payload.id
+          );
+
+          if (selectedIndex !== -1) {
+            state.selectedItems[selectedIndex] = action.payload;
+          }
+          setAlertState(state, "success", "更改成功！");
+        }
+      })
+      .addCase(updateCartItemThunk.rejected, (state, action) => {
+        // setAlertState(state, "error", "購物車商品更新失敗！");
+        console.log("action", action.payload);
+      });
+
+    // 刪除購物車項目
+    builder
+      .addCase(deleteCartItemThunk.fulfilled, (state, action) => {
+        state.cart = state.cart?.filter((item) => item.id !== action.payload);
+        setAlertState(state, "success", "移除商品成功！");
+      })
+      .addCase(deleteCartItemThunk.rejected, (state, action) => {
+        console.log("action", action.payload);
+        setAlertState(state, "error", "購物車商品移除失敗！");
+      });
   },
 });
 
@@ -416,9 +568,9 @@ export const {
   setUser,
   setIsLoggedIn,
   clearUserInfo,
-  addToCart,
-  removeFromCart,
-  updateCartQuantity,
+  clearCart,
+  setSelectedItems,
+  setShippingCost,
   addOrder,
   setAlert,
   clearAlert,

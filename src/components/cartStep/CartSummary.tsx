@@ -1,103 +1,58 @@
 "use client";
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "../../store/store";
+import { AppDispatch, RootState } from "@/store/store";
 import {
-  removeFromCart,
-  updateCartItemQuantity,
-} from "../../store/slice/productSlice";
-import Image from "next/image";
-import { SelectedItem } from "./types";
-
-interface CartSummaryProps {
-  selectAll: boolean;
-  setSelectAll: (value: boolean) => void;
-  selectedItems: SelectedItem[];
-  setSelectedItems: (items: SelectedItem[]) => void;
-}
-
-const CartSummary: React.FC<CartSummaryProps> = ({
-  selectAll,
-  setSelectAll,
-  selectedItems,
+  updateCartItemThunk,
+  deleteCartItemThunk,
   setSelectedItems,
-}) => {
-  const dispatch = useDispatch();
-  const cart = useSelector((state: RootState) => state.products.cart);
+} from "@/store/slice/userSlice";
+import Image from "next/image";
+import { CartItem } from "@/store/slice/types";
+import CartFooter from "./CartFooter";
 
-  // 購物車的商品
-  const cartItems = useMemo(
-    () =>
-      cart.map((item) => ({
-        id: item.id,
-        title: item.title,
-        image: item.image,
-        color: item.color,
-        size: item.size,
-        quantity: item.quantity,
-        price: item.price,
-      })),
-    [cart]
+const CartSummary = () => {
+  const dispatch: AppDispatch = useDispatch();
+  const cart = useSelector((state: RootState) => state.user.cart || []);
+  const selectedItems = useSelector(
+    (state: RootState) => state.user.selectedItems
   );
 
   // 判斷商品是否被選中
   const isItemSelected = useCallback(
-    (id: string, color: string, size: string) =>
-      selectedItems.some(
-        (item) => item.id === id && item.color === color && item.size === size
-      ),
+    (id: string) => selectedItems.some((item) => item.id === id),
     [selectedItems]
   );
 
-  // 清空/全選 Cart 中的所有項目
+  // 判斷是否Cart內商品 全被選中
+  const allItemsSelected =
+    selectedItems.length === cart.length && cart.length > 0;
+
   const handleSelectAll = useCallback(() => {
-    setSelectAll(!selectAll);
-    setSelectedItems(selectAll ? [] : cartItems);
-  }, [selectAll, setSelectAll, setSelectedItems, cartItems]);
+    const updatedItems = allItemsSelected ? [] : cart; // 全選或取消全選
+    dispatch(setSelectedItems(updatedItems));
+  }, [cart, allItemsSelected, dispatch]);
 
   // 處理單個商品選擇
-  // const handleSelectItem = useCallback(
-  //   (id: string, color: string, size: string) => {
-  //     const isSelected = isItemSelected(id, color, size);
-  //     setSelectedItems(
-  //       isSelected
-  //         ? selectedItems.filter(
-  //             (item: SelectedItem) =>
-  //               !(item.id === id && item.color === color && item.size === size)
-  //           )
-  //         : [
-  //             ...selectedItems,
-  //             {
-  //               id: item.id,
-  //               title: item.title,
-  //               image: item.image,
-  //               color: item.color,
-  //               size: item.size,
-  //               quantity: item.quantity,
-  //               price: item.price,
-  //             },
-  //           ]
-  //     );
-  //   },
-  //   [isItemSelected, selectedItems, setSelectedItems]
-  // );
   const handleSelectItem = useCallback(
-    (item: SelectedItem) => {
-      const isSelected = isItemSelected(item.id, item.color, item.size);
-      setSelectedItems(
-        isSelected
-          ? selectedItems.filter(
-              (selectedItem) =>
-                !(
-                  selectedItem.id === item.id &&
-                  selectedItem.color === item.color &&
-                  selectedItem.size === item.size
-                )
-            )
-          : [...selectedItems, item]
-      );
+    (item: CartItem) => {
+      const isSelected = isItemSelected(item.id);
+      const updatedItems = isSelected
+        ? selectedItems.filter((i) => i.id !== item.id)
+        : [...selectedItems, item];
+      dispatch(setSelectedItems(updatedItems));
     },
-    [isItemSelected, selectedItems, setSelectedItems]
+    [selectedItems, dispatch, isItemSelected]
+  );
+
+  // 改變商品數量;
+  const handleQuantityChange = useCallback(
+    async (item: CartItem, newQuantity: number) => {
+      if (newQuantity > 0) {
+        await dispatch(updateCartItemThunk({ ...item, quantity: newQuantity }));
+      }
+    },
+    [dispatch]
   );
 
   //單個商品總額
@@ -105,57 +60,6 @@ const CartSummary: React.FC<CartSummaryProps> = ({
     return (price * quantity).toFixed(2);
   };
 
-  // 改變商品數量
-  // const handleQuantityChange = useCallback(
-  //   (id: string, color: string, size: string, newQuantity: number) => {
-  //     if (newQuantity > 0) {
-  //       dispatch(
-  //         updateCartItemQuantity({ id, color, size, quantity: newQuantity })
-  //       );
-  //     }
-  //   },
-  //   [dispatch]
-  // );
-  const handleQuantityChange = useCallback(
-    (id: string, color: string, size: string, newQuantity: number) => {
-      if (newQuantity > 0) {
-        dispatch(
-          updateCartItemQuantity({ id, color, size, quantity: newQuantity })
-        );
-        setSelectedItems(
-          selectedItems.map((item) =>
-            item.id === id && item.color === color && item.size === size
-              ? { ...item, quantity: newQuantity }
-              : item
-          )
-        );
-      }
-    },
-    [dispatch, setSelectedItems, selectedItems]
-  );
-
-  // 計算總金額
-  const calculateTotal = useMemo(
-    () =>
-      cart
-        .filter((item) => isItemSelected(item.id, item.color, item.size))
-        .reduce((total, item) => total + item.price * item.quantity, 0),
-    [cart, isItemSelected]
-  );
-
-  // 計算總數量
-  const calculateItemsCount = useMemo(
-    () =>
-      cart
-        .filter((item) => isItemSelected(item.id, item.color, item.size))
-        .reduce((count, item) => count + item.quantity, 0),
-    [cart, isItemSelected]
-  );
-
-  const totalAmount = Math.floor(calculateTotal);
-  const shippingCost = 2;
-  const discount = totalAmount > 30 ? shippingCost : 0;
-  const finalTotal = totalAmount + shippingCost - discount;
   // console.log(cart);
   // console.log(cartItems);
   return (
@@ -164,7 +68,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({
       <div className="flex items-center mb-2">
         <input
           type="checkbox"
-          checked={selectAll}
+          // checked={selectAll}
           onChange={handleSelectAll}
           className="xs:h-3 xs:w-3 md:h-4 md:w-4 rounded"
         />
@@ -179,7 +83,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({
           <div
             key={item.id}
             className={`grid xs:grid-cols-5 xs:grid-rows-4 md:grid-cols-12 md:grid-rows-1 items-center p-2 rounded-lg relative ${
-              isItemSelected(item.id, item.color, item.size)
+              isItemSelected(item.id)
                 ? "border-2 border-borderChecked"
                 : "border border-gray-300"
             }`}
@@ -202,11 +106,12 @@ const CartSummary: React.FC<CartSummaryProps> = ({
             {/* Product Image */}
             <div className="xs:col-start-1 xs:row-start-2 xs:row-span-2 xs:col-span-2 md:col-span-2 md:col-start-auto md:row-start-auto">
               <Image
-                src={item.image}
-                alt={item.title}
+                src={item.product_image}
+                alt={item.product_name}
                 width="300"
                 height="200"
                 className="object-contain h-16 w-16 sm:h-20 sm:w-20"
+                priority // 優化圖片的加載 提高LCP性能
               />
             </div>
 
@@ -214,9 +119,9 @@ const CartSummary: React.FC<CartSummaryProps> = ({
             <div className="xs:col-start-3 xs:row-start-2 xs:row-span-2 xs:col-span-2 md:col-span-4 md:col-start-auto md:row-start-auto flex flex-col justify-center ">
               <h4
                 className="xs:text-[0.8rem] md:text-lg font-semibold truncate"
-                title={item.title}
+                title={item.product_name}
               >
-                {item.title}
+                {item.product_name}
               </h4>
               <p className="xs:text-[0.6rem] md:text-lg">
                 {item.color || "N/A"} - {item.size || "N/A"}
@@ -227,14 +132,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({
             <div className="xs:col-start-5 xs:row-start-4 xs:col-span-2 md:col-span-3 md:col-start-auto md:row-start-auto flex justify-center items-center xs:gap-1 md:gap-4">
               <button
                 className="xs:p-[0.35rem] md:p-[0.6rem] w-2 h-2 flex justify-center items-center border rounded text-xs"
-                onClick={() =>
-                  handleQuantityChange(
-                    item.id,
-                    item.color,
-                    item.size,
-                    item.quantity - 1
-                  )
-                }
+                onClick={() => handleQuantityChange(item, item.quantity - 1)}
                 disabled={item.quantity <= 1}
               >
                 <span className="xs:text-sm md:text-lg">-</span>
@@ -244,14 +142,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({
               </span>
               <button
                 className="xs:p-[0.35rem] md:p-[0.6rem] w-2 h-2 flex justify-center items-center border rounded text-xs"
-                onClick={() =>
-                  handleQuantityChange(
-                    item.id,
-                    item.color,
-                    item.size,
-                    item.quantity + 1
-                  )
-                }
+                onClick={() => handleQuantityChange(item, item.quantity + 1)}
               >
                 <span className="xs:text-sm md:text-lg">+</span>
               </button>
@@ -259,20 +150,12 @@ const CartSummary: React.FC<CartSummaryProps> = ({
 
             {/* Price */}
             <p className="xs:col-start-3 xs:row-start-4  md:col-span-2 xs:text-[0.5rem] md:text-sm md:col-start-auto md:row-start-auto font-semibold">
-              $ {singleProductTotal(item.price, item.quantity)}
+              $ {singleProductTotal(item.product_price, item.quantity)}
             </p>
 
             {/* Remove Button */}
             <div
-              onClick={() =>
-                dispatch(
-                  removeFromCart({
-                    id: item.id,
-                    color: item.color,
-                    size: item.size,
-                  })
-                )
-              }
+              onClick={() => dispatch(deleteCartItemThunk(item.id))}
               className="absolute top-0 right-2 text-red-500 cursor-pointer"
             >
               <span className="xs:text-xs md:text-xl lg:text-3xl">×</span>
@@ -281,15 +164,8 @@ const CartSummary: React.FC<CartSummaryProps> = ({
         ))}
       </div>
 
-      {/* Footer */}
-      <div className="mt-4 space-y-3 text-right text-sm">
-        <p>共 {calculateItemsCount} 件商品</p>
-        <p>商品金額：${totalAmount}</p>
-        <p>運費：${shippingCost}</p>
-        <p>運費折抵：-${discount}</p>
-        <hr className="my-2" />
-        <h4 className="text-lg font-semibold">小計：${finalTotal}</h4>
-      </div>
+      {/* Footer 顯示數量 總價*/}
+      <CartFooter />
     </div>
   );
 };

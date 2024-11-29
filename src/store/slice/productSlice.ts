@@ -2,7 +2,7 @@ import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import { RootState } from "../store";
 import { fetchAllProducts, fetchAllCategories } from "@/api";
 import { createSelector } from "reselect";
-import { CartItem, ProductState } from "@/store/slice/types";
+import { ProductState } from "@/store/slice/types";
 
 //定義 狀態 初始值
 const initialState: ProductState = {
@@ -11,32 +11,10 @@ const initialState: ProductState = {
   loading: true,
   error: null,
   searchQuery: "",
-  cart: [
-    // {
-    //   color: "Red",
-    //   id: "4-Red-S",
-    //   image: "https://fakestoreapi.com/img/71YXzeOuslL._AC_UY879_.jpg",
-    //   price: 15.99,
-    //   quantity: 4,
-    //   size: "S",
-    //   title: "Mens Casual Slim Fit",
-    // },
-    // {
-    //   color: "Blue",
-    //   id: "4-Blue-S",
-    //   image: "https://fakestoreapi.com/img/71YXzeOuslL._AC_UY879_.jpg",
-    //   price: 15.99,
-    //   quantity: 4,
-    //   size: "S",
-    //   title: "Mens Casual Slim Fit",
-    // },
-  ],
-  showCart: false,
 };
 
 // 定義非同步操作 (Thunk)
 export const fetchProductsAndCategories = createAsyncThunk(
-  // 路徑用來識別這個 Thunk，隨意命名
   "products/fetchProductsAndCategories",
   async () => {
     const [productsData, categoriesData] = await Promise.all([
@@ -53,56 +31,9 @@ const productSlice = createSlice({
   name: "products",
   initialState, // 初始化狀態
   reducers: {
-    addToCart(state, action: PayloadAction<CartItem>) {
-      const item = action.payload;
-      const existingItem = state.cart.find(
-        (cartItem) =>
-          cartItem.id === item.id &&
-          cartItem.color === item.color &&
-          cartItem.size === item.size
-      );
-
-      if (existingItem) {
-        existingItem.quantity += item.quantity;
-      } else {
-        state.cart.push(item);
-      }
-    },
-    removeFromCart(
-      state,
-      action: PayloadAction<{ id: string; color: string; size: string }>
-    ) {
-      const { id, color, size } = action.payload;
-      state.cart = state.cart.filter(
-        (item) => item.id !== id || item.color !== color || item.size !== size
-      );
-    },
-    updateCartItemQuantity(
-      state,
-      action: PayloadAction<{
-        id: string;
-        color: string;
-        size: string;
-        quantity: number;
-      }>
-    ) {
-      const { id, color, size, quantity } = action.payload;
-      const existingItem = state.cart.find(
-        (item) => item.id === id && item.color === color && item.size === size
-      );
-      if (existingItem) {
-        existingItem.quantity = quantity;
-      }
-    },
-    clearCart(state) {
-      state.cart = [];
-    },
     setSearchQuery(state, action: PayloadAction<string>) {
       state.searchQuery = action.payload;
     },
-    // setShowCart(state, action: PayloadAction<boolean>) {
-    //   state.showCart = action.payload;
-    // },
   },
   // 處理 Thunk 狀態變化
   extraReducers: (builder) => {
@@ -124,14 +55,14 @@ const productSlice = createSlice({
 });
 
 // 使用 reselect createSelector 創建記憶化選擇器，優化性能，選擇器會記住上次的計算結果，除非依賴的state改變，否則不會重新計算。 -> 計算購物車中商品的總數量
-export const selectCartItemCount = createSelector(
-  // 依賴的輸入選擇器
-  (state: RootState) => state.products.cart,
-  (cart) => {
-    // 計算邏輯
-    return cart.reduce((total, item) => total + item.quantity, 0);
-  }
-);
+// export const selectCartItemCount = createSelector(
+//   // 依賴的輸入選擇器
+//   (state: RootState) => state.products.cart,
+//   (cart) => {
+//     // 計算邏輯
+//     return cart.reduce((total, item) => total + item.quantity, 0);
+//   }
+// );
 
 // 依照條件filter
 export const selectFilteredProducts = createSelector(
@@ -153,10 +84,10 @@ export const selectFilteredProducts = createSelector(
 
 // 導出 actions 給元件使用
 export const {
-  addToCart,
-  removeFromCart,
-  updateCartItemQuantity,
-  clearCart,
+  // addToCart,
+  // removeFromCart,
+  // updateCartItemQuantity,
+  // clearCart,
   setSearchQuery,
   // setShowCart,
   // openCart,

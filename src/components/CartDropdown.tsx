@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
 
 const CartDropdown: React.FC = () => {
-  const cart = useSelector((state: RootState) => state.products.cart);
+  const cart = useSelector((state: RootState) => state.user.cart);
 
   // 標題樣式
   const headerStyle =
@@ -19,10 +19,10 @@ const CartDropdown: React.FC = () => {
 
   // 根據 cart 資料生成商品項目列表
   const renderedItems = useMemo(() => {
-    return cart.map((item, index) => (
+    return cart?.map((item, index) => (
       <div key={index} className="flex gap-1 mb-2">
-        <div className={`w-1/2 ${cellStyle}`} title={item.title}>
-          {item.title}
+        <div className={`w-1/2 ${cellStyle}`} title={item.product_name}>
+          {item.product_name}
         </div>
         <div className={`w-1/6 ${cellStyle}`}>{item.color || "N/A"}</div>
         <div className={`w-1/6 ${cellStyle}`}>{item.size || "N/A"}</div>

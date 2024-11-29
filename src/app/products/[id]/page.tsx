@@ -1,9 +1,10 @@
 "use client";
 import React, { useEffect, useState, useCallback } from "react";
-import { Product } from "@/store/slice/types";
+import { Product, CartItem } from "@/store/slice/types";
 import { fetchProductById } from "@/api";
-import { useDispatch } from "react-redux";
-import { addToCart } from "@/store/slice/productSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store/store";
+import { addToCartThunk, setAlert } from "@/store/slice/userSlice";
 import Image from "next/image";
 
 interface ProductDetailProps {
@@ -20,8 +21,11 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ params }) => {
   const [selectedColor, setSelectedColor] = useState<string>("");
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [quantity, setQuantity] = useState<number>(1);
-
-  const dispatch = useDispatch();
+  // 從使用者資訊 獲取使用者user_id
+  const userId =
+    useSelector((state: RootState) => state.user.userInfo?.id) ||
+    JSON.parse(localStorage.getItem("userData") || "{}").id;
+  const dispatch: AppDispatch = useDispatch();
 
   useEffect(() => {
     const loadProduct = async () => {
@@ -48,21 +52,37 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ params }) => {
   }, [id]);
 
   const handleAddToCart = useCallback(() => {
-    if (product) {
-      const uniqueId = `${product.id}-${selectedColor}-${selectedSize}`;
+    if (!userId) {
+      // console.error("無法獲取用戶ID，請先登入！");
       dispatch(
-        addToCart({
-          id: uniqueId,
-          title: product.title,
-          price: product.price,
-          quantity,
-          image: product.image,
-          color: selectedColor,
-          size: selectedSize,
+        setAlert({
+          open: true,
+          message: "請先登入，才能添加至購物車",
+          severity: "warning",
         })
       );
+      return;
     }
-  }, [product, quantity, selectedColor, selectedSize, dispatch]);
+
+    if (product && userId) {
+      const cartItem: CartItem = {
+        id: `${product.id}-${selectedColor}-${selectedSize}`, // 用於區分不同的顏色和尺寸
+        user_id: userId, // 確保這裡傳入當前登入用戶的 ID
+        product_id: String(product.id),
+        product_name: product.title,
+        product_price: product.price,
+        product_image: product.image,
+        color: selectedColor,
+        size: selectedSize,
+        quantity,
+        added_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+      console.log("即將添加至購物車的商品:", cartItem);
+      // 將完整數據傳遞給 Thunk
+      dispatch(addToCartThunk(cartItem));
+    }
+  }, [userId, product, selectedColor, selectedSize, quantity, dispatch]);
 
   if (loading) {
     return (
