@@ -1,58 +1,61 @@
 "use client";
-
 import React, { useCallback } from "react";
-import { ShippingInfo, Errors } from "./types";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "@/store/store";
+import { setDeliveryInfo, setErrors } from "@/store/slice/userSlice";
 
-interface ShippingInformationProps {
-  onInfoChange: (info: ShippingInfo) => void;
-  shippingInfo: ShippingInfo;
+interface PaymentDetailsProps {
   submitted: boolean;
-  errors: Errors["shipping"];
-  setErrors: (errors: Errors["shipping"]) => void;
 }
 
-const ShippingInformation: React.FC<ShippingInformationProps> = ({
-  onInfoChange,
-  shippingInfo,
-  submitted,
-  errors,
-  setErrors,
-}) => {
-  //處理TextField
-  const handleTextFieldChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const { name, value } = event.target;
-      const newErrors = { ...errors };
-
-      if (name === "phone" && !/^\d{10}$/.test(value)) {
-        newErrors.phone = true;
-      } else if (name === "email" && !/^\S+@\S+\.\S+$/.test(value)) {
-        newErrors.email = true;
-      } else {
-        newErrors[name as keyof typeof errors] = value.trim() === "";
-      }
-
-      setErrors(newErrors);
-      onInfoChange({ ...shippingInfo, [name]: value });
-    },
-    [errors, onInfoChange, setErrors, shippingInfo]
+const DeliveryForm: React.FC<PaymentDetailsProps> = ({ submitted }) => {
+  const dispatch = useDispatch();
+  const deliveryInfo = useSelector(
+    (state: RootState) => state.user.deliveryInfo
   );
+  const errors = useSelector((state: RootState) => state.user.errors);
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+
+    dispatch(setDeliveryInfo({ ...deliveryInfo, [name]: value }));
+
+    dispatch(
+      setErrors({
+        ...errors,
+        delivery: { ...errors.delivery, [name]: value.trim() === "" },
+      })
+    );
+  };
 
   const handleSelectChange = useCallback(
     (event: React.ChangeEvent<HTMLSelectElement>) => {
       const { name, value } = event.target;
-      const newErrors = { ...errors };
 
-      newErrors[name as keyof typeof errors] = value.trim() === "";
+      // 深拷貝當前的 `errors` 並修改其中的 `delivery`
+      const newDeliveryErrors = {
+        ...errors.delivery,
+        [name]: value.trim() === "",
+      };
 
-      setErrors(newErrors);
-      onInfoChange({ ...shippingInfo, [name]: value });
+      dispatch(
+        setErrors({
+          ...errors, // 保留其他錯誤
+          delivery: newDeliveryErrors, // 僅更新 delivery 部分
+        })
+      );
+
+      dispatch(setDeliveryInfo({ ...deliveryInfo, [name]: value }));
     },
-    [errors, onInfoChange, setErrors, shippingInfo]
+    [errors, deliveryInfo, dispatch]
   );
 
   return (
-    <div className="p-4">
+    <>
+      {/* 選擇 宅配 / 信用卡 */}
+
       <h2 className="text-lg font-semibold mb-4">收件人資訊</h2>
 
       <div className="mb-4">
@@ -63,13 +66,16 @@ const ShippingInformation: React.FC<ShippingInformationProps> = ({
           type="text"
           id="fullName"
           name="fullName"
-          value={shippingInfo.fullName}
-          onChange={handleTextFieldChange}
+          placeholder="請輸入收件人姓名"
+          value={deliveryInfo.fullName}
+          onChange={handleChange}
           className={`w-full px-3 py-2 border ${
-            submitted && errors.fullName ? "border-red-500" : "border-gray-300"
+            submitted && errors.delivery.fullName
+              ? "border-red-500"
+              : "border-gray-300"
           } rounded`}
         />
-        {submitted && errors.fullName && (
+        {submitted && errors.delivery.fullName && (
           <p className="text-red-500 text-sm mt-1">姓名為必填項</p>
         )}
       </div>
@@ -82,13 +88,16 @@ const ShippingInformation: React.FC<ShippingInformationProps> = ({
           type="tel"
           id="phone"
           name="phone"
-          value={shippingInfo.phone}
-          onChange={handleTextFieldChange}
+          placeholder="請輸入聯絡電話"
+          value={deliveryInfo.phone}
+          onChange={handleChange}
           className={`w-full px-3 py-2 border ${
-            submitted && errors.phone ? "border-red-500" : "border-gray-300"
+            submitted && errors.delivery.phone
+              ? "border-red-500"
+              : "border-gray-300"
           } rounded`}
         />
-        {submitted && errors.phone && (
+        {submitted && errors.delivery.phone && (
           <p className="text-red-500 text-sm mt-1">請輸入有效的手機號碼</p>
         )}
       </div>
@@ -101,13 +110,16 @@ const ShippingInformation: React.FC<ShippingInformationProps> = ({
           type="email"
           id="email"
           name="email"
-          value={shippingInfo.email}
-          onChange={handleTextFieldChange}
+          placeholder="請輸入Email"
+          value={deliveryInfo.email}
+          onChange={handleChange}
           className={`w-full px-3 py-2 border ${
-            submitted && errors.email ? "border-red-500" : "border-gray-300"
+            submitted && errors.delivery.email
+              ? "border-red-500"
+              : "border-gray-300"
           } rounded`}
         />
-        {submitted && errors.email && (
+        {submitted && errors.delivery.email && (
           <p className="text-red-500 text-sm mt-1">請輸入有效的電子郵件地址</p>
         )}
       </div>
@@ -119,10 +131,12 @@ const ShippingInformation: React.FC<ShippingInformationProps> = ({
         <select
           id="city"
           name="city"
-          value={shippingInfo.city}
+          value={deliveryInfo.city}
           onChange={handleSelectChange}
           className={`w-full px-3 py-2 border ${
-            submitted && errors.city ? "border-red-500" : "border-gray-300"
+            submitted && errors.delivery.city
+              ? "border-red-500"
+              : "border-gray-300"
           } rounded`}
         >
           <option value="">選擇縣市</option>
@@ -130,7 +144,7 @@ const ShippingInformation: React.FC<ShippingInformationProps> = ({
           <option value="台中市">台中市</option>
           <option value="高雄市">高雄市</option>
         </select>
-        {submitted && errors.city && (
+        {submitted && errors.delivery.city && (
           <p className="text-red-500 text-sm mt-1">縣市為必填項</p>
         )}
       </div>
@@ -142,10 +156,12 @@ const ShippingInformation: React.FC<ShippingInformationProps> = ({
         <select
           id="area"
           name="area"
-          value={shippingInfo.area}
+          value={deliveryInfo.area}
           onChange={handleSelectChange}
           className={`w-full px-3 py-2 border ${
-            submitted && errors.area ? "border-red-500" : "border-gray-300"
+            submitted && errors.delivery.area
+              ? "border-red-500"
+              : "border-gray-300"
           } rounded`}
         >
           <option value="">選擇地區</option>
@@ -153,7 +169,7 @@ const ShippingInformation: React.FC<ShippingInformationProps> = ({
           <option value="中山區">中山區</option>
           <option value="信義區">信義區</option>
         </select>
-        {submitted && errors.area && (
+        {submitted && errors.delivery.area && (
           <p className="text-red-500 text-sm mt-1">地區為必填項</p>
         )}
       </div>
@@ -166,18 +182,21 @@ const ShippingInformation: React.FC<ShippingInformationProps> = ({
           type="text"
           id="address"
           name="address"
-          value={shippingInfo.address}
-          onChange={handleTextFieldChange}
+          placeholder="請輸入收件地址"
+          value={deliveryInfo.address}
+          onChange={handleChange}
           className={`w-full px-3 py-2 border ${
-            submitted && errors.address ? "border-red-500" : "border-gray-300"
+            submitted && errors.delivery.address
+              ? "border-red-500"
+              : "border-gray-300"
           } rounded`}
         />
-        {submitted && errors.address && (
+        {submitted && errors.delivery.address && (
           <p className="text-red-500 text-sm mt-1">地址為必填項</p>
         )}
       </div>
-    </div>
+    </>
   );
 };
 
-export default ShippingInformation;
+export default DeliveryForm;

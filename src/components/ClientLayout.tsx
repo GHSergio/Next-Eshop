@@ -30,7 +30,6 @@ const ClientLayout: React.FC<{ children: React.ReactNode }> = ({
   const showCart = useSelector((state: RootState) => state.user.showCart);
   const showMember = useSelector((state: RootState) => state.user.showMember);
   const isLoggedIn = useSelector((state: RootState) => state.user.isLoggedIn);
-  // const userInfo = useSelector((state: RootState) => state.user.userInfo);
   const cartItemCount = useSelector(
     (state: RootState) => state.user.cart?.length
   );

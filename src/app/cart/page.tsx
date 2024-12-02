@@ -1,17 +1,16 @@
 // src/app/cart/CartPage.tsx
 "use client";
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import CartSummary from "@/components/cartStep/CartSummary";
-import DeliveryAndPayment from "@/components/cartStep/DeliveryAndPayment";
-import ShippingInformation from "@/components/cartStep/ShippingInformation";
-import PaymentDetails from "@/components/cartStep/PaymentDetails";
-import ReviewOrder from "@/components/cartStep/ReviewOrder";
+import {
+  CartSummary,
+  DeliveryAndPayment,
+  PaymentDetails,
+  ReviewOrder,
+} from "@/components/cartStep";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store/store";
 import { useRouter } from "next/navigation";
-import { PaymentInfo, ShippingInfo, Errors } from "@/components/cartStep/types";
-// import { CartItem } from "@/store/slice/types";
-import { clearCart } from "@/store/slice/userSlice";
+import { clearCart, setErrors } from "@/store/slice/userSlice";
 
 const steps = ["確認購物車", "付費方式&運送資訊", "填寫資料", "確認訂單"];
 
@@ -19,83 +18,94 @@ const CartPage: React.FC = () => {
   const selectedItems = useSelector(
     (state: RootState) => state.user.selectedItems
   );
+  const selectedPayment = useSelector(
+    (state: RootState) => state.user.selectedPayment
+  );
+  const deliveryInfo = useSelector(
+    (state: RootState) => state.user.deliveryInfo
+  );
+  const creditCardInfo = useSelector(
+    (state: RootState) => state.user.creditCardInfo
+  );
+  const storeInfo = useSelector((state: RootState) => state.user.storeInfo);
+  const errors = useSelector((state: RootState) => state.user.errors);
   const [activeStep, setActiveStep] = useState(0);
 
-  const [shippingInfo, setShippingInfo] = useState<ShippingInfo>({
-    fullName: "",
-    phone: "",
-    email: "",
-    city: "",
-    area: "",
-    address: "",
-  });
-  const [paymentInfo, setPaymentInfo] = useState<PaymentInfo>({
-    cardNumber: "",
-    expiryDate: "",
-    cvv: "",
-  });
-  const [errors, setErrors] = useState<Errors>({
-    shipping: {
-      fullName: true,
-      phone: true,
-      email: true,
-      city: true,
-      area: true,
-      address: true,
-    },
-    payment: {
-      cardNumber: true,
-      expiryDate: true,
-      cvv: true,
-    },
-  });
   const [submitted, setSubmitted] = useState(false);
 
   const router = useRouter();
   const dispatch: AppDispatch = useDispatch();
 
-  const validateShippingInfo = useCallback((): boolean => {
-    const newErrors = {
-      fullName: shippingInfo.fullName.trim() === "",
-      phone: !/^\d{10}$/.test(shippingInfo.phone),
-      email: !/^\S+@\S+\.\S+$/.test(shippingInfo.email),
-      city: shippingInfo.city.trim() === "",
-      area: shippingInfo.area.trim() === "",
-      address: shippingInfo.address.trim() === "",
-    };
-    setErrors((prev) => ({ ...prev, shipping: newErrors }));
-    return !Object.values(newErrors).some((error) => error);
-  }, [shippingInfo]);
+  // 填寫項目驗證
+  const validatePaymentDetails = useCallback((): boolean => {
+    let isDeliveryValid = true;
+    let isStoreValid = true;
+    let isCreditCardValid = true;
 
-  const validatePaymentInfo = useCallback((): boolean => {
-    const newErrors = {
-      cardNumber: !/^\d{16}$/.test(paymentInfo.cardNumber),
-      expiryDate: paymentInfo.expiryDate.trim() === "",
-      cvv: !/^\d{3}$/.test(paymentInfo.cvv),
-    };
-    setErrors((prev) => ({ ...prev, payment: newErrors }));
-    return !Object.values(newErrors).some((error) => error);
-  }, [paymentInfo]);
+    if (selectedPayment === "delivery") {
+      const newDeliveryErrors = {
+        fullName: deliveryInfo.fullName.trim() === "",
+        phone: !/^\d{10}$/.test(deliveryInfo.phone),
+        email: !/^\S+@\S+\.\S+$/.test(deliveryInfo.email),
+        city: deliveryInfo.city.trim() === "",
+        area: deliveryInfo.area.trim() === "",
+        address: deliveryInfo.address.trim() === "",
+      };
+      // 取出 newDeliveryErrors 對象中所有屬性的值，返回一個陣列
+      // 如果 some 返回 false，表示沒有任何錯誤，則取反後變成 true。
+      isDeliveryValid = !Object.values(newDeliveryErrors).some(
+        (error) => error
+      );
+      // 僅更新 delivery 錯誤部分
+      dispatch(setErrors({ ...errors, delivery: newDeliveryErrors }));
+    }
+
+    if (selectedPayment === "7-11" || selectedPayment === "family") {
+      const newStoreErrors = {
+        fullName: storeInfo.fullName.trim() === "",
+        phone: !/^\d{10}$/.test(storeInfo.phone),
+        store: storeInfo.store.trim() === "",
+      };
+      isStoreValid = !Object.values(newStoreErrors).some((error) => error);
+      // 僅更新 store 錯誤部分
+      dispatch(setErrors({ ...errors, store: newStoreErrors }));
+    }
+
+    if (selectedPayment === "credit") {
+      const newCreditCardErrors = {
+        cardNumber: !/^\d{16}$/.test(creditCardInfo.cardNumber),
+        expiryDate: creditCardInfo.expiryDate.trim() === "",
+        cvv: !/^\d{3}$/.test(creditCardInfo.cvv),
+      };
+      isCreditCardValid = !Object.values(newCreditCardErrors).some(
+        (error) => error
+      );
+      // 僅更新 creditCard 錯誤部分
+      dispatch(setErrors({ ...errors, creditCard: newCreditCardErrors }));
+    }
+
+    return isDeliveryValid && isStoreValid && isCreditCardValid;
+  }, [
+    selectedPayment,
+    deliveryInfo,
+    storeInfo,
+    creditCardInfo,
+    errors,
+    dispatch,
+  ]);
 
   const handleNext = useCallback(() => {
     setSubmitted(true);
     let valid = true;
-    if (activeStep === 1) {
-      valid = validateShippingInfo();
-    } else if (activeStep === 2) {
-      valid = validatePaymentInfo();
+
+    if (activeStep === 2) {
+      valid = validatePaymentDetails();
     }
     if (valid) {
-      setActiveStep((prevActiveStep) => prevActiveStep + 1);
+      setActiveStep((prev) => prev + 1);
       setSubmitted(false);
     }
-  }, [
-    activeStep,
-    // shippingInfo,
-    // paymentInfo,
-    validateShippingInfo,
-    validatePaymentInfo,
-  ]);
+  }, [activeStep, validatePaymentDetails]);
 
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
@@ -109,38 +119,11 @@ const CartPage: React.FC = () => {
           return <CartSummary />;
         case 1:
           return <DeliveryAndPayment />;
-        // return (
-        //   <ShippingInformation
-        //     onInfoChange={setShippingInfo}
-        //     shippingInfo={shippingInfo}
-        //     submitted={submitted}
-        //     errors={errors.shipping}
-        //     setErrors={(newErrors) =>
-        //       setErrors((prev) => ({ ...prev, shipping: newErrors }))
-        //     }
-        //   />
-        // );
 
         case 2:
-          return (
-            <PaymentDetails
-              onPaymentChange={setPaymentInfo}
-              paymentInfo={paymentInfo}
-              submitted={submitted}
-              errors={errors.payment}
-              setErrors={(newErrors) =>
-                setErrors((prev) => ({ ...prev, payment: newErrors }))
-              }
-            />
-          );
+          return <PaymentDetails submitted={submitted} />;
         case 3:
-          return (
-            <ReviewOrder
-              paymentInfo={paymentInfo}
-              shippingInfo={shippingInfo}
-              // selectedItems={selectedItems}
-            />
-          );
+          return <ReviewOrder />;
         default:
           return (
             <div className="text-center mt-4">
@@ -155,13 +138,7 @@ const CartPage: React.FC = () => {
           );
       }
     },
-    [
-      errors.payment,
-      // errors.shipping,
-      paymentInfo,
-      shippingInfo,
-      submitted,
-    ]
+    [submitted]
   );
 
   const stepContent = useMemo(

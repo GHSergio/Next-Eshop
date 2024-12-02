@@ -5,7 +5,11 @@ import {
   CartItem,
   OrderItem,
   AlertState,
-} from "@/store/slice/types";
+  DeliveryInfo,
+  CreditCardInfo,
+  StoreInfo,
+  Errors,
+} from "@/types";
 import { supabase } from "@/supabaseClient";
 import { RootState } from "@/store/store";
 
@@ -20,8 +24,47 @@ const initialState: UserState = {
   userInfo: null,
   cart: [],
   selectedItems: [],
+  selectedPayment: "",
   shippingCost: 0,
+  deliveryInfo: {
+    fullName: "",
+    phone: "",
+    email: "",
+    city: "",
+    area: "",
+    address: "",
+  },
+  creditCardInfo: {
+    cardNumber: "",
+    expiryDate: "",
+    cvv: "",
+  },
+  storeInfo: {
+    fullName: "",
+    phone: "",
+    store: "",
+  },
   ordersHistory: [],
+  errors: {
+    delivery: {
+      fullName: true,
+      phone: true,
+      email: true,
+      city: true,
+      area: true,
+      address: true,
+    },
+    creditCard: {
+      cardNumber: true,
+      expiryDate: true,
+      cvv: true,
+    },
+    store: {
+      fullName: true,
+      phone: true,
+      store: true,
+    },
+  },
   alert: {
     open: false,
     message: "",
@@ -423,9 +466,29 @@ const userSlice = createSlice({
     setSelectedItems(state, action: PayloadAction<CartItem[]>) {
       state.selectedItems = action.payload;
     },
+    // 選擇支付方式
+    setSelectedPayment(state, action: PayloadAction<string>) {
+      state.selectedPayment = action.payload;
+    },
     // 運費
     setShippingCost(state, action: PayloadAction<number>) {
       state.shippingCost = action.payload;
+    },
+    // 設置收件人資訊
+    setDeliveryInfo(state, action: PayloadAction<DeliveryInfo>) {
+      state.deliveryInfo = action.payload;
+    },
+    // 設置信用卡資訊
+    setCreditCardInfo(state, action: PayloadAction<CreditCardInfo>) {
+      state.creditCardInfo = action.payload;
+    },
+    // 設置超商取貨資訊
+    setStoreInfo(state, action: PayloadAction<StoreInfo>) {
+      state.storeInfo = action.payload;
+    },
+    // 設置驗證
+    setErrors(state, action: PayloadAction<Errors>) {
+      state.errors = action.payload;
     },
     // 新增訂單
     addOrder(state, action: PayloadAction<OrderItem>) {
@@ -570,7 +633,12 @@ export const {
   clearUserInfo,
   clearCart,
   setSelectedItems,
+  setSelectedPayment,
   setShippingCost,
+  setDeliveryInfo,
+  setCreditCardInfo,
+  setStoreInfo,
+  setErrors,
   addOrder,
   setAlert,
   clearAlert,

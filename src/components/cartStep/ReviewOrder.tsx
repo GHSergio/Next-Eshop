@@ -1,35 +1,22 @@
-import React, { useMemo } from "react";
+import React from "react";
 import Image from "next/image";
-import { ShippingInfo, PaymentInfo } from "./types";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
-// import { CartItem } from "@/store/slice/types";
-// import CartFooter from "./CartFooter";
+import CartFooter from "./CartFooter";
 
-interface ReviewOrderProps {
-  shippingInfo: ShippingInfo;
-  paymentInfo: PaymentInfo;
-}
-
-const ReviewOrder: React.FC<ReviewOrderProps> = ({
-  shippingInfo,
-  paymentInfo,
-}) => {
+const ReviewOrder = () => {
   const selectedItems = useSelector(
     (state: RootState) => state.user.selectedItems
   );
-  const shippingCost = useSelector(
-    (state: RootState) => state.user.shippingCost
+  const selectedPayment = useSelector(
+    (state: RootState) => state.user.selectedPayment
   );
-  const totalAmount = useMemo(() => {
-    return selectedItems.reduce(
-      (total, item) => total + Math.floor(item.product_price * item.quantity),
-      0
-    );
-  }, [selectedItems]);
-
-  const discount = totalAmount > 1000 ? shippingCost : 0;
-  const finalTotal = totalAmount + shippingCost - discount;
+  const deliveryInfo = useSelector(
+    (state: RootState) => state.user.deliveryInfo
+  );
+  const creditCardInfo = useSelector(
+    (state: RootState) => state.user.creditCardInfo
+  );
 
   const commonTextClasses = () => "xs:text-xs md:text-sm";
 
@@ -39,27 +26,33 @@ const ReviewOrder: React.FC<ReviewOrderProps> = ({
   // console.log(selectedItems);
   return (
     <div className="xs:p-0 md:p-6">
-      <h2 className="xs:text-md md:text-xl font-semibold mb-4">確認您的訂單</h2>
-      <hr className="my-4" />
+      {/* 訂單個人資訊 */}
+      <div className="grid gap-4 xs:text-start md:text-center">
+        <h2 className="xs:text-md md:text-xl font-semibold mb-4">
+          確認您的訂單
+        </h2>
+        <hr className="my-4" />
 
-      <h3 className="xs:text-sm md:text-lg font-semibold mb-2">收件人資訊</h3>
-      <p className={`${commonTextClasses()}`}>姓名: {shippingInfo.fullName}</p>
-      <p className={`${commonTextClasses()}`}>手機: {shippingInfo.phone}</p>
-      <p className={`${commonTextClasses()}`}>縣市: {shippingInfo.city}</p>
-      <p className={`${commonTextClasses()}`}>地區: {shippingInfo.area}</p>
-      <p className={`${commonTextClasses()}`}>地址: {shippingInfo.address}</p>
+        <h3 className="xs:text-sm md:text-lg font-semibold mb-2">收件人資訊</h3>
+        <p className={`${commonTextClasses()}`}>
+          姓名: {deliveryInfo.fullName}
+        </p>
+        <p className={`${commonTextClasses()}`}>手機: {deliveryInfo.phone}</p>
+        <p className={`${commonTextClasses()}`}>縣市: {deliveryInfo.city}</p>
+        <p className={`${commonTextClasses()}`}>地區: {deliveryInfo.area}</p>
+        <p className={`${commonTextClasses()}`}>地址: {deliveryInfo.address}</p>
 
-      <hr className="my-4" />
+        <hr className="my-4" />
 
-      <h3 className="xs:text-sm md:text-lg font-semibold mb-2">付款資訊</h3>
-      <p className={`${commonTextClasses()}`}>
-        信用卡號: **** **** **** {paymentInfo.cardNumber?.slice(-4)}
-      </p>
-      <p className={`${commonTextClasses()}`}>
-        有效期限: {paymentInfo.expiryDate}
-      </p>
-      <p className={`${commonTextClasses()}`}>背面末三碼: ***</p>
-
+        <h3 className="xs:text-sm md:text-lg font-semibold mb-2">付款資訊</h3>
+        <p className={`${commonTextClasses()}`}>
+          信用卡號: **** **** **** {creditCardInfo.cardNumber?.slice(-4)}
+        </p>
+        <p className={`${commonTextClasses()}`}>
+          有效期限: {creditCardInfo.expiryDate}
+        </p>
+        <p className={`${commonTextClasses()}`}>背面末三碼: ***</p>
+      </div>
       <hr className="my-4" />
 
       {/* 購物車內容 */}
@@ -134,11 +127,9 @@ const ReviewOrder: React.FC<ReviewOrderProps> = ({
         ))}
       </div>
 
+      {/* CartFooter */}
       <div className="mt-6 text-right">
-        <h3 className="xs:text-[0.8rem] md:text-lg font-bold text-textColor">
-          總計: ${totalAmount}
-          總計: ${finalTotal}
-        </h3>
+        <CartFooter />
       </div>
     </div>
   );

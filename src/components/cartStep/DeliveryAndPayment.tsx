@@ -1,40 +1,52 @@
 "use client";
-import React, { useState } from "react";
-import CartFooter from "./CartFooter";
-import { useSelector, useDispatch } from "react-redux";
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store/store";
-import { setShippingCost } from "@/store/slice/userSlice";
+import { setShippingCost, setSelectedPayment } from "@/store/slice/userSlice";
+import CartFooter from "./CartFooter";
 
 const DeliveryAndPayment = () => {
   const dispatch: AppDispatch = useDispatch();
-  const [selectedOption, setSelectedOption] = useState<string>("");
+  const selectedPayment = useSelector(
+    (state: RootState) => state.user.selectedPayment
+  );
 
+  console.log(selectedPayment);
+
+  // 選擇哪種運送方式 & 需支付運費
   const handleOptionShipping = (option: string) => {
     switch (option) {
       case "7-11":
-        return dispatch(setShippingCost(50));
+        dispatch(setShippingCost(10));
+        break;
       case "family":
-        return dispatch(setShippingCost(50));
+        dispatch(setShippingCost(10));
+        break;
       case "delivery":
-        return dispatch(setShippingCost(60));
+        dispatch(setShippingCost(15));
+        break;
       case "credit":
-        return dispatch(setShippingCost(60));
+        dispatch(setShippingCost(15));
+        break;
+      default:
+        dispatch(setShippingCost(0));
     }
-    setSelectedOption(option);
+    // 使用 break 而非 return -> 否則會直接跳出函式 無法執行此行
+    dispatch(setSelectedPayment(option)); // 更新 Redux 狀態
   };
 
   const deliveryOptions = [
-    { id: "7-11", label: "7-11 取貨付款", note: "滿 $1000 元免運，運費 $50" },
-    { id: "family", label: "全家 取貨付款", note: "滿 $1000 元免運，運費 $50" },
+    { id: "7-11", label: "7-11 取貨付款", note: "滿 $100 元免運，運費 $10" },
+    { id: "family", label: "全家 取貨付款", note: "滿 $100 元免運，運費 $10" },
     {
       id: "delivery",
       label: "宅配 貨到付款",
-      note: "滿 1200 元免運，運費 $60",
+      note: "滿 120 元免運，運費 $15",
     },
     {
       id: "credit",
       label: "宅配 信用卡付款",
-      note: "滿 1200 元免運，運費 $60",
+      note: "滿 120 元免運，運費 $15",
     },
   ];
 
@@ -45,8 +57,8 @@ const DeliveryAndPayment = () => {
         {deliveryOptions.map((option) => (
           <label
             key={option.id}
-            className={`flex items-center p-2 rounded-lg ${
-              selectedOption === option.id
+            className={`flex items-center p-2 rounded-lg cursor-pointer ${
+              selectedPayment === option.id
                 ? "border-2 border-borderChecked"
                 : "border border-gray-300"
             }`}
@@ -55,7 +67,7 @@ const DeliveryAndPayment = () => {
               type="radio"
               name="deliveryOption"
               value={option.id}
-              checked={selectedOption === option.id}
+              checked={selectedPayment === option.id}
               onChange={() => handleOptionShipping(option.id)}
               className="xs:h-3 xs:w-3 md:h-4 md:w-4 rounded"
             />

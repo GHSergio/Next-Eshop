@@ -8,7 +8,7 @@ import {
   setSelectedItems,
 } from "@/store/slice/userSlice";
 import Image from "next/image";
-import { CartItem } from "@/store/slice/types";
+import { CartItem } from "@/types";
 import CartFooter from "./CartFooter";
 
 const CartSummary = () => {
@@ -57,7 +57,7 @@ const CartSummary = () => {
 
   //單個商品總額
   const singleProductTotal = (price: number, quantity: number) => {
-    return (price * quantity).toFixed(2);
+    return (price * quantity).toFixed();
   };
 
   // console.log(cart);
@@ -68,7 +68,6 @@ const CartSummary = () => {
       <div className="flex items-center mb-2">
         <input
           type="checkbox"
-          // checked={selectAll}
           onChange={handleSelectAll}
           className="xs:h-3 xs:w-3 md:h-4 md:w-4 rounded"
         />
