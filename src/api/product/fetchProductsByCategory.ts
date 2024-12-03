@@ -1,5 +1,5 @@
 import apiClient from "../fakeApiClient";
-import { Product } from "@/store/slice/types"; 
+import { Product } from "@/types"; 
 // 獲取特定類別的產品
 export const fetchProductsByCategory = async (
   category: string

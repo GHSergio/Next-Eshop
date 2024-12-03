@@ -48,7 +48,7 @@ const CartPage: React.FC = () => {
         phone: !/^\d{10}$/.test(deliveryInfo.phone),
         email: !/^\S+@\S+\.\S+$/.test(deliveryInfo.email),
         city: deliveryInfo.city.trim() === "",
-        area: deliveryInfo.area.trim() === "",
+        district: deliveryInfo.district.trim() === "",
         address: deliveryInfo.address.trim() === "",
       };
       // 取出 newDeliveryErrors 對象中所有屬性的值，返回一個陣列
@@ -64,6 +64,8 @@ const CartPage: React.FC = () => {
       const newStoreErrors = {
         fullName: storeInfo.fullName.trim() === "",
         phone: !/^\d{10}$/.test(storeInfo.phone),
+        city: deliveryInfo.city.trim() === "",
+        district: deliveryInfo.district.trim() === "",
         store: storeInfo.store.trim() === "",
       };
       isStoreValid = !Object.values(newStoreErrors).some((error) => error);

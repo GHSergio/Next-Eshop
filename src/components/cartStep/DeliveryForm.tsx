@@ -1,8 +1,13 @@
 "use client";
-import React, { useCallback } from "react";
+import React, {useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
 import { setDeliveryInfo, setErrors } from "@/store/slice/userSlice";
+import {
+  setSelectedCity,
+  setSelectedDistrict,
+  setAddress,
+} from "@/store/slice/locationSlice";
 
 interface PaymentDetailsProps {
   submitted: boolean;
@@ -14,42 +19,64 @@ const DeliveryForm: React.FC<PaymentDetailsProps> = ({ submitted }) => {
     (state: RootState) => state.user.deliveryInfo
   );
   const errors = useSelector((state: RootState) => state.user.errors);
+  const cities = useSelector((state: RootState) => state.location.cities);
+  const districts = useSelector((state: RootState) => state.location.districts);
+  const location = useSelector((state: RootState) => state.location);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
+  const updateErrors = useCallback(
+    (name: string, value: string) => {
+      dispatch(
+        setErrors({
+          ...errors,
+          delivery: { ...errors.delivery, [name]: value.trim() === "" },
+        })
+      );
+    },
+    [dispatch, errors]
+  );
 
-    dispatch(setDeliveryInfo({ ...deliveryInfo, [name]: value }));
+  const handleChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+      const { name, value } = e.target;
+      if (name === "address") {
+        dispatch(setAddress(value));
+        dispatch(setDeliveryInfo({ ...deliveryInfo, address: value }));
+      } else {
+        dispatch(setDeliveryInfo({ ...deliveryInfo, [name]: value }));
+      }
 
-    dispatch(
-      setErrors({
-        ...errors,
-        delivery: { ...errors.delivery, [name]: value.trim() === "" },
-      })
-    );
-  };
+      // 修改其中的 `delivery`
+      updateErrors(name, value);
+    },
+    [updateErrors, deliveryInfo, dispatch]
+  );
 
   const handleSelectChange = useCallback(
     (event: React.ChangeEvent<HTMLSelectElement>) => {
       const { name, value } = event.target;
 
-      // 深拷貝當前的 `errors` 並修改其中的 `delivery`
-      const newDeliveryErrors = {
-        ...errors.delivery,
-        [name]: value.trim() === "",
-      };
+      // 更新不同的 state 依據 name 的值
+      if (name === "city") {
+        // 當選擇城市時，需要更新 Redux 的 selectedCity 和 districts
+        dispatch(setSelectedCity(value));
+        dispatch(
+          setDeliveryInfo({ ...deliveryInfo, city: value, district: "" })
+        );
+      } else if (name === "district") {
+        dispatch(setSelectedDistrict(value));
+        dispatch(setDeliveryInfo({ ...deliveryInfo, district: value }));
+      }
 
-      dispatch(
-        setErrors({
-          ...errors, // 保留其他錯誤
-          delivery: newDeliveryErrors, // 僅更新 delivery 部分
-        })
-      );
+      // // 深拷貝當前的 `errors` 並修改其中的 `delivery`
+      // const newDeliveryErrors = {
+      //   ...errors.delivery,
+      //   [name]: value.trim() === "",
+      // };
 
-      dispatch(setDeliveryInfo({ ...deliveryInfo, [name]: value }));
+      // 修改其中的 `delivery`
+      updateErrors(name, value);
     },
-    [errors, deliveryInfo, dispatch]
+    [updateErrors, deliveryInfo, dispatch]
   );
 
   return (
@@ -131,18 +158,22 @@ const DeliveryForm: React.FC<PaymentDetailsProps> = ({ submitted }) => {
         <select
           id="city"
           name="city"
-          value={deliveryInfo.city}
+          value={location.selectedCity}
+          // value={deliveryInfo.city}
           onChange={handleSelectChange}
-          className={`w-full px-3 py-2 border ${
+          className={`w-full px-3 py-2 border cursor-pointer ${
             submitted && errors.delivery.city
               ? "border-red-500"
               : "border-gray-300"
           } rounded`}
         >
           <option value="">選擇縣市</option>
-          <option value="台北市">台北市</option>
-          <option value="台中市">台中市</option>
-          <option value="高雄市">高雄市</option>
+
+          {cities.map((city) => (
+            <option key={city.name} value={city.name}>
+              {city.name}
+            </option>
+          ))}
         </select>
         {submitted && errors.delivery.city && (
           <p className="text-red-500 text-sm mt-1">縣市為必填項</p>
@@ -150,26 +181,29 @@ const DeliveryForm: React.FC<PaymentDetailsProps> = ({ submitted }) => {
       </div>
 
       <div className="mb-4">
-        <label className="block font-medium mb-1" htmlFor="area">
+        <label className="block font-medium mb-1" htmlFor="district">
           地區
         </label>
         <select
-          id="area"
-          name="area"
-          value={deliveryInfo.area}
+          id="district"
+          name="district"
+          value={location.selectedDistrict}
+          // value={deliveryInfo.district}
           onChange={handleSelectChange}
-          className={`w-full px-3 py-2 border ${
-            submitted && errors.delivery.area
+          className={`w-full px-3 py-2 border cursor-pointer ${
+            submitted && errors.delivery.district
               ? "border-red-500"
               : "border-gray-300"
           } rounded`}
         >
           <option value="">選擇地區</option>
-          <option value="大安區">大安區</option>
-          <option value="中山區">中山區</option>
-          <option value="信義區">信義區</option>
+          {districts.map((district) => (
+            <option key={district.name} value={district.name}>
+              {district.name}
+            </option>
+          ))}
         </select>
-        {submitted && errors.delivery.area && (
+        {submitted && errors.delivery.district && (
           <p className="text-red-500 text-sm mt-1">地區為必填項</p>
         )}
       </div>
@@ -183,7 +217,8 @@ const DeliveryForm: React.FC<PaymentDetailsProps> = ({ submitted }) => {
           id="address"
           name="address"
           placeholder="請輸入收件地址"
-          value={deliveryInfo.address}
+          value={location.address}
+          // value={deliveryInfo.address}
           onChange={handleChange}
           className={`w-full px-3 py-2 border ${
             submitted && errors.delivery.address

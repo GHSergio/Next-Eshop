@@ -31,7 +31,7 @@ const initialState: UserState = {
     phone: "",
     email: "",
     city: "",
-    area: "",
+    district: "",
     address: "",
   },
   creditCardInfo: {
@@ -42,6 +42,8 @@ const initialState: UserState = {
   storeInfo: {
     fullName: "",
     phone: "",
+    city: "",
+    district: "",
     store: "",
   },
   ordersHistory: [],
@@ -51,7 +53,7 @@ const initialState: UserState = {
       phone: true,
       email: true,
       city: true,
-      area: true,
+      district: true,
       address: true,
     },
     creditCard: {
@@ -62,6 +64,8 @@ const initialState: UserState = {
     store: {
       fullName: true,
       phone: true,
+      city: true,
+      district: true,
       store: true,
     },
   },
@@ -461,7 +465,6 @@ const userSlice = createSlice({
     setIsLoggedIn(state, action: PayloadAction<boolean>) {
       state.isLoggedIn = action.payload;
     },
-
     // 選中商品
     setSelectedItems(state, action: PayloadAction<CartItem[]>) {
       state.selectedItems = action.payload;
@@ -486,6 +489,7 @@ const userSlice = createSlice({
     setStoreInfo(state, action: PayloadAction<StoreInfo>) {
       state.storeInfo = action.payload;
     },
+
     // 設置驗證
     setErrors(state, action: PayloadAction<Errors>) {
       state.errors = action.payload;

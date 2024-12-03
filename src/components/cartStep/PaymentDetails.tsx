@@ -34,7 +34,6 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({ submitted }) => {
       )}
 
       {/* 信用卡 */}
-
       {selectedPayment === "credit" && (
         <div className="p-4">
           <CreditCardForm submitted={submitted} />

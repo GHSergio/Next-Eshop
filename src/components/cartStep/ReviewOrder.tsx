@@ -17,42 +17,88 @@ const ReviewOrder = () => {
   const creditCardInfo = useSelector(
     (state: RootState) => state.user.creditCardInfo
   );
+  const storeInfo = useSelector((state: RootState) => state.user.storeInfo);
 
   const commonTextClasses = () => "xs:text-xs md:text-sm";
 
   const commonSpanClasses = () =>
     "md:col-start-auto md:row-start-auto text-center text-textColor font-semibold xs:text-[0.5rem] md:text-sm";
 
+  const paymentMethods = {
+    "7-11": "7-11 取貨付款",
+    family: "全家 取貨付款",
+    delivery: "宅配 貨到付款",
+    credit: "宅配 信用卡",
+  };
+
   // console.log(selectedItems);
   return (
     <div className="xs:p-0 md:p-6">
       {/* 訂單個人資訊 */}
-      <div className="grid gap-4 xs:text-start md:text-center">
-        <h2 className="xs:text-md md:text-xl font-semibold mb-4">
-          確認您的訂單
-        </h2>
-        <hr className="my-4" />
-
-        <h3 className="xs:text-sm md:text-lg font-semibold mb-2">收件人資訊</h3>
-        <p className={`${commonTextClasses()}`}>
-          姓名: {deliveryInfo.fullName}
-        </p>
-        <p className={`${commonTextClasses()}`}>手機: {deliveryInfo.phone}</p>
-        <p className={`${commonTextClasses()}`}>縣市: {deliveryInfo.city}</p>
-        <p className={`${commonTextClasses()}`}>地區: {deliveryInfo.area}</p>
-        <p className={`${commonTextClasses()}`}>地址: {deliveryInfo.address}</p>
-
-        <hr className="my-4" />
-
-        <h3 className="xs:text-sm md:text-lg font-semibold mb-2">付款資訊</h3>
-        <p className={`${commonTextClasses()}`}>
-          信用卡號: **** **** **** {creditCardInfo.cardNumber?.slice(-4)}
-        </p>
-        <p className={`${commonTextClasses()}`}>
-          有效期限: {creditCardInfo.expiryDate}
-        </p>
-        <p className={`${commonTextClasses()}`}>背面末三碼: ***</p>
+      <div className="grid gap-4 xs:text-start">
+        {/* 根據付款和運送方式顯示不同資訊 */}
+        {selectedPayment === "7-11" || selectedPayment === "family" ? (
+          <>
+            <h3 className="xs:text-sm md:text-lg font-semibold mb-2">
+              超商取貨資訊
+            </h3>
+            <p className={`${commonTextClasses()}`}>
+              付款方式 : {paymentMethods[selectedPayment] || "未知付款方式"}
+            </p>
+            <p className={`${commonTextClasses()}`}>
+              訂購姓名 : {storeInfo.fullName}
+            </p>
+            <p className={`${commonTextClasses()}`}>
+              聯絡方式 : {storeInfo.phone}
+            </p>
+            <p className={`${commonTextClasses()}`}>
+              取貨門市 : {storeInfo.store}
+            </p>
+          </>
+        ) : selectedPayment === "delivery" ? (
+          <>
+            <h3 className="xs:text-sm md:text-lg font-semibold mb-2">
+              宅配收件資訊
+            </h3>
+            <p className={`${commonTextClasses()}`}>
+              付款方式 : {paymentMethods[selectedPayment] || "未知付款方式"}
+            </p>
+            <p className={`${commonTextClasses()}`}>
+              訂購姓名 : {deliveryInfo.fullName}
+            </p>
+            <p className={`${commonTextClasses()}`}>
+              聯絡方式 : {deliveryInfo.phone}
+            </p>
+            <p className={`${commonTextClasses()}`}>
+              收件地址 : {deliveryInfo.city}-{deliveryInfo.district}-
+              {deliveryInfo.address}
+            </p>
+          </>
+        ) : selectedPayment === "credit" ? (
+          <>
+            <h3 className="xs:text-sm md:text-lg font-semibold mb-2">
+              信用卡付款資訊
+            </h3>
+            <p className={`${commonTextClasses()}`}>
+              付款方式 : {paymentMethods[selectedPayment] || "未知付款方式"}
+            </p>
+            <p className={`${commonTextClasses()}`}>
+              訂購姓名 : {deliveryInfo.fullName}
+            </p>
+            <p className={`${commonTextClasses()}`}>
+              聯絡方式 : {deliveryInfo.phone}
+            </p>
+            <p className={`${commonTextClasses()}`}>
+              收件地址 : {deliveryInfo.city}-{deliveryInfo.district}-
+              {deliveryInfo.address}
+            </p>
+            <p className={`${commonTextClasses()}`}>
+              信用卡號 : **** **** **** {creditCardInfo.cardNumber?.slice(-4)}
+            </p>
+          </>
+        ) : null}
       </div>
+
       <hr className="my-4" />
 
       {/* 購物車內容 */}

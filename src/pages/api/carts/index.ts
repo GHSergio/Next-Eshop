@@ -1,6 +1,6 @@
 // pages/api/cart/index.ts
 import { NextApiRequest, NextApiResponse } from "next";
-import { CartItem } from "@/store/slice/types";
+import { CartItem } from "@/types";
 
 const cartItems: CartItem[] = [];
 

@@ -3,7 +3,7 @@ export interface DeliveryInfo {
   phone: string;
   email: string;
   city: string;
-  area: string;
+  district: string;
   address: string;
 }
 
@@ -16,6 +16,8 @@ export interface CreditCardInfo {
 export interface StoreInfo {
   fullName: string;
   phone: string;
+  city: string;
+  district: string;
   store: string;
 }
 
@@ -25,7 +27,7 @@ export interface Errors {
     phone: boolean;
     email: boolean;
     city: boolean;
-    area: boolean;
+    district: boolean;
     address: boolean;
   };
   creditCard: {
@@ -36,6 +38,8 @@ export interface Errors {
   store: {
     fullName: boolean;
     phone: boolean;
+    city: boolean;
+    district: boolean;
     store: boolean;
   };
 }

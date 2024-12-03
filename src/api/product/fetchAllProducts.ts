@@ -1,5 +1,5 @@
 import apiClient from "../fakeApiClient";
-import { Product } from "@/store/slice/types"; 
+import { Product } from "@/types"; 
 // 獲取所有產品
 export const fetchAllProducts = async (): Promise<Product[]> => {
   const response = await apiClient.get("/products");

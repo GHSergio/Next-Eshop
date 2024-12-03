@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState, useCallback } from "react";
-import { Product, CartItem } from "@/store/slice/types";
+import { Product, CartItem } from "@/types";
 import { fetchProductById } from "@/api";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store/store";
