@@ -55,9 +55,24 @@ const CartSummary = () => {
     [dispatch]
   );
 
+  // 改變商品數量;
+  const handleDeleteItem = useCallback(
+    async (itemId: string) => {
+      // 移除該商品 DB
+      await dispatch(deleteCartItemThunk(itemId));
+
+      // 同時從 selectedItems 中移除該商品
+      const updatedSelectedItems = selectedItems.filter(
+        (item) => item.id !== itemId
+      );
+      dispatch(setSelectedItems(updatedSelectedItems));
+    },
+    [dispatch, selectedItems]
+  );
+
   //單個商品總額
   const singleProductTotal = (price: number, quantity: number) => {
-    return (price * quantity).toFixed();
+    return price * quantity;
   };
 
   // console.log(cart);
@@ -149,12 +164,13 @@ const CartSummary = () => {
 
             {/* Price */}
             <p className="xs:col-start-3 xs:row-start-4  md:col-span-2 xs:text-[0.5rem] md:text-sm md:col-start-auto md:row-start-auto font-semibold">
-              $ {singleProductTotal(item.product_price, item.quantity)}
+              ${" "}
+              {singleProductTotal(item.product_price, item.quantity).toFixed()}
             </p>
 
             {/* Remove Button */}
             <div
-              onClick={() => dispatch(deleteCartItemThunk(item.id))}
+              onClick={() => handleDeleteItem(item.id)}
               className="absolute top-0 right-2 text-red-500 cursor-pointer"
             >
               <span className="xs:text-xs md:text-xl lg:text-3xl">×</span>

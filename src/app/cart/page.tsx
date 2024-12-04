@@ -64,8 +64,8 @@ const CartPage: React.FC = () => {
       const newStoreErrors = {
         fullName: storeInfo.fullName.trim() === "",
         phone: !/^\d{10}$/.test(storeInfo.phone),
-        city: deliveryInfo.city.trim() === "",
-        district: deliveryInfo.district.trim() === "",
+        city: storeInfo.city.trim() === "",
+        district: storeInfo.district.trim() === "",
         store: storeInfo.store.trim() === "",
       };
       isStoreValid = !Object.values(newStoreErrors).some((error) => error);

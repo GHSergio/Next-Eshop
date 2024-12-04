@@ -2,7 +2,7 @@ import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import { RootState } from "../store";
 import { fetchAllProducts, fetchAllCategories } from "@/api";
 import { createSelector } from "reselect";
-import { ProductState } from "@/store/slice/types";
+import { ProductState } from "@/types";
 
 //定義 狀態 初始值
 const initialState: ProductState = {
@@ -54,16 +54,6 @@ const productSlice = createSlice({
   },
 });
 
-// 使用 reselect createSelector 創建記憶化選擇器，優化性能，選擇器會記住上次的計算結果，除非依賴的state改變，否則不會重新計算。 -> 計算購物車中商品的總數量
-// export const selectCartItemCount = createSelector(
-//   // 依賴的輸入選擇器
-//   (state: RootState) => state.products.cart,
-//   (cart) => {
-//     // 計算邏輯
-//     return cart.reduce((total, item) => total + item.quantity, 0);
-//   }
-// );
-
 // 依照條件filter
 export const selectFilteredProducts = createSelector(
   (state: RootState) => state.products.products,
@@ -83,16 +73,7 @@ export const selectFilteredProducts = createSelector(
 );
 
 // 導出 actions 給元件使用
-export const {
-  // addToCart,
-  // removeFromCart,
-  // updateCartItemQuantity,
-  // clearCart,
-  setSearchQuery,
-  // setShowCart,
-  // openCart,
-  // closeCart,
-} = productSlice.actions;
+export const { setSearchQuery } = productSlice.actions;
 
 // 導出 reducer 給 store 使用
 export default productSlice.reducer;

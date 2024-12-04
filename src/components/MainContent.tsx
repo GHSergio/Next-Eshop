@@ -6,7 +6,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "../store/store";
 import {
   setSearchQuery,
-  fetchProductsAndCategories,
+  // fetchProductsAndCategories,
   selectFilteredProducts,
 } from "../store/slice/productSlice";
 
@@ -19,17 +19,17 @@ const MainContent: React.FC<MainContentProps> = ({ category }) => {
   const loading = useSelector((state: RootState) => state.products.loading);
 
   // 使用 useCallback 確保這些函數只有在 dispatch 改變時才重新創建
-  const fetchProducts = useCallback(() => {
-    dispatch(fetchProductsAndCategories());
-  }, [dispatch]);
+  // const fetchProducts = useCallback(() => {
+  //   dispatch(fetchProductsAndCategories());
+  // }, [dispatch]);
 
   const clearSearchQuery = useCallback(() => {
     dispatch(setSearchQuery(""));
   }, [dispatch]);
 
-  useEffect(() => {
-    fetchProducts();
-  }, [fetchProducts]);
+  // useEffect(() => {
+  //   fetchProducts();
+  // }, [fetchProducts]);
 
   useEffect(() => {
     clearSearchQuery();

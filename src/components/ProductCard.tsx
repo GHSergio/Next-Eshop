@@ -1,7 +1,6 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-// import { Product } from "@/store/slice/types";
 
 interface ProductCardProps {
   id: number;
@@ -20,6 +19,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
 }) => {
   return (
     // onClick 商品Card 導航到商品的詳細頁
+    // id 通過 URL 動態參數傳遞
     <Link href={`/products/${id}`} passHref title={title}>
       <div className="card p-6 rounded-lg shadow-md transition-all duration-300 hover:shadow-lg hover:bg-cardHoverBgc cursor-pointer">
         <div className="w-full h-48 overflow-hidden">
@@ -48,11 +48,13 @@ const ProductCard: React.FC<ProductCardProps> = ({
           <p className="text-xs mt-2 text-secondary">
             {discountPrice ? (
               <>
-                <span className="line-through text-gray-500">${price}</span>{" "}
+                <span className="line-through text-gray-500">
+                  ${price.toFixed()}
+                </span>{" "}
                 <span className="text-accent">${discountPrice}</span>
               </>
             ) : (
-              `$${price}`
+              `$${price.toFixed()}`
             )}
           </p>
         </div>

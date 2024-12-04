@@ -14,6 +14,8 @@ interface ProductDetailProps {
 }
 
 const ProductDetail: React.FC<ProductDetailProps> = ({ params }) => {
+  // id 自動由 Next.js 的動態路由系統注入到 params。
+  // 通過 params.id 提取該 id。
   const { id } = params;
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -159,7 +161,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ params }) => {
           </div>
           {/* Price */}
           <div className="text-xl font-semibold mb-4 text-textColor">
-            Price: ${product.price}
+            Price: ${product.price.toFixed()}
           </div>
           <hr className="my-4" />
           {/* Quantity */}

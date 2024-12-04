@@ -13,6 +13,7 @@ import {
   fetchCartThunk,
   initializeUserThunk,
 } from "../store/slice/userSlice";
+import { fetchProductsAndCategories } from "../store/slice/productSlice";
 import NavLinks from "./NavLinks";
 import CartDropdown from "./CartDropdown";
 import MemberDropdown from "./MemberDropdown";
@@ -33,6 +34,11 @@ const ClientLayout: React.FC<{ children: React.ReactNode }> = ({
   const cartItemCount = useSelector(
     (state: RootState) => state.user.cart?.length
   );
+
+  // 加載分類和產品信息
+  useEffect(() => {
+    dispatch(fetchProductsAndCategories());
+  }, [dispatch]);
 
   // 檢查是否需要初始化 & 調用初始化
   const handleInitialization = useCallback(
