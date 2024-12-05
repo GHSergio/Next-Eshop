@@ -10,7 +10,14 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store/store";
 import { useRouter } from "next/navigation";
-import { clearCart, setErrors } from "@/store/slice/userSlice";
+import {
+  clearCart,
+  setErrors,
+  setSelectedItems,
+  saveOrderThunk,
+  deleteCartItemThunk,
+} from "@/store/slice/userSlice";
+import useCartCalculations from "@/hook/useCartCalculations";
 
 const steps = ["確認購物車", "付費方式&運送資訊", "填寫資料", "確認訂單"];
 
@@ -29,6 +36,9 @@ const CartPage: React.FC = () => {
   );
   const storeInfo = useSelector((state: RootState) => state.user.storeInfo);
   const errors = useSelector((state: RootState) => state.user.errors);
+  const userInfo = useSelector((state: RootState) => state.user.userInfo);
+  const { calculateItemsCount, totalAmount, shippingCost, finalTotal } =
+    useCartCalculations();
   const [activeStep, setActiveStep] = useState(0);
 
   const [submitted, setSubmitted] = useState(false);
@@ -96,18 +106,127 @@ const CartPage: React.FC = () => {
     dispatch,
   ]);
 
-  const handleNext = useCallback(() => {
+  // 提交訂單邏輯(支付資訊&商品明細)
+  const handleConfirmOrder = useCallback(async () => {
+    if (!userInfo?.id) {
+      alert("未登入用戶，無法提交訂單！");
+      return;
+    }
+
+    const paymentMethods = {
+      "7-11": "7-11 取貨付款",
+      family: "全家 取貨付款",
+      delivery: "宅配 貨到付款",
+      credit: "宅配 信用卡",
+    };
+
+    const payment_method =
+      selectedPayment in paymentMethods
+        ? paymentMethods[selectedPayment as keyof typeof paymentMethods]
+        : "未知付款方式";
+
+    const paymentInfo = {
+      payment_method,
+      recipient_name:
+        selectedPayment === "7-11" || selectedPayment === "family"
+          ? storeInfo.fullName
+          : deliveryInfo.fullName,
+      recipient_phone:
+        selectedPayment === "7-11" || selectedPayment === "family"
+          ? storeInfo.phone
+          : deliveryInfo.phone,
+      delivery_address:
+        selectedPayment === "delivery" || selectedPayment === "credit"
+          ? `${deliveryInfo.city}-${deliveryInfo.district}-${deliveryInfo.address}`
+          : null,
+      store_name:
+        selectedPayment === "7-11" || selectedPayment === "family"
+          ? storeInfo.store
+          : null,
+    };
+
+    const newOrder = {
+      // id: "", // 在資料庫插入後由資料庫自動生成
+      user_id: userInfo.id,
+      total_price: finalTotal,
+      items_count: calculateItemsCount,
+      total_items_price: totalAmount,
+      shipping_cost: shippingCost,
+      payment_method: paymentInfo.payment_method,
+      recipient_name: paymentInfo.recipient_name,
+      recipient_phone: paymentInfo.recipient_phone,
+      delivery_address: paymentInfo.delivery_address || null,
+      store_name: paymentInfo.store_name || null,
+      status: "pending",
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+
+    const orderItems = selectedItems.map((item) => ({
+      product_id: item.product_id,
+      product_name: item.product_name,
+      product_image: item.product_image,
+      product_price: item.product_price,
+      quantity: item.quantity,
+      color: item.color,
+      size: item.size,
+      subtotal: item.product_price * item.quantity,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    }));
+
+    try {
+      const result = await dispatch(
+        saveOrderThunk({ newOrder, orderItems })
+      ).unwrap();
+      console.log("提交成功，返回的結果：", result);
+      // 刪除購物車中的項目
+      for (const item of selectedItems) {
+        await dispatch(deleteCartItemThunk(item.id));
+      }
+      dispatch(setSelectedItems([])); // 清空 selectedItems
+    } catch (error) {
+      console.error("提交失敗，錯誤信息：", error);
+      alert("提交訂單失敗，請稍後再試！");
+    }
+  }, [
+    calculateItemsCount,
+    deliveryInfo.address,
+    deliveryInfo.city,
+    deliveryInfo.district,
+    deliveryInfo.fullName,
+    deliveryInfo.phone,
+    finalTotal,
+    selectedItems,
+    selectedPayment,
+    shippingCost,
+    storeInfo.fullName,
+    storeInfo.phone,
+    storeInfo.store,
+    totalAmount,
+    userInfo?.id,
+    dispatch,
+  ]);
+
+  const handleNext = useCallback(async () => {
     setSubmitted(true);
     let valid = true;
 
     if (activeStep === 2) {
       valid = validatePaymentDetails();
     }
-    if (valid) {
+    // 如果是最後一步，執行訂單提交邏輯
+    if (activeStep === steps.length - 1) {
+      if (valid) {
+        await handleConfirmOrder();
+        setActiveStep((prev) => prev + 1);
+      }
+    } else if (valid) {
+      // 其他步驟，直接前進
       setActiveStep((prev) => prev + 1);
       setSubmitted(false);
     }
-  }, [activeStep, validatePaymentDetails]);
+  }, [activeStep, validatePaymentDetails, handleConfirmOrder]);
 
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
@@ -121,7 +240,6 @@ const CartPage: React.FC = () => {
           return <CartSummary />;
         case 1:
           return <DeliveryAndPayment />;
-
         case 2:
           return <PaymentDetails submitted={submitted} />;
         case 3:
@@ -129,18 +247,27 @@ const CartPage: React.FC = () => {
         default:
           return (
             <div className="text-center mt-4">
-              <h2 className="text-xl mb-2">成功完成訂單流程！</h2>
+              <h2 className="text-xl mb-2 font-semibold text-green-600">
+                訂單已成功提交！
+              </h2>
+              <p className="text-sm text-gray-600 mb-4">
+                您的訂單已提交成功，您可以到{" "}
+                <a href="/member" className="text-blue-500 underline">
+                  會員中心
+                </a>{" "}
+                查詢您的訂單進度。
+              </p>
               <button
-                onClick={() => clearCart()}
+                onClick={() => router.push("/")}
                 className="bg-blue-500 text-white px-4 py-2 rounded-md"
               >
-                返回主頁面
+                返回首頁
               </button>
             </div>
           );
       }
     },
-    [submitted]
+    [submitted, router]
   );
 
   const stepContent = useMemo(
@@ -148,16 +275,16 @@ const CartPage: React.FC = () => {
     [activeStep, renderStepContent]
   );
 
-  useEffect(() => {
-    if (activeStep === steps.length) {
-      dispatch(clearCart());
-      const timer = setTimeout(() => {
-        router.push("/");
-      }, 2000);
+  // useEffect(() => {
+  //   if (activeStep === steps.length) {
+  //     dispatch(clearCart());
+  //     const timer = setTimeout(() => {
+  //       router.push("/");
+  //     }, 2000);
 
-      return () => clearTimeout(timer);
-    }
-  }, [activeStep, router, dispatch]);
+  //     return () => clearTimeout(timer);
+  //   }
+  // }, [activeStep, router, dispatch]);
 
   // console.log("選擇的商品: ", selectedItems);
   return (

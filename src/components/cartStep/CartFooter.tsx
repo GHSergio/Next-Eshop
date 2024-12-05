@@ -1,36 +1,39 @@
 "use client";
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
 import { setShippingCost } from "@/store/slice/userSlice";
+import useCartCalculations from "@/hook/useCartCalculations";
 
 const CartFooter = () => {
   const dispatch = useDispatch();
-  const selectedItems = useSelector(
-    (state: RootState) => state.user.selectedItems
-  );
+  // const selectedItems = useSelector(
+  //   (state: RootState) => state.user.selectedItems
+  // );
   const selectedPayment = useSelector(
     (state: RootState) => state.user.selectedPayment
   );
-  const shippingCost = useSelector(
-    (state: RootState) => state.user.shippingCost
-  );
+  // const shippingCost = useSelector(
+  //   (state: RootState) => state.user.shippingCost
+  // );
+  const { calculateItemsCount, totalAmount, shippingCost, finalTotal } =
+    useCartCalculations();
 
-  // 計算總數量
-  const calculateItemsCount = useMemo(
-    () => selectedItems.reduce((count, item) => count + item.quantity, 0),
-    [selectedItems]
-  );
+  // // 計算總數量
+  // const calculateItemsCount = useMemo(
+  //   () => selectedItems.reduce((count, item) => count + item.quantity, 0),
+  //   [selectedItems]
+  // );
 
-  // 計算總金額
-  const totalAmount = useMemo(
-    () =>
-      selectedItems.reduce(
-        (sum, item) => sum + item.product_price * item.quantity,
-        0
-      ),
-    [selectedItems]
-  );
+  // // 計算總金額
+  // const totalAmount = useMemo(
+  //   () =>
+  //     selectedItems.reduce(
+  //       (sum, item) => sum + item.product_price * item.quantity,
+  //       0
+  //     ),
+  //   [selectedItems]
+  // );
 
   // 動態調整運費折抵
   useEffect(() => {
@@ -52,11 +55,11 @@ const CartFooter = () => {
     dispatch(setShippingCost(adjustedShippingCost));
   }, [selectedPayment, totalAmount, shippingCost, dispatch]);
 
-  // 計算最終金額
-  const finalTotal = useMemo(
-    () => totalAmount + shippingCost,
-    [totalAmount, shippingCost]
-  );
+  // // 計算最終金額
+  // const finalTotal = useMemo(
+  //   () => totalAmount + shippingCost,
+  //   [totalAmount, shippingCost]
+  // );
 
   useEffect(() => {}, []);
 

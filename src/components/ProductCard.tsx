@@ -49,12 +49,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
             {discountPrice ? (
               <>
                 <span className="line-through text-gray-500">
-                  ${price.toFixed()}
+                  ${Math.ceil(price)}
                 </span>{" "}
                 <span className="text-accent">${discountPrice}</span>
               </>
             ) : (
-              `$${price.toFixed()}`
+              `$${Math.ceil(price)}`
             )}
           </p>
         </div>

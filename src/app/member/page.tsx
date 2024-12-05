@@ -1,13 +1,26 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import UserProfile from "@/components/members/UserProfile";
 import OrderHistory from "@/components/members/OrderHistory";
-// import ModifyPassword from "@/components/members/ModifyPassword";
-
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store/store";
+import { fetchOrdersThunk } from "@/store/slice/userSlice";
 const MemberPage: React.FC = () => {
+  const dispatch: AppDispatch = useDispatch();
   const [activeTab, setActiveTab] = useState("profile");
+  const ordersHistory = useSelector(
+    (state: RootState) => state.user.ordersHistory
+  );
 
-  // const buttonStyled {}
+  // 當切換到 "訂單紀錄" 時，調用 `fetchOrders`
+  useEffect(() => {
+    const authId = JSON.parse(localStorage.getItem("userData") || "{}").id;
+    if (authId) {
+      if (activeTab === "orders" && ordersHistory.length === 0) {
+        dispatch(fetchOrdersThunk(authId));
+      }
+    }
+  }, [activeTab, dispatch, ordersHistory.length]);
 
   return (
     <div className="max-w-4xl mx-auto p-4">
@@ -34,7 +47,7 @@ const MemberPage: React.FC = () => {
           訂單紀錄
         </button>
         <button
-          onClick={() => setActiveTab("orders")}
+          onClick={() => setActiveTab("modifyPassword")}
           className={`${
             activeTab === "modify-password"
               ? "text-blue-500 font-bold"

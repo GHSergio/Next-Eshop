@@ -38,19 +38,38 @@ export interface Address {
   isDefault?: boolean; // 是否為默認地址
 }
 
-// 訂單
-export interface OrderItem {
-  id: string;
-  items: CartItem[];
-  totalAmount: number;
-  date: string;
+// 訂單資訊
+export interface Order {
+  id?: string; // 訂單ID，資料庫生成
+  user_id: string;
+  total_price: number;
+  items_count: number;
+  total_items_price: number;
+  shipping_cost: number;
+  payment_method: string;
+  recipient_name: string;
+  recipient_phone: string;
+  delivery_address?: string | null; // 可空，僅宅配需要
+  store_name?: string | null; // 可空，僅超商取貨需要
   status: string;
+  created_at: string;
+  updated_at: string;
 }
 
-export interface OrderState {
-  orders: OrderItem[];
-  loading: boolean;
-  error: string | null;
+// 訂單商品資訊
+export interface OrderItem {
+  id?: string;
+  order_id?: string;
+  product_id: string;
+  product_name: string;
+  product_price: number;
+  product_image: string;
+  color: string;
+  size: string;
+  quantity: number;
+  subtotal: number;
+  created_at: string;
+  updated_at: string;
 }
 
 // Alert
@@ -85,6 +104,13 @@ export interface UserInfo {
   updatedAt?: string;
 }
 
+export interface CurrentOrderDetails {
+  [orderId: string]: {
+    order: Order | null;
+    items: OrderItem[];
+  };
+}
+
 // User 狀態接口
 export interface UserState {
   isLoggedIn: boolean;
@@ -97,7 +123,8 @@ export interface UserState {
   creditCardInfo: CreditCardInfo; // 信用卡資訊
   storeInfo: StoreInfo; // 超商取貨資訊
   errors: Errors; // 資訊填寫驗證
-  ordersHistory?: OrderItem[];
+  ordersHistory: Order[];
+  currentOrderDetails: CurrentOrderDetails; // 使用明確類型
   alert: AlertState;
   showCart: boolean;
   showMember: boolean;

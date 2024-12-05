@@ -113,7 +113,10 @@ const ReviewOrder = () => {
             <div
               className={`w-[100px] xs:col-start-1 xs:row-start-1 xs:row-span-1 xs:col-span-2 md:col-span-4 md:col-start-auto md:row-start-auto md:col-span-auto md:row-span-auto flex flex-col justify-center`}
             >
-              <span className="font-semibold text-textColor truncate xs:text-[0.5rem] md:text-sm">
+              <span
+                className="font-semibold text-textColor truncate xs:text-[0.5rem] md:text-sm"
+                title={item.product_name}
+              >
                 {item.product_name}
               </span>
               <span className="text-xs text-textColor xs:text-[0.5rem] md:text-sm">
@@ -131,6 +134,7 @@ const ReviewOrder = () => {
                 width={80}
                 height={80}
                 className="object-contain h-16 w-16 sm:h-20 sm:w-20"
+                priority
               />
             </div>
 
@@ -143,7 +147,7 @@ const ReviewOrder = () => {
             <span
               className={`xs:col-start-4 xs:row-start-2 xs:row-span-1 xs:col-span-1 md:col-span-2 ${commonSpanClasses()}`}
             >
-              $ {item.product_price}
+              $ {Math.ceil(item.product_price)}
             </span>
 
             {/* 數量 */}
@@ -167,7 +171,7 @@ const ReviewOrder = () => {
             <span
               className={`xs:col-start-4 xs:row-start-4 xs:row-span-1 xs:col-span-1 md:col-span-2 ${commonSpanClasses()}`}
             >
-              $ {Math.floor(item.product_price * item.quantity)}
+              $ {Math.ceil(item.product_price * item.quantity)}
             </span>
           </div>
         ))}

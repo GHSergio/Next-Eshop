@@ -3,6 +3,7 @@ import {
   UserState,
   UserInfo,
   CartItem,
+  Order,
   OrderItem,
   AlertState,
   DeliveryInfo,
@@ -26,6 +27,7 @@ const initialState: UserState = {
   selectedItems: [],
   selectedPayment: "",
   shippingCost: 0,
+  // 收件資訊表格
   deliveryInfo: {
     fullName: "",
     phone: "",
@@ -34,11 +36,13 @@ const initialState: UserState = {
     district: "",
     address: "",
   },
+  // 信用卡資訊表格
   creditCardInfo: {
     cardNumber: "",
     expiryDate: "",
     cvv: "",
   },
+  // 門市資訊表格
   storeInfo: {
     fullName: "",
     phone: "",
@@ -47,6 +51,7 @@ const initialState: UserState = {
     store: "",
   },
   ordersHistory: [],
+  currentOrderDetails: {},
   errors: {
     delivery: {
       fullName: true,
@@ -419,6 +424,110 @@ export const deleteCartItemThunk = createAsyncThunk<
   }
 });
 
+// 儲存訂單
+export const saveOrderThunk = createAsyncThunk<
+  Order, // 返回 Order 類型
+  { newOrder: Order; orderItems: OrderItem[] }, // 傳入的參數類型
+  { rejectValue: string }
+>("orders/saveOrder", async ({ newOrder, orderItems }, { rejectWithValue }) => {
+  try {
+    // 插入到 `orders` 表
+    const { data: orderData, error: orderError } = await supabase
+      .from("orders")
+      .insert(newOrder)
+      .select()
+      .single();
+
+    if (orderError) {
+      return rejectWithValue("儲存訂單失敗：" + orderError.message);
+    }
+
+    // 將 `orderItems` 插入到 `order_items` 表
+    const enrichedOrderItems = orderItems.map((item) => ({
+      ...item,
+      order_id: orderData.id, // 關聯剛生成的訂單ID
+    }));
+
+    const { error: itemsError } = await supabase
+      .from("order_items")
+      .insert(enrichedOrderItems);
+
+    if (itemsError) {
+      return rejectWithValue("儲存訂單商品失敗：" + itemsError.message);
+    }
+
+    return orderData as Order;
+  } catch (error) {
+    console.log(error);
+    return rejectWithValue("儲存訂單時發生未知錯誤");
+  }
+});
+
+// 獲取訂單紀錄
+export const fetchOrdersThunk = createAsyncThunk<
+  Order[], // 返回值類型
+  string, // 傳入的 user_id
+  { rejectValue: string }
+>("orders/fetchOrders", async (userId, { rejectWithValue }) => {
+  try {
+    const { data, error } = await supabase
+      .from("orders")
+      .select("*")
+      .eq("user_id", userId); // 在orders內 尋找user_id 符合userId的項目
+
+    if (error) {
+      return rejectWithValue("獲取訂單失敗：" + error.message);
+    }
+
+    return data as Order[];
+  } catch (error) {
+    console.error("獲取歷史訂單時發生錯誤：", error);
+    return rejectWithValue("發生未知錯誤，無法獲取訂單");
+  }
+});
+
+// 獲取訂單詳細資訊
+export const fetchOrderDetailsThunk = createAsyncThunk<
+  { order: Order; items: OrderItem[] }, // 返回訂單主檔和商品明細
+  string, // 傳入 order_id
+  { rejectValue: string }
+>("orders/fetchOrderDetails", async (orderId, { rejectWithValue }) => {
+  try {
+    // 獲取訂單主檔
+    const { data: orderData, error: orderError } = await supabase
+      .from("orders")
+      .select("*")
+      .eq("id", orderId) // 在orders內 尋找id 符合orderId的項目
+      .single();
+
+    if (orderError) {
+      return rejectWithValue("獲取訂單主檔失敗：" + orderError.message);
+    }
+
+    // 獲取訂單的商品明細
+    const { data: itemsData, error: itemsError } = await supabase
+      .from("order_items")
+      .select("*")
+      .eq("order_id", orderId);
+
+    if (itemsError || !itemsData) {
+      console.error("訂單商品明細查詢失敗：", itemsError?.message);
+      return rejectWithValue(
+        `獲取訂單商品失敗：${itemsError?.message || "未知錯誤"}`
+      );
+    }
+
+    // 返回訂單主檔和商品明細
+    return {
+      order: orderData as Order,
+      items: itemsData as OrderItem[],
+    };
+  } catch (error) {
+    console.log(error);
+    return rejectWithValue("發生未知錯誤，無法獲取訂單詳情");
+  }
+});
+
 // 格式化 axios errorResponse
 // export const formatErrorResponse = (error: unknown) => {
 //   if (axios.isAxiosError(error) && error.response) {
@@ -489,15 +598,9 @@ const userSlice = createSlice({
     setStoreInfo(state, action: PayloadAction<StoreInfo>) {
       state.storeInfo = action.payload;
     },
-
     // 設置驗證
     setErrors(state, action: PayloadAction<Errors>) {
       state.errors = action.payload;
-    },
-    // 新增訂單
-    addOrder(state, action: PayloadAction<OrderItem>) {
-      state.ordersHistory?.push(action.payload);
-      state.cart = []; // 清空購物車
     },
     // Alert
     setAlert(state, action: PayloadAction<AlertState>) {
@@ -615,18 +718,60 @@ const userSlice = createSlice({
       })
       .addCase(updateCartItemThunk.rejected, (state, action) => {
         // setAlertState(state, "error", "購物車商品更新失敗！");
-        console.log("action", action.payload);
+        console.log("商品數量更新失敗", action.payload);
       });
 
     // 刪除購物車項目
     builder
       .addCase(deleteCartItemThunk.fulfilled, (state, action) => {
         state.cart = state.cart?.filter((item) => item.id !== action.payload);
-        setAlertState(state, "success", "移除商品成功！");
+        // setAlertState(state, "success", "移除商品成功！");
+        console.log("移除商品成功");
       })
       .addCase(deleteCartItemThunk.rejected, (state, action) => {
         console.log("action", action.payload);
-        setAlertState(state, "error", "購物車商品移除失敗！");
+        // setAlertState(state, "error", "移除商品失敗！");
+        console.log("移除商品失敗");
+      });
+    // 獲取訂單紀錄
+    builder
+      .addCase(fetchOrdersThunk.fulfilled, (state, action) => {
+        console.log("獲取訂單紀錄成功", action.payload);
+        state.ordersHistory = action.payload;
+      })
+      .addCase(fetchOrdersThunk.rejected, (state, action) => {
+        console.log("獲取訂單紀錄失敗", action.payload);
+      });
+    // 獲取訂單詳細資訊
+    builder
+      .addCase(
+        fetchOrderDetailsThunk.fulfilled,
+        (
+          state,
+          action: PayloadAction<{ order: Order; items: OrderItem[] }>
+        ) => {
+          console.log("獲取訂單詳細資訊成功", action.payload);
+          const { order, items } = action.payload;
+          if (order.id) {
+            // 使用 order.id 作為鍵
+            state.currentOrderDetails[order.id] = { order, items };
+          } else {
+            console.error("訂單沒有 ID，無法更新 currentOrderDetails");
+          }
+        }
+      )
+      .addCase(fetchOrderDetailsThunk.rejected, (state, action) => {
+        console.log("獲取訂單詳細資訊失敗", action.payload);
+      });
+
+    // 儲存訂單
+    builder
+      .addCase(saveOrderThunk.fulfilled, (state, action) => {
+        console.log("儲存訂單成功", action.payload);
+        state.ordersHistory = [...state.ordersHistory, action.payload];
+      })
+      .addCase(saveOrderThunk.rejected, (state, action) => {
+        console.log("儲存訂單失敗", action.payload);
       });
   },
 });
@@ -643,7 +788,6 @@ export const {
   setCreditCardInfo,
   setStoreInfo,
   setErrors,
-  addOrder,
   setAlert,
   clearAlert,
   setShowCart,
