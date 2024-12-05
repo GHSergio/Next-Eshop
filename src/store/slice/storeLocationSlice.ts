@@ -7,68 +7,58 @@ interface StoreLocationState {
   cities: string[]; // 可用的城市列表
   districts: string[]; // 可用的地區列表
   stores: { name: string; address: string }[]; // 可用的門市列表
-  selectedCity: string; // 選擇的城市
-  selectedDistrict: string; // 選擇的地區
-  selectedStore: string; // 選擇的門市
-  selectedPayment: string; // 當前的支付方式
+  selectedPayment: string; // 用來儲存 userSlice.setselectedPayment ation 接收到的 value
 }
 
 const initialState: StoreLocationState = {
   cities: [],
   districts: [],
   stores: [],
-  selectedCity: "",
-  selectedDistrict: "",
-  selectedStore: "",
-  selectedPayment: "", // 初始化為空
+  selectedPayment: "",
 };
 
 const storeLocationSlice = createSlice({
   name: "storeLocation",
   initialState,
   reducers: {
-    // 選擇城市
-    setStoreCity(state, action: PayloadAction<string>) {
-      state.selectedCity = action.payload;
-      state.selectedDistrict = "";
-      state.selectedStore = "";
+    // 選擇支付方式後更新城市列表
+    updateStoreCities(state, action: PayloadAction<string>) {
+      const payment = action.payload;
+      const allStores =
+        payment === "7-11" ? sevenElevenStores : familyMartStores;
 
-      // 根據當前支付方式選擇數據源
+      state.cities = Array.from(new Set(allStores.map((store) => store.city)));
+      state.districts = [];
+      state.stores = [];
+    },
+    // 根據選擇的城市更新地區列表
+    updateStoreDistricts(state, action: PayloadAction<string>) {
+      const selectedCity = action.payload;
       const allStores =
         state.selectedPayment === "7-11" ? sevenElevenStores : familyMartStores;
 
-      // 根據選擇的城市篩選地區
       state.districts = Array.from(
         new Set(
           allStores
-            .filter((store) => store.city === action.payload)
+            .filter((store) => store.city === selectedCity)
             .map((store) => store.district)
         )
       );
-
-      state.stores = []; // 清空門市
+      state.stores = [];
     },
-    // 選擇地區
-    setStoreDistrict(state, action: PayloadAction<string>) {
-      state.selectedDistrict = action.payload;
-      state.selectedStore = "";
-
-      // 根據當前支付方式選擇數據源
+    // 根據選擇的地區更新門市列表
+    updateStores(state, action: PayloadAction<string>) {
+      const selectedDistrict = action.payload;
       const allStores =
         state.selectedPayment === "7-11" ? sevenElevenStores : familyMartStores;
 
-      // 根據選擇的地區篩選門市
-      const filteredDistrict = allStores.find(
-        (store) =>
-          store.city === state.selectedCity && store.district === action.payload
+      // 找到匹配的地區
+      const districtData = allStores.find(
+        (store) => store.district === selectedDistrict
       );
 
-      // 將篩選出的 `stores` 設置為 state.stores，如果找不到則設置為空陣列
-      state.stores = filteredDistrict ? filteredDistrict.stores : [];
-    },
-    // 選擇門市
-    setStore(state, action: PayloadAction<string>) {
-      state.selectedStore = action.payload;
+      // 如果找到，提取門市數據；否則設置為空數組
+      state.stores = districtData ? districtData.stores : [];
     },
   },
   // 間接 等於訂閱 userSlice 的 selectedPayment state
@@ -77,11 +67,6 @@ const storeLocationSlice = createSlice({
     builder.addCase(setSelectedPayment, (state, action) => {
       // 這裡獲取 `selectedPayment` 的值
       const payment = action.payload;
-      // 清空選擇
-      state.selectedCity = "";
-      state.selectedDistrict = "";
-      state.selectedStore = "";
-
       // 將 `selectedPayment` 值存到 `storeLocationSlice` 的 state 中
       state.selectedPayment = payment;
 
@@ -100,7 +85,7 @@ const storeLocationSlice = createSlice({
   },
 });
 
-export const { setStoreCity, setStoreDistrict, setStore } =
+export const { updateStoreCities, updateStoreDistricts, updateStores } =
   storeLocationSlice.actions;
 
 export default storeLocationSlice.reducer;

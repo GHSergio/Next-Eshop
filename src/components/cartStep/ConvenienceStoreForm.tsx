@@ -4,9 +4,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { setStoreInfo, setErrors } from "@/store/slice/userSlice";
 import {
-  setStoreCity,
-  setStoreDistrict,
-  setStore,
+  updateStoreDistricts,
+  updateStores,
 } from "@/store/slice/storeLocationSlice";
 
 interface ConvenienceStoreFormProps {
@@ -24,7 +23,6 @@ const ConvenienceStoreForm: React.FC<ConvenienceStoreFormProps> = ({
     (state: RootState) => state.storeLocation.districts
   );
   const stores = useSelector((state: RootState) => state.storeLocation.stores);
-  const storeLocation = useSelector((state: RootState) => state.storeLocation);
 
   const handleChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,15 +45,19 @@ const ConvenienceStoreForm: React.FC<ConvenienceStoreFormProps> = ({
       const { name, value } = event.target;
 
       if (name === "city") {
-        dispatch(setStoreCity(value)); // 更新城市並觸發 Redux 的地區更新
+        // dispatch(setStoreCity(value)); // 更新城市並觸發 storeLocation Slice內 的地區state更新
+        dispatch(updateStoreDistricts(value)); // 通知 storeLocationSlice 更新地區列表
+
         dispatch(
           setStoreInfo({ ...storeInfo, city: value, district: "", store: "" })
         ); // 清空相關字段
       } else if (name === "district") {
-        dispatch(setStoreDistrict(value)); // 更新地區並觸發 Redux 的門市更新
+        // dispatch(setStoreDistrict(value)); // 更新地區並觸發 storeLocation Slice內 的門市state更新
+        dispatch(updateStores(value)); // 通知 storeLocationSlice 更新門市列表
+
         dispatch(setStoreInfo({ ...storeInfo, district: value, store: "" })); // 清空門市字段
       } else if (name === "store") {
-        dispatch(setStore(value)); // 更新選中的門市
+        // dispatch(setStore(value)); // 更新選中的門市
         dispatch(setStoreInfo({ ...storeInfo, store: value })); // 更新 Redux storeInfo
       }
 
@@ -125,8 +127,8 @@ const ConvenienceStoreForm: React.FC<ConvenienceStoreFormProps> = ({
         <select
           id="city"
           name="city"
-          // value={storeInfo.city}
-          value={storeLocation.selectedCity} // 確保 value 綁定到 Redux 狀態
+          value={storeInfo.city}
+          // value={storeLocation.selectedCity} // 確保 value 綁定到 Redux 狀態
           onChange={handleSelectChange}
           className={`w-full px-3 py-2 border ${
             submitted && errors.store.city
@@ -153,8 +155,8 @@ const ConvenienceStoreForm: React.FC<ConvenienceStoreFormProps> = ({
         <select
           id="district"
           name="district"
-          value={storeLocation.selectedDistrict} // 綁定到 Redux 狀態
-          // value={storeInfo.district}
+          // value={storeLocation.selectedDistrict} // 綁定到 Redux 狀態
+          value={storeInfo.district}
           onChange={handleSelectChange}
           className={`w-full px-3 py-2 border ${
             submitted && errors.store.district
@@ -181,8 +183,8 @@ const ConvenienceStoreForm: React.FC<ConvenienceStoreFormProps> = ({
         <select
           id="store"
           name="store"
-          value={storeLocation.selectedStore} // 綁定到 Redux 狀態
-          // value={storeInfo.store}
+          // value={storeLocation.selectedStore} // 綁定到 Redux 狀態
+          value={storeInfo.store}
           onChange={handleSelectChange}
           className={`w-full px-3 py-2 border ${
             submitted && errors.store.store

@@ -1,5 +1,5 @@
 "use client";
-import React, {useCallback } from "react";
+import React, { useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
 import { setDeliveryInfo, setErrors } from "@/store/slice/userSlice";
@@ -7,7 +7,7 @@ import {
   setSelectedCity,
   setSelectedDistrict,
   setAddress,
-} from "@/store/slice/locationSlice";
+} from "@/store/slice/deliveryLocationSlice";
 
 interface PaymentDetailsProps {
   submitted: boolean;

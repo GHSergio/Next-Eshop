@@ -621,10 +621,6 @@ const userSlice = createSlice({
     clearUserInfo(state) {
       state.userInfo = null;
     },
-    // 清除 使用者購物車紀錄
-    clearCart(state) {
-      state.cart = [];
-    },
   },
   extraReducers: (builder) => {
     // 一般 & 遊客 登入
@@ -780,7 +776,6 @@ export const {
   setUser,
   setIsLoggedIn,
   clearUserInfo,
-  clearCart,
   setSelectedItems,
   setSelectedPayment,
   setShippingCost,

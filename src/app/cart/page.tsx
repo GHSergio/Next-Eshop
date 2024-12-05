@@ -11,12 +11,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store/store";
 import { useRouter } from "next/navigation";
 import {
-  clearCart,
   setErrors,
   setSelectedItems,
   saveOrderThunk,
   deleteCartItemThunk,
 } from "@/store/slice/userSlice";
+
 import useCartCalculations from "@/hook/useCartCalculations";
 
 const steps = ["確認購物車", "付費方式&運送資訊", "填寫資料", "確認訂單"];
@@ -28,23 +28,39 @@ const CartPage: React.FC = () => {
   const selectedPayment = useSelector(
     (state: RootState) => state.user.selectedPayment
   );
+  const storeInfo = useSelector((state: RootState) => state.user.storeInfo);
+  const errors = useSelector((state: RootState) => state.user.errors);
+  const userInfo = useSelector((state: RootState) => state.user.userInfo);
+
   const deliveryInfo = useSelector(
     (state: RootState) => state.user.deliveryInfo
   );
   const creditCardInfo = useSelector(
     (state: RootState) => state.user.creditCardInfo
   );
-  const storeInfo = useSelector((state: RootState) => state.user.storeInfo);
-  const errors = useSelector((state: RootState) => state.user.errors);
-  const userInfo = useSelector((state: RootState) => state.user.userInfo);
+  const city = useSelector(
+    (state: RootState) => state.storeLocation.selectedCity
+  );
+  const district = useSelector(
+    (state: RootState) => state.storeLocation.selectedDistrict
+  );
+  const store = useSelector(
+    (state: RootState) => state.storeLocation.selectedStore
+  );
+
   const { calculateItemsCount, totalAmount, shippingCost, finalTotal } =
     useCartCalculations();
   const [activeStep, setActiveStep] = useState(0);
-
+  // onClick下一步 狀態改為true -> 觸發表單驗證 -> 未通過則顯示錯誤提示
   const [submitted, setSubmitted] = useState(false);
-
+  const [isOrderSubmitted, setIsOrderSubmitted] = useState(false);
   const router = useRouter();
   const dispatch: AppDispatch = useDispatch();
+
+  // 在組件掛載時重置
+  useEffect(() => {
+    setIsOrderSubmitted(false); // 重置提交狀態
+  }, []);
 
   // 填寫項目驗證
   const validatePaymentDetails = useCallback((): boolean => {
@@ -74,9 +90,12 @@ const CartPage: React.FC = () => {
       const newStoreErrors = {
         fullName: storeInfo.fullName.trim() === "",
         phone: !/^\d{10}$/.test(storeInfo.phone),
-        city: storeInfo.city.trim() === "",
-        district: storeInfo.district.trim() === "",
-        store: storeInfo.store.trim() === "",
+        city: city.trim() === "",
+        district: district.trim() === "",
+        store: store.trim() === "",
+        // city: storeInfo.city.trim() === "",
+        // district: storeInfo.district.trim() === "",
+        // store: storeInfo.store.trim() === "",
       };
       isStoreValid = !Object.values(newStoreErrors).some((error) => error);
       // 僅更新 store 錯誤部分
@@ -104,6 +123,9 @@ const CartPage: React.FC = () => {
     creditCardInfo,
     errors,
     dispatch,
+    city,
+    district,
+    store,
   ]);
 
   // 提交訂單邏輯(支付資訊&商品明細)
@@ -209,22 +231,23 @@ const CartPage: React.FC = () => {
   ]);
 
   const handleNext = useCallback(async () => {
-    setSubmitted(true);
     let valid = true;
 
     if (activeStep === 2) {
+      setSubmitted(true);
       valid = validatePaymentDetails();
     }
     // 如果是最後一步，執行訂單提交邏輯
-    if (activeStep === steps.length - 1) {
-      if (valid) {
+    if (valid) {
+      if (activeStep === steps.length - 1) {
+        // 最後一步：提交訂單邏輯
         await handleConfirmOrder();
-        setActiveStep((prev) => prev + 1);
+        setIsOrderSubmitted(true);
       }
-    } else if (valid) {
-      // 其他步驟，直接前進
+
+      // 前進到下一步
       setActiveStep((prev) => prev + 1);
-      setSubmitted(false);
+      setSubmitted(false); // 清除表單驗證狀態
     }
   }, [activeStep, validatePaymentDetails, handleConfirmOrder]);
 
@@ -275,16 +298,21 @@ const CartPage: React.FC = () => {
     [activeStep, renderStepContent]
   );
 
-  // useEffect(() => {
-  //   if (activeStep === steps.length) {
-  //     dispatch(clearCart());
-  //     const timer = setTimeout(() => {
-  //       router.push("/");
-  //     }, 2000);
+  console.log("Selected payment method:", selectedPayment);
+  console.log("Store Info:", storeInfo);
+  console.log("Errors:", errors.store);
 
-  //     return () => clearTimeout(timer);
-  //   }
-  // }, [activeStep, router, dispatch]);
+  // 提交後 跳轉
+  useEffect(() => {
+    if (isOrderSubmitted) {
+      const timer = setTimeout(() => {
+        router.push("/"); // 跳轉回首頁
+        setIsOrderSubmitted(false); // 跳轉後重置狀態
+      }, 2000);
+
+      return () => clearTimeout(timer); // 清理計時器，防止內存洩漏
+    }
+  }, [isOrderSubmitted, router]);
 
   // console.log("選擇的商品: ", selectedItems);
   return (
