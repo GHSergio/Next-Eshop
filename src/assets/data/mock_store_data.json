@@ -1,0 +1,1298 @@
+[
+  {
+    "c_store": "7-Eleven",
+    "city": "台北市",
+    "district": "大安區",
+    "road_section": "南京東路三段",
+    "store_name": "松竹店",
+    "store_address": "台北市大安區南京東路三段110號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台北市",
+    "district": "大安區",
+    "road_section": "南京東路三段",
+    "store_name": "永康店",
+    "store_address": "台北市大安區南京東路三段140號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台北市",
+    "district": "大安區",
+    "road_section": "南京東路三段",
+    "store_name": "大墩店",
+    "store_address": "台北市大安區南京東路三段100號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台北市",
+    "district": "大安區",
+    "road_section": "台灣大道三段",
+    "store_name": "福星店",
+    "store_address": "台北市大安區台灣大道三段170號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台北市",
+    "district": "大安區",
+    "road_section": "台灣大道三段",
+    "store_name": "自由店",
+    "store_address": "台北市大安區台灣大道三段120號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台北市",
+    "district": "大安區",
+    "road_section": "台灣大道三段",
+    "store_name": "福星店",
+    "store_address": "台北市大安區台灣大道三段130號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台北市",
+    "district": "大安區",
+    "road_section": "昌平路一段",
+    "store_name": "自由店",
+    "store_address": "台北市大安區昌平路一段190號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台北市",
+    "district": "大安區",
+    "road_section": "昌平路一段",
+    "store_name": "自由店",
+    "store_address": "台北市大安區昌平路一段120號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台北市",
+    "district": "大安區",
+    "road_section": "昌平路一段",
+    "store_name": "民族店",
+    "store_address": "台北市大安區昌平路一段170號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台北市",
+    "district": "中山區",
+    "road_section": "信義路三段",
+    "store_name": "民族店",
+    "store_address": "台北市中山區信義路三段110號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台北市",
+    "district": "中山區",
+    "road_section": "信義路三段",
+    "store_name": "大墩店",
+    "store_address": "台北市中山區信義路三段140號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台北市",
+    "district": "中山區",
+    "road_section": "信義路三段",
+    "store_name": "民族店",
+    "store_address": "台北市中山區信義路三段100號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台北市",
+    "district": "中山區",
+    "road_section": "五權西路二段",
+    "store_name": "自由店",
+    "store_address": "台北市中山區五權西路二段110號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台北市",
+    "district": "中山區",
+    "road_section": "五權西路二段",
+    "store_name": "大墩店",
+    "store_address": "台北市中山區五權西路二段140號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台北市",
+    "district": "中山區",
+    "road_section": "五權西路二段",
+    "store_name": "民族店",
+    "store_address": "台北市中山區五權西路二段190號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台北市",
+    "district": "中山區",
+    "road_section": "台灣大道三段",
+    "store_name": "松竹店",
+    "store_address": "台北市中山區台灣大道三段150號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台北市",
+    "district": "中山區",
+    "road_section": "台灣大道三段",
+    "store_name": "三多店",
+    "store_address": "台北市中山區台灣大道三段170號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台北市",
+    "district": "中山區",
+    "road_section": "台灣大道三段",
+    "store_name": "自由店",
+    "store_address": "台北市中山區台灣大道三段100號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台北市",
+    "district": "信義區",
+    "road_section": "九如一路",
+    "store_name": "松江店",
+    "store_address": "台北市信義區九如一路120號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台北市",
+    "district": "信義區",
+    "road_section": "九如一路",
+    "store_name": "松江店",
+    "store_address": "台北市信義區九如一路100號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台北市",
+    "district": "信義區",
+    "road_section": "九如一路",
+    "store_name": "自由店",
+    "store_address": "台北市信義區九如一路180號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台北市",
+    "district": "信義區",
+    "road_section": "台灣大道三段",
+    "store_name": "福星店",
+    "store_address": "台北市信義區台灣大道三段170號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台北市",
+    "district": "信義區",
+    "road_section": "台灣大道三段",
+    "store_name": "松竹店",
+    "store_address": "台北市信義區台灣大道三段160號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台北市",
+    "district": "信義區",
+    "road_section": "台灣大道三段",
+    "store_name": "永康店",
+    "store_address": "台北市信義區台灣大道三段180號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台北市",
+    "district": "信義區",
+    "road_section": "松壽路",
+    "store_name": "大墩店",
+    "store_address": "台北市信義區松壽路140號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台北市",
+    "district": "信義區",
+    "road_section": "松壽路",
+    "store_name": "三多店",
+    "store_address": "台北市信義區松壽路110號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台北市",
+    "district": "信義區",
+    "road_section": "松壽路",
+    "store_name": "松竹店",
+    "store_address": "台北市信義區松壽路170號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台中市",
+    "district": "西屯區",
+    "road_section": "信義路三段",
+    "store_name": "自由店",
+    "store_address": "台中市西屯區信義路三段140號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台中市",
+    "district": "西屯區",
+    "road_section": "信義路三段",
+    "store_name": "永康店",
+    "store_address": "台中市西屯區信義路三段100號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台中市",
+    "district": "西屯區",
+    "road_section": "信義路三段",
+    "store_name": "自由店",
+    "store_address": "台中市西屯區信義路三段160號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台中市",
+    "district": "西屯區",
+    "road_section": "五權西路二段",
+    "store_name": "民族店",
+    "store_address": "台中市西屯區五權西路二段170號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台中市",
+    "district": "西屯區",
+    "road_section": "五權西路二段",
+    "store_name": "和平店",
+    "store_address": "台中市西屯區五權西路二段130號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台中市",
+    "district": "西屯區",
+    "road_section": "五權西路二段",
+    "store_name": "民族店",
+    "store_address": "台中市西屯區五權西路二段190乙號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台中市",
+    "district": "西屯區",
+    "road_section": "九如一路",
+    "store_name": "福星店",
+    "store_address": "台中市西屯區九如一路120號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台中市",
+    "district": "西屯區",
+    "road_section": "九如一路",
+    "store_name": "松竹店",
+    "store_address": "台中市西屯區九如一路180號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台中市",
+    "district": "西屯區",
+    "road_section": "九如一路",
+    "store_name": "松竹店",
+    "store_address": "台中市西屯區九如一路190號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台中市",
+    "district": "北屯區",
+    "road_section": "信義路三段",
+    "store_name": "松江店",
+    "store_address": "台中市北屯區信義路三段160號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台中市",
+    "district": "北屯區",
+    "road_section": "信義路三段",
+    "store_name": "福星店",
+    "store_address": "台中市北屯區信義路三段170號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台中市",
+    "district": "北屯區",
+    "road_section": "信義路三段",
+    "store_name": "和平店",
+    "store_address": "台中市北屯區信義路三段130號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台中市",
+    "district": "北屯區",
+    "road_section": "台灣大道三段",
+    "store_name": "和平店",
+    "store_address": "台中市北屯區台灣大道三段160號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台中市",
+    "district": "北屯區",
+    "road_section": "台灣大道三段",
+    "store_name": "民族店",
+    "store_address": "台中市北屯區台灣大道三段190號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台中市",
+    "district": "北屯區",
+    "road_section": "台灣大道三段",
+    "store_name": "松江店",
+    "store_address": "台中市北屯區台灣大道三段150號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台中市",
+    "district": "北屯區",
+    "road_section": "五權西路二段",
+    "store_name": "松江店",
+    "store_address": "台中市北屯區五權西路二段160號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台中市",
+    "district": "北屯區",
+    "road_section": "五權西路二段",
+    "store_name": "大墩店",
+    "store_address": "台中市北屯區五權西路二段180號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台中市",
+    "district": "北屯區",
+    "road_section": "五權西路二段",
+    "store_name": "和平店",
+    "store_address": "台中市北屯區五權西路二段100號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台中市",
+    "district": "南屯區",
+    "road_section": "九如一路",
+    "store_name": "自由店",
+    "store_address": "台中市南屯區九如一路110號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台中市",
+    "district": "南屯區",
+    "road_section": "九如一路",
+    "store_name": "三多店",
+    "store_address": "台中市南屯區九如一路160號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台中市",
+    "district": "南屯區",
+    "road_section": "九如一路",
+    "store_name": "和平店",
+    "store_address": "台中市南屯區九如一路150號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台中市",
+    "district": "南屯區",
+    "road_section": "台灣大道三段",
+    "store_name": "自由店",
+    "store_address": "台中市南屯區台灣大道三段190號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台中市",
+    "district": "南屯區",
+    "road_section": "台灣大道三段",
+    "store_name": "松江店",
+    "store_address": "台中市南屯區台灣大道三段160號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台中市",
+    "district": "南屯區",
+    "road_section": "台灣大道三段",
+    "store_name": "大墩店",
+    "store_address": "台中市南屯區台灣大道三段170號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台中市",
+    "district": "南屯區",
+    "road_section": "信義路三段",
+    "store_name": "松江店",
+    "store_address": "台中市南屯區信義路三段120號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台中市",
+    "district": "南屯區",
+    "road_section": "信義路三段",
+    "store_name": "福星店",
+    "store_address": "台中市南屯區信義路三段110號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台中市",
+    "district": "南屯區",
+    "road_section": "信義路三段",
+    "store_name": "松竹店",
+    "store_address": "台中市南屯區信義路三段140號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "高雄市",
+    "district": "三民區",
+    "road_section": "信義路三段",
+    "store_name": "民族店",
+    "store_address": "高雄市三民區信義路三段110號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "高雄市",
+    "district": "三民區",
+    "road_section": "信義路三段",
+    "store_name": "福星店",
+    "store_address": "高雄市三民區信義路三段170號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "高雄市",
+    "district": "三民區",
+    "road_section": "信義路三段",
+    "store_name": "永康店",
+    "store_address": "高雄市三民區信義路三段180號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "高雄市",
+    "district": "三民區",
+    "road_section": "昌平路一段",
+    "store_name": "松江店",
+    "store_address": "高雄市三民區昌平路一段190號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "高雄市",
+    "district": "三民區",
+    "road_section": "昌平路一段",
+    "store_name": "福星店",
+    "store_address": "高雄市三民區昌平路一段100號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "高雄市",
+    "district": "三民區",
+    "road_section": "昌平路一段",
+    "store_name": "松江店",
+    "store_address": "高雄市三民區昌平路一段170號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "高雄市",
+    "district": "三民區",
+    "road_section": "九如一路",
+    "store_name": "大墩店",
+    "store_address": "高雄市三民區九如一路190號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "高雄市",
+    "district": "三民區",
+    "road_section": "九如一路",
+    "store_name": "自由店",
+    "store_address": "高雄市三民區九如一路130號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "高雄市",
+    "district": "三民區",
+    "road_section": "九如一路",
+    "store_name": "自由店",
+    "store_address": "高雄市三民區九如一路100號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "高雄市",
+    "district": "左營區",
+    "road_section": "四維三路",
+    "store_name": "松江店",
+    "store_address": "高雄市左營區四維三路140號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "高雄市",
+    "district": "左營區",
+    "road_section": "四維三路",
+    "store_name": "三多店",
+    "store_address": "高雄市左營區四維三路170號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "高雄市",
+    "district": "左營區",
+    "road_section": "四維三路",
+    "store_name": "三多店",
+    "store_address": "高雄市左營區四維三路140號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "高雄市",
+    "district": "左營區",
+    "road_section": "松壽路",
+    "store_name": "大墩店",
+    "store_address": "高雄市左營區松壽路130號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "高雄市",
+    "district": "左營區",
+    "road_section": "松壽路",
+    "store_name": "福星店",
+    "store_address": "高雄市左營區松壽路190號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "高雄市",
+    "district": "左營區",
+    "road_section": "松壽路",
+    "store_name": "大墩店",
+    "store_address": "高雄市左營區松壽路160號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "高雄市",
+    "district": "左營區",
+    "road_section": "博愛一路",
+    "store_name": "三多店",
+    "store_address": "高雄市左營區博愛一路190號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "高雄市",
+    "district": "左營區",
+    "road_section": "博愛一路",
+    "store_name": "松江店",
+    "store_address": "高雄市左營區博愛一路120號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "高雄市",
+    "district": "左營區",
+    "road_section": "博愛一路",
+    "store_name": "民族店",
+    "store_address": "高雄市左營區博愛一路170號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "高雄市",
+    "district": "苓雅區",
+    "road_section": "博愛一路",
+    "store_name": "松江店",
+    "store_address": "高雄市苓雅區博愛一路100號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "高雄市",
+    "district": "苓雅區",
+    "road_section": "博愛一路",
+    "store_name": "大墩店",
+    "store_address": "高雄市苓雅區博愛一路150號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "高雄市",
+    "district": "苓雅區",
+    "road_section": "博愛一路",
+    "store_name": "福星店",
+    "store_address": "高雄市苓雅區博愛一路170號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "高雄市",
+    "district": "苓雅區",
+    "road_section": "五權西路二段",
+    "store_name": "福星店",
+    "store_address": "高雄市苓雅區五權西路二段100號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "高雄市",
+    "district": "苓雅區",
+    "road_section": "五權西路二段",
+    "store_name": "大墩店",
+    "store_address": "高雄市苓雅區五權西路二段140號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "高雄市",
+    "district": "苓雅區",
+    "road_section": "五權西路二段",
+    "store_name": "和平店",
+    "store_address": "高雄市苓雅區五權西路二段170號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "高雄市",
+    "district": "苓雅區",
+    "road_section": "松壽路",
+    "store_name": "福星店",
+    "store_address": "高雄市苓雅區松壽路190號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "高雄市",
+    "district": "苓雅區",
+    "road_section": "松壽路",
+    "store_name": "松江店",
+    "store_address": "高雄市苓雅區松壽路150號"
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "高雄市",
+    "district": "苓雅區",
+    "road_section": "松壽路",
+    "store_name": "民族店",
+    "store_address": "高雄市苓雅區松壽路190號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台北市",
+    "district": "大安區",
+    "road_section": "南京東路三段",
+    "store_name": "松江店",
+    "store_address": "台北市大安區南京東路三段140號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台北市",
+    "district": "大安區",
+    "road_section": "南京東路三段",
+    "store_name": "三多店",
+    "store_address": "台北市大安區南京東路三段190號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台北市",
+    "district": "大安區",
+    "road_section": "南京東路三段",
+    "store_name": "松竹店",
+    "store_address": "台北市大安區南京東路三段150號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台北市",
+    "district": "大安區",
+    "road_section": "九如一路",
+    "store_name": "三多店",
+    "store_address": "台北市大安區九如一路170號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台北市",
+    "district": "大安區",
+    "road_section": "九如一路",
+    "store_name": "和平店",
+    "store_address": "台北市大安區九如一路120號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台北市",
+    "district": "大安區",
+    "road_section": "九如一路",
+    "store_name": "和平店",
+    "store_address": "台北市大安區九如一路150號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台北市",
+    "district": "大安區",
+    "road_section": "信義路三段",
+    "store_name": "松江店",
+    "store_address": "台北市大安區信義路三段110號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台北市",
+    "district": "大安區",
+    "road_section": "信義路三段",
+    "store_name": "永康店",
+    "store_address": "台北市大安區信義路三段190號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台北市",
+    "district": "大安區",
+    "road_section": "信義路三段",
+    "store_name": "自由店",
+    "store_address": "台北市大安區信義路三段190號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台北市",
+    "district": "中山區",
+    "road_section": "昌平路一段",
+    "store_name": "三多店",
+    "store_address": "台北市中山區昌平路一段140號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台北市",
+    "district": "中山區",
+    "road_section": "昌平路一段",
+    "store_name": "永康店",
+    "store_address": "台北市中山區昌平路一段110號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台北市",
+    "district": "中山區",
+    "road_section": "昌平路一段",
+    "store_name": "自由店",
+    "store_address": "台北市中山區昌平路一段100號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台北市",
+    "district": "中山區",
+    "road_section": "南京東路三段",
+    "store_name": "三多店",
+    "store_address": "台北市中山區南京東路三段190號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台北市",
+    "district": "中山區",
+    "road_section": "南京東路三段",
+    "store_name": "民族店",
+    "store_address": "台北市中山區南京東路三段100號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台北市",
+    "district": "中山區",
+    "road_section": "南京東路三段",
+    "store_name": "福星店",
+    "store_address": "台北市中山區南京東路三段110號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台北市",
+    "district": "中山區",
+    "road_section": "博愛一路",
+    "store_name": "松江店",
+    "store_address": "台北市中山區博愛一路190號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台北市",
+    "district": "中山區",
+    "road_section": "博愛一路",
+    "store_name": "三多店",
+    "store_address": "台北市中山區博愛一路180號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台北市",
+    "district": "中山區",
+    "road_section": "博愛一路",
+    "store_name": "大墩店",
+    "store_address": "台北市中山區博愛一路100號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台北市",
+    "district": "信義區",
+    "road_section": "昌平路一段",
+    "store_name": "松竹店",
+    "store_address": "台北市信義區昌平路一段170號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台北市",
+    "district": "信義區",
+    "road_section": "昌平路一段",
+    "store_name": "大墩店",
+    "store_address": "台北市信義區昌平路一段150號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台北市",
+    "district": "信義區",
+    "road_section": "昌平路一段",
+    "store_name": "三多店",
+    "store_address": "台北市信義區昌平路一段160號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台北市",
+    "district": "信義區",
+    "road_section": "信義路三段",
+    "store_name": "松江店",
+    "store_address": "台北市信義區信義路三段160號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台北市",
+    "district": "信義區",
+    "road_section": "信義路三段",
+    "store_name": "和平店",
+    "store_address": "台北市信義區信義路三段170號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台北市",
+    "district": "信義區",
+    "road_section": "信義路三段",
+    "store_name": "松竹店",
+    "store_address": "台北市信義區信義路三段160號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台北市",
+    "district": "信義區",
+    "road_section": "五權西路二段",
+    "store_name": "福星店",
+    "store_address": "台北市信義區五權西路二段100號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台北市",
+    "district": "信義區",
+    "road_section": "五權西路二段",
+    "store_name": "三多店",
+    "store_address": "台北市信義區五權西路二段120號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台北市",
+    "district": "信義區",
+    "road_section": "五權西路二段",
+    "store_name": "松竹店",
+    "store_address": "台北市信義區五權西路二段120號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台中市",
+    "district": "西屯區",
+    "road_section": "松壽路",
+    "store_name": "永康店",
+    "store_address": "台中市西屯區松壽路190號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台中市",
+    "district": "西屯區",
+    "road_section": "松壽路",
+    "store_name": "福星店",
+    "store_address": "台中市西屯區松壽路170號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台中市",
+    "district": "西屯區",
+    "road_section": "松壽路",
+    "store_name": "三多店",
+    "store_address": "台中市西屯區松壽路140號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台中市",
+    "district": "西屯區",
+    "road_section": "台灣大道三段",
+    "store_name": "和平店",
+    "store_address": "台中市西屯區台灣大道三段130號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台中市",
+    "district": "西屯區",
+    "road_section": "台灣大道三段",
+    "store_name": "大墩店",
+    "store_address": "台中市西屯區台灣大道三段110號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台中市",
+    "district": "西屯區",
+    "road_section": "台灣大道三段",
+    "store_name": "松竹店",
+    "store_address": "台中市西屯區台灣大道三段150號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台中市",
+    "district": "西屯區",
+    "road_section": "昌平路一段",
+    "store_name": "民族店",
+    "store_address": "台中市西屯區昌平路一段120號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台中市",
+    "district": "西屯區",
+    "road_section": "昌平路一段",
+    "store_name": "松竹店",
+    "store_address": "台中市西屯區昌平路一段190號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台中市",
+    "district": "西屯區",
+    "road_section": "昌平路一段",
+    "store_name": "自由店",
+    "store_address": "台中市西屯區昌平路一段100號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台中市",
+    "district": "北屯區",
+    "road_section": "昌平路一段",
+    "store_name": "三多店",
+    "store_address": "台中市北屯區昌平路一段190號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台中市",
+    "district": "北屯區",
+    "road_section": "昌平路一段",
+    "store_name": "松江店",
+    "store_address": "台中市北屯區昌平路一段140號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台中市",
+    "district": "北屯區",
+    "road_section": "昌平路一段",
+    "store_name": "自由店",
+    "store_address": "台中市北屯區昌平路一段110號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台中市",
+    "district": "北屯區",
+    "road_section": "台灣大道三段",
+    "store_name": "三多店",
+    "store_address": "台中市北屯區台灣大道三段110號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台中市",
+    "district": "北屯區",
+    "road_section": "台灣大道三段",
+    "store_name": "松竹店",
+    "store_address": "台中市北屯區台灣大道三段100號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台中市",
+    "district": "北屯區",
+    "road_section": "台灣大道三段",
+    "store_name": "福星店",
+    "store_address": "台中市北屯區台灣大道三段150號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台中市",
+    "district": "北屯區",
+    "road_section": "南京東路三段",
+    "store_name": "大墩店",
+    "store_address": "台中市北屯區南京東路三段140號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台中市",
+    "district": "北屯區",
+    "road_section": "南京東路三段",
+    "store_name": "松竹店",
+    "store_address": "台中市北屯區南京東路三段170號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台中市",
+    "district": "北屯區",
+    "road_section": "南京東路三段",
+    "store_name": "民族店",
+    "store_address": "台中市北屯區南京東路三段160號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台中市",
+    "district": "南屯區",
+    "road_section": "松壽路",
+    "store_name": "松江店",
+    "store_address": "台中市南屯區松壽路190號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台中市",
+    "district": "南屯區",
+    "road_section": "松壽路",
+    "store_name": "永康店",
+    "store_address": "台中市南屯區松壽路100號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台中市",
+    "district": "南屯區",
+    "road_section": "松壽路",
+    "store_name": "永康店",
+    "store_address": "台中市南屯區松壽路150號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台中市",
+    "district": "南屯區",
+    "road_section": "九如一路",
+    "store_name": "民族店",
+    "store_address": "台中市南屯區九如一路110號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台中市",
+    "district": "南屯區",
+    "road_section": "九如一路",
+    "store_name": "永康店",
+    "store_address": "台中市南屯區九如一路110號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台中市",
+    "district": "南屯區",
+    "road_section": "九如一路",
+    "store_name": "大墩店",
+    "store_address": "台中市南屯區九如一路110號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台中市",
+    "district": "南屯區",
+    "road_section": "四維三路",
+    "store_name": "福星店",
+    "store_address": "台中市南屯區四維三路120號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台中市",
+    "district": "南屯區",
+    "road_section": "四維三路",
+    "store_name": "三多店",
+    "store_address": "台中市南屯區四維三路110號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台中市",
+    "district": "南屯區",
+    "road_section": "四維三路",
+    "store_name": "民族店",
+    "store_address": "台中市南屯區四維三路140號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "高雄市",
+    "district": "三民區",
+    "road_section": "台灣大道三段",
+    "store_name": "松江店",
+    "store_address": "高雄市三民區台灣大道三段160號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "高雄市",
+    "district": "三民區",
+    "road_section": "台灣大道三段",
+    "store_name": "永康店",
+    "store_address": "高雄市三民區台灣大道三段110號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "高雄市",
+    "district": "三民區",
+    "road_section": "台灣大道三段",
+    "store_name": "民族店",
+    "store_address": "高雄市三民區台灣大道三段100號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "高雄市",
+    "district": "三民區",
+    "road_section": "五權西路二段",
+    "store_name": "三多店",
+    "store_address": "高雄市三民區五權西路二段100號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "高雄市",
+    "district": "三民區",
+    "road_section": "五權西路二段",
+    "store_name": "松竹店",
+    "store_address": "高雄市三民區五權西路二段110號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "高雄市",
+    "district": "三民區",
+    "road_section": "五權西路二段",
+    "store_name": "松江店",
+    "store_address": "高雄市三民區五權西路二段160號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "高雄市",
+    "district": "三民區",
+    "road_section": "昌平路一段",
+    "store_name": "松江店",
+    "store_address": "高雄市三民區昌平路一段180號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "高雄市",
+    "district": "三民區",
+    "road_section": "昌平路一段",
+    "store_name": "松江店",
+    "store_address": "高雄市三民區昌平路一段180號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "高雄市",
+    "district": "三民區",
+    "road_section": "昌平路一段",
+    "store_name": "三多店",
+    "store_address": "高雄市三民區昌平路一段160號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "高雄市",
+    "district": "左營區",
+    "road_section": "昌平路一段",
+    "store_name": "松竹店",
+    "store_address": "高雄市左營區昌平路一段140號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "高雄市",
+    "district": "左營區",
+    "road_section": "昌平路一段",
+    "store_name": "三多店",
+    "store_address": "高雄市左營區昌平路一段140號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "高雄市",
+    "district": "左營區",
+    "road_section": "昌平路一段",
+    "store_name": "永康店",
+    "store_address": "高雄市左營區昌平路一段130號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "高雄市",
+    "district": "左營區",
+    "road_section": "松壽路",
+    "store_name": "三多店",
+    "store_address": "高雄市左營區松壽路120號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "高雄市",
+    "district": "左營區",
+    "road_section": "松壽路",
+    "store_name": "自由店",
+    "store_address": "高雄市左營區松壽路170號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "高雄市",
+    "district": "左營區",
+    "road_section": "松壽路",
+    "store_name": "和平店",
+    "store_address": "高雄市左營區松壽路170號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "高雄市",
+    "district": "左營區",
+    "road_section": "博愛一路",
+    "store_name": "大墩店",
+    "store_address": "高雄市左營區博愛一路170號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "高雄市",
+    "district": "左營區",
+    "road_section": "博愛一路",
+    "store_name": "三多店",
+    "store_address": "高雄市左營區博愛一路170號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "高雄市",
+    "district": "左營區",
+    "road_section": "博愛一路",
+    "store_name": "和平店",
+    "store_address": "高雄市左營區博愛一路180號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "高雄市",
+    "district": "苓雅區",
+    "road_section": "博愛一路",
+    "store_name": "松江店",
+    "store_address": "高雄市苓雅區博愛一路180號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "高雄市",
+    "district": "苓雅區",
+    "road_section": "博愛一路",
+    "store_name": "和平店",
+    "store_address": "高雄市苓雅區博愛一路150號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "高雄市",
+    "district": "苓雅區",
+    "road_section": "博愛一路",
+    "store_name": "民族店",
+    "store_address": "高雄市苓雅區博愛一路160號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "高雄市",
+    "district": "苓雅區",
+    "road_section": "四維三路",
+    "store_name": "自由店",
+    "store_address": "高雄市苓雅區四維三路150號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "高雄市",
+    "district": "苓雅區",
+    "road_section": "四維三路",
+    "store_name": "三多店",
+    "store_address": "高雄市苓雅區四維三路190號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "高雄市",
+    "district": "苓雅區",
+    "road_section": "四維三路",
+    "store_name": "松江店",
+    "store_address": "高雄市苓雅區四維三路110號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "高雄市",
+    "district": "苓雅區",
+    "road_section": "九如一路",
+    "store_name": "松江店",
+    "store_address": "高雄市苓雅區九如一路140號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "高雄市",
+    "district": "苓雅區",
+    "road_section": "九如一路",
+    "store_name": "和平店",
+    "store_address": "高雄市苓雅區九如一路120號"
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "高雄市",
+    "district": "苓雅區",
+    "road_section": "九如一路",
+    "store_name": "民族店",
+    "store_address": "高雄市苓雅區九如一路140號"
+  }
+]

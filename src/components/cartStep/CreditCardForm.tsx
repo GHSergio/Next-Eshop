@@ -1,101 +1,110 @@
 "use client";
-import React, { useCallback } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/store/store";
-import { setCreditCardInfo, setErrors } from "@/store/slice/userSlice";
-
+import React, { useEffect, useCallback } from "react";
+import { renderInput } from "@/utils/formRenderers";
+import { validateCreditCardInfo } from "@/utils/validators";
+import { CreditCardInfo, CreditCardErrors } from "@/types";
 interface CreditCardFormProps {
+  user_id?: string;
+  Info: CreditCardInfo;
+  setInfo: (info: CreditCardInfo) => void;
+  errors: CreditCardErrors;
+  setErrors: (errors: CreditCardErrors) => void;
+  onValidate: (isValid: boolean) => void;
   submitted: boolean;
 }
 
-const CreditCardForm: React.FC<CreditCardFormProps> = ({ submitted }) => {
-  const dispatch = useDispatch();
-  const creditCardInfo = useSelector(
-    (state: RootState) => state.user.creditCardInfo
-  );
-  const errors = useSelector((state: RootState) => state.user.errors);
+const CreditCardForm: React.FC<CreditCardFormProps> = ({
+  Info,
+  setInfo,
+  errors,
+  setErrors,
+  onValidate,
+  submitted,
+}) => {
+  // 驗證 creditCardInfo 是否通過
+  const validateForm = useCallback(() => {
+    const newErrors = validateCreditCardInfo(Info);
+
+    // 僅當錯誤狀態改變(單項符合驗證)時才執行
+    if (JSON.stringify(errors) !== JSON.stringify(newErrors)) {
+      console.log("比較差異:", "creditCard:", errors, "newErrors:", newErrors);
+      setErrors(newErrors);
+    }
+
+    const isValid = !Object.values(newErrors).some((error) => error);
+    onValidate(isValid);
+  }, [Info, errors, setErrors, onValidate]);
+
+  // 提交時觸發驗證
+  useEffect(() => {
+    if (submitted) validateForm();
+  }, [submitted, validateForm]);
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const { name, value } = e.target;
+      const updateInfo = { ...Info, [name]: value };
+      // 將target value set 到 creditCardInfo state
+      setInfo(updateInfo);
 
-      dispatch(setCreditCardInfo({ ...creditCardInfo, [name]: value }));
-
-      dispatch(
-        setErrors({
-          ...errors,
-          creditCard: { ...errors.creditCard, [name]: value.trim() === "" },
-        })
-      );
+      // 即時驗證並更新狀態
+      const newErrors = validateCreditCardInfo(updateInfo);
+      const isValid = !Object.values(newErrors).some((error) => error);
+      setErrors(newErrors);
+      onValidate(isValid); // 即時更新 valid 狀態
     },
-    [dispatch, creditCardInfo, errors]
+    [Info, onValidate, setErrors, setInfo]
   );
+
+  const errorMessages: { [key: string]: string } = {
+    card_number: "請輸入信用卡卡號",
+    expiry_date: "請輸入有限期限",
+    cvv: "請輸入背面末三碼",
+  };
 
   return (
     <>
-      <h2 className="text-xl font-semibold mb-4">支付細節</h2>
-
       {/* 卡號輸入框 */}
-      <div>
-        <label className="block text-sm font-medium">信用卡卡號</label>
-        <input
-          type="text"
-          name="cardNumber"
-          className={`mt-1 block w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-            submitted && errors.creditCard.cardNumber
-              ? "border-red-500"
-              : "border-gray-300"
-          }`}
-          placeholder="請輸入16位信用卡號"
-          onChange={handleChange}
-          value={creditCardInfo.cardNumber}
-        />
-        {submitted && errors.creditCard.cardNumber && (
-          <p className="text-red-500 text-xs mt-1">請輸入16位有效的信用卡號</p>
-        )}
-      </div>
+      {renderInput({
+        type: "text",
+        id: "card_number",
+        name: "card_number",
+        label: "信用卡卡號",
+        placeholder: "請輸入信用卡卡號",
+        value: Info.card_number,
+        onChange: handleChange,
+        error: errors.card_number,
+        errorMessage: errorMessages.card_number,
+        submitted,
+      })}
 
       {/* 有效期限輸入框 */}
-      <div>
-        <label className="block text-sm font-medium">有效期限 月/年</label>
-        <input
-          type="month"
-          name="expiryDate"
-          className={`mt-1 block w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-            submitted && errors.creditCard.expiryDate
-              ? "border-red-500"
-              : "border-gray-300"
-          }`}
-          placeholder="MM/YY"
-          onChange={handleChange}
-          value={creditCardInfo.expiryDate}
-        />
-        {submitted && errors.creditCard.expiryDate && (
-          <p className="text-red-500 text-xs mt-1">
-            請輸入有效的有效期限 (MM/YY)
-          </p>
-        )}
-      </div>
+      {renderInput({
+        type: "month",
+        id: "expiry_date",
+        name: "expiry_date",
+        label: "有限期限",
+        placeholder: "請輸入有限期限",
+        value: Info.expiry_date,
+        onChange: handleChange,
+        error: errors.expiry_date,
+        errorMessage: errorMessages.expiry_date,
+        submitted,
+      })}
 
       {/* CVV輸入框 */}
-      <div>
-        <label className="block text-sm font-medium">背面末三碼</label>
-        <input
-          type="password"
-          name="cvv"
-          className={`mt-1 block w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-            submitted && errors.creditCard.cvv
-              ? "border-red-500"
-              : "border-gray-300"
-          }`}
-          placeholder="請輸入3位數CVV"
-          onChange={handleChange}
-          value={creditCardInfo.cvv}
-        />
-        {submitted && errors.creditCard.cvv && (
-          <p className="text-red-500 text-xs mt-1">請輸入3位數的CVV</p>
-        )}
-      </div>
+      {renderInput({
+        type: "text",
+        id: "cvv",
+        name: "cvv",
+        label: "背面末三碼",
+        placeholder: "請輸入背面末三碼",
+        value: Info.cvv,
+        onChange: handleChange,
+        error: errors.cvv,
+        errorMessage: errorMessages.cvv,
+        submitted,
+      })}
     </>
   );
 };

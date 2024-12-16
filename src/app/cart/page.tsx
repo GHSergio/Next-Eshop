@@ -11,122 +11,57 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store/store";
 import { useRouter } from "next/navigation";
 import {
-  setErrors,
+  // setErrors,
   setSelectedItems,
   saveOrderThunk,
   deleteCartItemThunk,
+  setAlert,
 } from "@/store/slice/userSlice";
-
 import useCartCalculations from "@/hook/useCartCalculations";
 
 const steps = ["確認購物車", "付費方式&運送資訊", "填寫資料", "確認訂單"];
 
 const CartPage: React.FC = () => {
+  const dispatch: AppDispatch = useDispatch();
+  const router = useRouter();
+
   const selectedItems = useSelector(
     (state: RootState) => state.user.selectedItems
   );
   const selectedPayment = useSelector(
     (state: RootState) => state.user.selectedPayment
   );
-  const storeInfo = useSelector((state: RootState) => state.user.storeInfo);
-  const errors = useSelector((state: RootState) => state.user.errors);
+
   const userInfo = useSelector((state: RootState) => state.user.userInfo);
-
+  const storeInfo = useSelector((state: RootState) => state.user.store_info);
   const deliveryInfo = useSelector(
-    (state: RootState) => state.user.deliveryInfo
+    (state: RootState) => state.user.delivery_info
   );
-  const creditCardInfo = useSelector(
-    (state: RootState) => state.user.creditCardInfo
+  // const creditCardInfo = useSelector(
+  //   (state: RootState) => state.user.creditCard_info
+  // );
+  // const errors = useSelector((state: RootState) => state.user.errors);
+  const isDeliveryFormValid = useSelector(
+    (state: RootState) => state.user.isDeliveryFormValid
   );
-  const city = useSelector(
-    (state: RootState) => state.storeLocation.selectedCity
+  const isStoreFormValid = useSelector(
+    (state: RootState) => state.user.isStoreFormValid
   );
-  const district = useSelector(
-    (state: RootState) => state.storeLocation.selectedDistrict
+  const isCreditCardFormValid = useSelector(
+    (state: RootState) => state.user.isCreditCardFormValid
   );
-  const store = useSelector(
-    (state: RootState) => state.storeLocation.selectedStore
-  );
-
   const { calculateItemsCount, totalAmount, shippingCost, finalTotal } =
     useCartCalculations();
+
   const [activeStep, setActiveStep] = useState(0);
   // onClick下一步 狀態改為true -> 觸發表單驗證 -> 未通過則顯示錯誤提示
   const [submitted, setSubmitted] = useState(false);
   const [isOrderSubmitted, setIsOrderSubmitted] = useState(false);
-  const router = useRouter();
-  const dispatch: AppDispatch = useDispatch();
 
   // 在組件掛載時重置
   useEffect(() => {
     setIsOrderSubmitted(false); // 重置提交狀態
   }, []);
-
-  // 填寫項目驗證
-  const validatePaymentDetails = useCallback((): boolean => {
-    let isDeliveryValid = true;
-    let isStoreValid = true;
-    let isCreditCardValid = true;
-
-    if (selectedPayment === "delivery") {
-      const newDeliveryErrors = {
-        fullName: deliveryInfo.fullName.trim() === "",
-        phone: !/^\d{10}$/.test(deliveryInfo.phone),
-        email: !/^\S+@\S+\.\S+$/.test(deliveryInfo.email),
-        city: deliveryInfo.city.trim() === "",
-        district: deliveryInfo.district.trim() === "",
-        address: deliveryInfo.address.trim() === "",
-      };
-      // 取出 newDeliveryErrors 對象中所有屬性的值，返回一個陣列
-      // 如果 some 返回 false，表示沒有任何錯誤，則取反後變成 true。
-      isDeliveryValid = !Object.values(newDeliveryErrors).some(
-        (error) => error
-      );
-      // 僅更新 delivery 錯誤部分
-      dispatch(setErrors({ ...errors, delivery: newDeliveryErrors }));
-    }
-
-    if (selectedPayment === "7-11" || selectedPayment === "family") {
-      const newStoreErrors = {
-        fullName: storeInfo.fullName.trim() === "",
-        phone: !/^\d{10}$/.test(storeInfo.phone),
-        city: city.trim() === "",
-        district: district.trim() === "",
-        store: store.trim() === "",
-        // city: storeInfo.city.trim() === "",
-        // district: storeInfo.district.trim() === "",
-        // store: storeInfo.store.trim() === "",
-      };
-      isStoreValid = !Object.values(newStoreErrors).some((error) => error);
-      // 僅更新 store 錯誤部分
-      dispatch(setErrors({ ...errors, store: newStoreErrors }));
-    }
-
-    if (selectedPayment === "credit") {
-      const newCreditCardErrors = {
-        cardNumber: !/^\d{16}$/.test(creditCardInfo.cardNumber),
-        expiryDate: creditCardInfo.expiryDate.trim() === "",
-        cvv: !/^\d{3}$/.test(creditCardInfo.cvv),
-      };
-      isCreditCardValid = !Object.values(newCreditCardErrors).some(
-        (error) => error
-      );
-      // 僅更新 creditCard 錯誤部分
-      dispatch(setErrors({ ...errors, creditCard: newCreditCardErrors }));
-    }
-
-    return isDeliveryValid && isStoreValid && isCreditCardValid;
-  }, [
-    selectedPayment,
-    deliveryInfo,
-    storeInfo,
-    creditCardInfo,
-    errors,
-    dispatch,
-    city,
-    district,
-    store,
-  ]);
 
   // 提交訂單邏輯(支付資訊&商品明細)
   const handleConfirmOrder = useCallback(async () => {
@@ -136,8 +71,7 @@ const CartPage: React.FC = () => {
     }
 
     const paymentMethods = {
-      "7-11": "7-11 取貨付款",
-      family: "全家 取貨付款",
+      c_store: "超商 取貨付款",
       delivery: "宅配 貨到付款",
       credit: "宅配 信用卡",
     };
@@ -147,43 +81,39 @@ const CartPage: React.FC = () => {
         ? paymentMethods[selectedPayment as keyof typeof paymentMethods]
         : "未知付款方式";
 
+    // 依支付方式顯示
     const paymentInfo = {
       payment_method,
       recipient_name:
-        selectedPayment === "7-11" || selectedPayment === "family"
-          ? storeInfo.fullName
-          : deliveryInfo.fullName,
-      recipient_phone:
-        selectedPayment === "7-11" || selectedPayment === "family"
-          ? storeInfo.phone
-          : deliveryInfo.phone,
+        selectedPayment === "c_store"
+          ? storeInfo.recipient_name
+          : deliveryInfo.recipient_name,
+      phone:
+        selectedPayment === "c_store" ? storeInfo.phone : deliveryInfo.phone,
       delivery_address:
         selectedPayment === "delivery" || selectedPayment === "credit"
-          ? `${deliveryInfo.city}-${deliveryInfo.district}-${deliveryInfo.address}`
+          ? `${deliveryInfo.city}-${deliveryInfo.district}-${deliveryInfo.address_line}`
           : null,
-      store_name:
-        selectedPayment === "7-11" || selectedPayment === "family"
-          ? storeInfo.store
-          : null,
+      store_name: selectedPayment === "c_store" ? storeInfo.store : null,
     };
 
+    // 訂單
     const newOrder = {
-      // id: "", // 在資料庫插入後由資料庫自動生成
-      user_id: userInfo.id,
+      auth_id: userInfo.id,
       total_price: finalTotal,
       items_count: calculateItemsCount,
       total_items_price: totalAmount,
       shipping_cost: shippingCost,
       payment_method: paymentInfo.payment_method,
       recipient_name: paymentInfo.recipient_name,
-      recipient_phone: paymentInfo.recipient_phone,
+      recipient_phone: paymentInfo.phone,
       delivery_address: paymentInfo.delivery_address || null,
       store_name: paymentInfo.store_name || null,
       status: "pending",
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
-
+    // 訂單商品明細
     const orderItems = selectedItems.map((item) => ({
       product_id: item.product_id,
       product_name: item.product_name,
@@ -213,16 +143,16 @@ const CartPage: React.FC = () => {
     }
   }, [
     calculateItemsCount,
-    deliveryInfo.address,
+    deliveryInfo.address_line,
     deliveryInfo.city,
     deliveryInfo.district,
-    deliveryInfo.fullName,
+    deliveryInfo.recipient_name,
     deliveryInfo.phone,
     finalTotal,
     selectedItems,
     selectedPayment,
     shippingCost,
-    storeInfo.fullName,
+    storeInfo.recipient_name,
     storeInfo.phone,
     storeInfo.store,
     totalAmount,
@@ -230,26 +160,48 @@ const CartPage: React.FC = () => {
     dispatch,
   ]);
 
+  // 下一步
   const handleNext = useCallback(async () => {
-    let valid = true;
-
     if (activeStep === 2) {
       setSubmitted(true);
-      valid = validatePaymentDetails();
-    }
-    // 如果是最後一步，執行訂單提交邏輯
-    if (valid) {
-      if (activeStep === steps.length - 1) {
-        // 最後一步：提交訂單邏輯
-        await handleConfirmOrder();
-        setIsOrderSubmitted(true);
-      }
 
-      // 前進到下一步
-      setActiveStep((prev) => prev + 1);
-      setSubmitted(false); // 清除表單驗證狀態
+      if (
+        (selectedPayment === "c_store" && !isStoreFormValid) ||
+        (selectedPayment === "delivery" && !isDeliveryFormValid) ||
+        // 信用卡需要 delivery & credit 表單都通過驗證
+        (selectedPayment === "credit" &&
+          (!isCreditCardFormValid || !isDeliveryFormValid))
+      ) {
+        console.log("selectedPayment", selectedPayment);
+        dispatch(
+          setAlert({
+            open: true,
+            message: "請完成表單的所有欄位！",
+            severity: "info",
+          })
+        );
+        return;
+      }
     }
-  }, [activeStep, validatePaymentDetails, handleConfirmOrder]);
+
+    // 如果是最後一步，執行訂單提交邏輯
+    if (activeStep === steps.length - 1) {
+      await handleConfirmOrder();
+      setIsOrderSubmitted(true);
+    }
+
+    // 前進到下一步
+    setActiveStep((prev) => prev + 1);
+    setSubmitted(false); // 重置表單提交狀態
+  }, [
+    dispatch,
+    activeStep,
+    isCreditCardFormValid,
+    isDeliveryFormValid,
+    isStoreFormValid,
+    selectedPayment,
+    handleConfirmOrder,
+  ]);
 
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
@@ -298,9 +250,9 @@ const CartPage: React.FC = () => {
     [activeStep, renderStepContent]
   );
 
-  console.log("Selected payment method:", selectedPayment);
-  console.log("Store Info:", storeInfo);
-  console.log("Errors:", errors.store);
+  // console.log("Selected payment method:", selectedPayment);
+  // console.log("Store Info:", storeInfo);
+  // console.log("Errors:", errors.store);
 
   // 提交後 跳轉
   useEffect(() => {
@@ -366,17 +318,22 @@ const CartPage: React.FC = () => {
             disabled={activeStep === 0}
             onClick={handleBack}
             className={`bg-gray-300 text-black px-4 py-2 rounded-md ${
-              activeStep === 0 ? "cursor-not-allowed opacity-50" : ""
+              activeStep === 0 ? "invisible" : ""
             }`}
           >
             上一步
           </button>
+
           {/* 第一步未選任何商品時禁用 */}
           <button
-            disabled={activeStep === 0 && selectedItems.length === 0}
+            disabled={
+              (activeStep === 0 && selectedItems.length === 0) ||
+              (activeStep === 1 && selectedPayment === "")
+            }
             onClick={handleNext}
             className={`px-4 py-2 rounded-md ${
-              activeStep === 0 && selectedItems.length === 0
+              (activeStep === 0 && selectedItems.length === 0) ||
+              (activeStep === 1 && selectedPayment === "")
                 ? "bg-gray-300 text-gray-500 cursor-not-allowed opacity-50"
                 : "bg-blue-500 text-white"
             }`}

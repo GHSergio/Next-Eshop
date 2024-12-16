@@ -1,0 +1,101 @@
+[
+  {
+    "c_store": "7-Eleven",
+    "city": "台北市",
+    "district": "大安區",
+    "road_section": "信義路三段",
+    "stores": [
+      { "name": "大安永康店", "address": "台北市大安區信義路三段120號" },
+      { "name": "大安信義店", "address": "台北市大安區信義路三段50號" },
+      { "name": "大安和平店", "address": "台北市大安區和平東路三段20號" }
+    ]
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台北市",
+    "district": "中山區",
+    "road_section": "南京東路三段",
+    "stores": [
+      { "name": "中山南京店", "address": "台北市中山區南京東路三段100號" },
+      { "name": "中山松江店", "address": "台北市中山區松江路50號" },
+      { "name": "中山八德店", "address": "台北市中山區八德路二段30號" }
+    ]
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "台北市",
+    "district": "信義區",
+    "road_section": "松壽路",
+    "stores": [
+      { "name": "信義威秀店", "address": "台北市信義區松壽路100號" },
+      { "name": "信義市府店", "address": "台北市信義區市府路30號" },
+      { "name": "信義松仁店", "address": "台北市信義區松仁路20號" }
+    ]
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台中市",
+    "district": "西屯區",
+    "road_section": "台灣大道三段",
+    "stores": [
+      { "name": "西屯台灣店", "address": "台中市西屯區台灣大道三段120號" },
+      { "name": "西屯福星店", "address": "台中市西屯區福星路50號" },
+      { "name": "西屯黎明店", "address": "台中市西屯區黎明路二段30號" }
+    ]
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台中市",
+    "district": "北屯區",
+    "road_section": "昌平路一段",
+    "stores": [
+      { "name": "北屯昌平店", "address": "台中市北屯區昌平路一段100號" },
+      { "name": "北屯松竹店", "address": "台中市北屯區松竹路50號" },
+      { "name": "北屯東山店", "address": "台中市北屯區東山路30號" }
+    ]
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "台中市",
+    "district": "南屯區",
+    "road_section": "五權西路二段",
+    "stores": [
+      { "name": "南屯五權店", "address": "台中市南屯區五權西路二段120號" },
+      { "name": "南屯黎明店", "address": "台中市南屯區黎明路50號" },
+      { "name": "南屯大墩店", "address": "台中市南屯區大墩路30號" }
+    ]
+  },
+  {
+    "c_store": "7-Eleven",
+    "city": "高雄市",
+    "district": "三民區",
+    "road_section": "九如一路",
+    "stores": [
+      { "name": "三民九如店", "address": "高雄市三民區九如一路120號" },
+      { "name": "三民民族店", "address": "高雄市三民區民族一路50號" },
+      { "name": "三民建工店", "address": "高雄市三民區建工路30號" }
+    ]
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "高雄市",
+    "district": "左營區",
+    "road_section": "博愛一路",
+    "stores": [
+      { "name": "左營博愛店", "address": "高雄市左營區博愛一路120號" },
+      { "name": "左營文自店", "address": "高雄市左營區文自路50號" },
+      { "name": "左營自由店", "address": "高雄市左營區自由路30號" }
+    ]
+  },
+  {
+    "c_store": "FamilyMart",
+    "city": "高雄市",
+    "district": "苓雅區",
+    "road_section": "四維三路",
+    "stores": [
+      { "name": "苓雅四維店", "address": "高雄市苓雅區四維三路120號" },
+      { "name": "苓雅三多店", "address": "高雄市苓雅區三多路50號" },
+      { "name": "苓雅五福店", "address": "高雄市苓雅區五福一路30號" }
+    ]
+  }
+]

@@ -1,235 +1,177 @@
 "use client";
-import React, { useCallback } from "react";
+import React, { useEffect, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
-import { setDeliveryInfo, setErrors } from "@/store/slice/userSlice";
-import {
-  setSelectedCity,
-  setSelectedDistrict,
-  setAddress,
-} from "@/store/slice/deliveryLocationSlice";
+import { updateDeliveryCity } from "@/store/slice/deliveryLocationSlice";
+import { renderInput, renderSelect } from "@/utils/formRenderers";
+import { validateDeliveryInfo } from "@/utils/validators";
+import { DeliveryInfo, DeliveryErrors } from "@/types";
 
-interface PaymentDetailsProps {
+interface DeliveryFormProps {
+  user_id?: string;
+  Info: DeliveryInfo;
+  setInfo: (info: DeliveryInfo) => void;
+  errors: DeliveryErrors;
+  setErrors: (errors: DeliveryErrors) => void;
+  onValidate: (isValid: boolean) => void;
   submitted: boolean;
 }
 
-const DeliveryForm: React.FC<PaymentDetailsProps> = ({ submitted }) => {
+const DeliveryForm: React.FC<DeliveryFormProps> = ({
+  Info,
+  setInfo,
+  errors,
+  setErrors,
+  onValidate,
+  submitted,
+}) => {
   const dispatch = useDispatch();
-  const deliveryInfo = useSelector(
-    (state: RootState) => state.user.deliveryInfo
+  const cities = useSelector(
+    (state: RootState) => state.deliveryLocation.cities
   );
-  const errors = useSelector((state: RootState) => state.user.errors);
-  const cities = useSelector((state: RootState) => state.location.cities);
-  const districts = useSelector((state: RootState) => state.location.districts);
-  const location = useSelector((state: RootState) => state.location);
-
-  const updateErrors = useCallback(
-    (name: string, value: string) => {
-      dispatch(
-        setErrors({
-          ...errors,
-          delivery: { ...errors.delivery, [name]: value.trim() === "" },
-        })
-      );
-    },
-    [dispatch, errors]
+  const districts = useSelector(
+    (state: RootState) => state.deliveryLocation.districts
   );
 
-  const handleChange = useCallback(
+  // 驗證 deliveryInfo 是否通過
+  const validateForm = useCallback(() => {
+    const newErrors = validateDeliveryInfo(Info);
+
+    // 僅當錯誤狀態改變(單項符合驗證)時才執行
+    if (JSON.stringify(errors) !== JSON.stringify(newErrors)) {
+      // console.log(
+      //   "比較差異:",
+      //   "delivery:",
+      //   errors.delivery,
+      //   "newErrors:",
+      //   newErrors
+      // );
+      setErrors(newErrors);
+    }
+
+    const isValid = !Object.values(newErrors).some((error) => error);
+    onValidate(isValid);
+  }, [Info, errors, setErrors, onValidate]);
+
+  // 提交時觸發驗證
+  useEffect(() => {
+    if (submitted) validateForm();
+  }, [submitted, validateForm]);
+
+  const handleInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
       const { name, value } = e.target;
-      if (name === "address") {
-        dispatch(setAddress(value));
-        dispatch(setDeliveryInfo({ ...deliveryInfo, address: value }));
-      } else {
-        dispatch(setDeliveryInfo({ ...deliveryInfo, [name]: value }));
-      }
+      const updatedInfo = { ...Info, [name]: value };
+      setInfo(updatedInfo);
 
-      // 修改其中的 `delivery`
-      updateErrors(name, value);
+      // 即時驗證並更新狀態
+      const newErrors = validateDeliveryInfo(updatedInfo);
+      const isValid = !Object.values(newErrors).some((error) => error);
+      setErrors(newErrors);
+      onValidate(isValid); // 即時更新 valid 狀態
     },
-    [updateErrors, deliveryInfo, dispatch]
+    [Info, setInfo, setErrors, onValidate]
   );
 
+  // 自定義 錯誤提示訊息
   const handleSelectChange = useCallback(
     (event: React.ChangeEvent<HTMLSelectElement>) => {
       const { name, value } = event.target;
+      let updatedInfo = { ...Info };
 
       // 更新不同的 state 依據 name 的值
       if (name === "city") {
-        // 當選擇城市時，需要更新 Redux 的 selectedCity 和 districts
-        dispatch(setSelectedCity(value));
-        dispatch(
-          setDeliveryInfo({ ...deliveryInfo, city: value, district: "" })
-        );
+        // 當選擇城市時 通知 storeLocationSlice 更新地區列表
+        dispatch(updateDeliveryCity(value));
+        // 更新 state 的 city 部分 & 清空 district
+        updatedInfo = { ...Info, city: value, district: "" };
       } else if (name === "district") {
-        dispatch(setSelectedDistrict(value));
-        dispatch(setDeliveryInfo({ ...deliveryInfo, district: value }));
+        // 更新 state 的 district 部分
+        updatedInfo = { ...Info, district: value };
       }
 
-      // // 深拷貝當前的 `errors` 並修改其中的 `delivery`
-      // const newDeliveryErrors = {
-      //   ...errors.delivery,
-      //   [name]: value.trim() === "",
-      // };
+      // 更新 Redux 的 deliveryInfo
+      setInfo(updatedInfo);
 
-      // 修改其中的 `delivery`
-      updateErrors(name, value);
+      // 即時驗證並更新狀態
+      const newErrors = validateDeliveryInfo(updatedInfo);
+      const isValid = !Object.values(newErrors).some((error) => error);
+      setErrors(newErrors);
+      onValidate(isValid); // 即時更新 valid 狀態
     },
-    [updateErrors, deliveryInfo, dispatch]
+    [Info, setInfo, dispatch, setErrors, onValidate]
   );
+
+  const errorMessages: { [key: string]: string } = {
+    recipient_name: "姓名不能為空",
+    phone: "請輸入有效的10位手機號碼",
+    city: "請選擇縣市",
+    district: "請選擇地區",
+    address_line: "詳細地址不可為空",
+  };
 
   return (
     <>
       {/* 選擇 宅配 / 信用卡 */}
+      {/* Input */}
+      {renderInput({
+        type: "text",
+        id: "recipient_name",
+        name: "recipient_name",
+        label: "姓名",
+        placeholder: "請輸入取件人姓名",
+        value: Info.recipient_name,
+        onChange: handleInputChange,
+        error: errors.recipient_name,
+        errorMessage: errorMessages.recipient_name,
+        submitted,
+      })}
+      {renderInput({
+        type: "text",
+        id: "phone",
+        name: "phone",
+        label: "手機",
+        placeholder: "請輸入聯絡電話",
+        value: Info.phone,
+        onChange: handleInputChange,
+        error: errors.phone,
+        errorMessage: errorMessages.phone,
+        submitted,
+      })}
 
-      <h2 className="text-lg font-semibold mb-4">收件人資訊</h2>
-
-      <div className="mb-4">
-        <label className="block font-medium mb-1" htmlFor="fullName">
-          姓名
-        </label>
-        <input
-          type="text"
-          id="fullName"
-          name="fullName"
-          placeholder="請輸入收件人姓名"
-          value={deliveryInfo.fullName}
-          onChange={handleChange}
-          className={`w-full px-3 py-2 border ${
-            submitted && errors.delivery.fullName
-              ? "border-red-500"
-              : "border-gray-300"
-          } rounded`}
-        />
-        {submitted && errors.delivery.fullName && (
-          <p className="text-red-500 text-sm mt-1">姓名為必填項</p>
-        )}
-      </div>
-
-      <div className="mb-4">
-        <label className="block font-medium mb-1" htmlFor="phone">
-          手機
-        </label>
-        <input
-          type="tel"
-          id="phone"
-          name="phone"
-          placeholder="請輸入聯絡電話"
-          value={deliveryInfo.phone}
-          onChange={handleChange}
-          className={`w-full px-3 py-2 border ${
-            submitted && errors.delivery.phone
-              ? "border-red-500"
-              : "border-gray-300"
-          } rounded`}
-        />
-        {submitted && errors.delivery.phone && (
-          <p className="text-red-500 text-sm mt-1">請輸入有效的手機號碼</p>
-        )}
-      </div>
-
-      <div className="mb-4">
-        <label className="block font-medium mb-1" htmlFor="email">
-          信箱
-        </label>
-        <input
-          type="email"
-          id="email"
-          name="email"
-          placeholder="請輸入Email"
-          value={deliveryInfo.email}
-          onChange={handleChange}
-          className={`w-full px-3 py-2 border ${
-            submitted && errors.delivery.email
-              ? "border-red-500"
-              : "border-gray-300"
-          } rounded`}
-        />
-        {submitted && errors.delivery.email && (
-          <p className="text-red-500 text-sm mt-1">請輸入有效的電子郵件地址</p>
-        )}
-      </div>
-
-      <div className="mb-4">
-        <label className="block font-medium mb-1" htmlFor="city">
-          縣市
-        </label>
-        <select
-          id="city"
-          name="city"
-          value={location.selectedCity}
-          // value={deliveryInfo.city}
-          onChange={handleSelectChange}
-          className={`w-full px-3 py-2 border cursor-pointer ${
-            submitted && errors.delivery.city
-              ? "border-red-500"
-              : "border-gray-300"
-          } rounded`}
-        >
-          <option value="">選擇縣市</option>
-
-          {cities.map((city) => (
-            <option key={city.name} value={city.name}>
-              {city.name}
-            </option>
-          ))}
-        </select>
-        {submitted && errors.delivery.city && (
-          <p className="text-red-500 text-sm mt-1">縣市為必填項</p>
-        )}
-      </div>
-
-      <div className="mb-4">
-        <label className="block font-medium mb-1" htmlFor="district">
-          地區
-        </label>
-        <select
-          id="district"
-          name="district"
-          value={location.selectedDistrict}
-          // value={deliveryInfo.district}
-          onChange={handleSelectChange}
-          className={`w-full px-3 py-2 border cursor-pointer ${
-            submitted && errors.delivery.district
-              ? "border-red-500"
-              : "border-gray-300"
-          } rounded`}
-        >
-          <option value="">選擇地區</option>
-          {districts.map((district) => (
-            <option key={district.name} value={district.name}>
-              {district.name}
-            </option>
-          ))}
-        </select>
-        {submitted && errors.delivery.district && (
-          <p className="text-red-500 text-sm mt-1">地區為必填項</p>
-        )}
-      </div>
-
-      <div className="mb-4">
-        <label className="block font-medium mb-1" htmlFor="address">
-          地址
-        </label>
-        <input
-          type="text"
-          id="address"
-          name="address"
-          placeholder="請輸入收件地址"
-          value={location.address}
-          // value={deliveryInfo.address}
-          onChange={handleChange}
-          className={`w-full px-3 py-2 border ${
-            submitted && errors.delivery.address
-              ? "border-red-500"
-              : "border-gray-300"
-          } rounded`}
-        />
-        {submitted && errors.delivery.address && (
-          <p className="text-red-500 text-sm mt-1">地址為必填項</p>
-        )}
-      </div>
+      {/* Select */}
+      {renderSelect({
+        id: "city",
+        name: "city",
+        label: "縣市",
+        value: Info.city,
+        options: cities,
+        onChange: handleSelectChange,
+        error: errors.city,
+        submitted,
+      })}
+      {renderSelect({
+        id: "district",
+        name: "district",
+        label: "地區",
+        value: Info.district,
+        options: districts,
+        onChange: handleSelectChange,
+        error: errors.district,
+        submitted,
+      })}
+      {renderInput({
+        type: "text",
+        id: "address_line",
+        name: "address_line",
+        label: "詳細地址",
+        placeholder: "請輸入詳細地址",
+        value: Info.address_line,
+        onChange: handleInputChange,
+        error: errors.address_line,
+        errorMessage: errorMessages.address_line,
+        submitted,
+      })}
     </>
   );
 };

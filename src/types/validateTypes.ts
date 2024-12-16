@@ -1,45 +1,67 @@
+// Info
 export interface DeliveryInfo {
-  fullName: string;
+  user_id: string;
+  recipient_name: string;
   phone: string;
-  email: string;
   city: string;
   district: string;
-  address: string;
+  address_line: string;
+  is_default: boolean;
 }
 
 export interface CreditCardInfo {
-  cardNumber: string;
-  expiryDate: string;
+  user_id: string;
+  card_number: string;
+  expiry_date: string;
   cvv: string;
 }
 
 export interface StoreInfo {
-  fullName: string;
+  user_id: string;
+  recipient_name: string;
   phone: string;
+  c_store: string;
   city: string;
   district: string;
-  store: string;
+  road_section: string;
+  // store: {
+  //   store_name: string;
+  //   store_address: string;
+  // };
+  store_name: string;
+  store_address: string;
+  is_default: boolean;
 }
 
+// Errors
+export interface DeliveryErrors {
+  recipient_name: boolean;
+  phone: boolean;
+  city: boolean;
+  district: boolean;
+  address_line: boolean;
+}
+
+export interface CreditCardErrors {
+  card_number: boolean;
+  expiry_date: boolean;
+  cvv: boolean;
+}
+
+export interface StoreErrors {
+  recipient_name: boolean;
+  phone: boolean;
+  c_store: boolean;
+  city: boolean;
+  district: boolean;
+  road_section: boolean;
+  store_name: boolean;
+  // store_address: boolean;
+}
+
+// 維持 Errors 作為整體結構
 export interface Errors {
-  delivery: {
-    fullName: boolean;
-    phone: boolean;
-    email: boolean;
-    city: boolean;
-    district: boolean;
-    address: boolean;
-  };
-  creditCard: {
-    cardNumber: boolean;
-    expiryDate: boolean;
-    cvv: boolean;
-  };
-  store: {
-    fullName: boolean;
-    phone: boolean;
-    city: boolean;
-    district: boolean;
-    store: boolean;
-  };
+  delivery: DeliveryErrors;
+  creditCard: CreditCardErrors;
+  store: StoreErrors;
 }

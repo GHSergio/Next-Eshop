@@ -4,12 +4,17 @@ import {
   UserInfo,
   CartItem,
   Order,
+  OrderInput,
   OrderItem,
   AlertState,
   DeliveryInfo,
   CreditCardInfo,
   StoreInfo,
-  Errors,
+  AddressItem,
+  InsertAddressItem,
+  StoreItem,
+  InsertStoreItem,
+  // Errors,
 } from "@/types";
 import { supabase } from "@/supabaseClient";
 import { RootState } from "@/store/store";
@@ -24,54 +29,68 @@ const initialState: UserState = {
   // isInitialized: false,
   userInfo: null,
   cart: [],
+  ordersHistory: [],
+  currentOrderDetails: {},
+  addresses: [],
+  stores: [],
+
   selectedItems: [],
   selectedPayment: "",
-  shippingCost: 0,
+  shipping_cost: 0,
   // 收件資訊表格
-  deliveryInfo: {
-    fullName: "",
+  delivery_info: {
+    user_id: "",
+    recipient_name: "",
     phone: "",
-    email: "",
+    // email: "",
     city: "",
     district: "",
-    address: "",
+    address_line: "",
+    is_default: false,
   },
   // 信用卡資訊表格
-  creditCardInfo: {
-    cardNumber: "",
-    expiryDate: "",
+  creditCard_info: {
+    user_id: "",
+    card_number: "",
+    expiry_date: "",
     cvv: "",
   },
   // 門市資訊表格
-  storeInfo: {
-    fullName: "",
+  store_info: {
+    user_id: "",
+    recipient_name: "",
     phone: "",
+    c_store: "",
     city: "",
     district: "",
-    store: "",
+    road_section: "",
+    store_name: "",
+    store_address: "",
+    is_default: false,
   },
-  ordersHistory: [],
-  currentOrderDetails: {},
+
   errors: {
     delivery: {
-      fullName: true,
+      recipient_name: true,
       phone: true,
-      email: true,
       city: true,
       district: true,
-      address: true,
+      address_line: true,
     },
     creditCard: {
-      cardNumber: true,
-      expiryDate: true,
+      card_number: true,
+      expiry_date: true,
       cvv: true,
     },
     store: {
-      fullName: true,
+      recipient_name: true,
       phone: true,
+      c_store: true,
       city: true,
       district: true,
-      store: true,
+      road_section: true,
+      store_name: true,
+      // store_address: true,
     },
   },
   alert: {
@@ -81,28 +100,14 @@ const initialState: UserState = {
   },
   showCart: false,
   showMember: false,
+  // 表單驗證是否通過
+  isDeliveryFormValid: false,
+  isStoreFormValid: false,
+  isCreditCardFormValid: false,
   // emailVerified: false,
+  isAddAddressModalOpen: false,
+  isAddStoreModalOpen: false,
 };
-
-// // register
-// export const registerUserThunk = createAsyncThunk(
-//   "user/registerUser",
-//   async (userData: RegisterUserPayload, { rejectWithValue }) => {
-//     try {
-//       const response = await registerUser(userData);
-//       // 若註冊成功（`status` 為 201 且 `success` 為 true），回傳使用者資料
-//       console.log("thunk接收到的: ", response);
-//       if (response.status === 201) {
-//         console.log("201接收到的: ", response.data);
-//         return response.data;
-//       }
-//     } catch (error: unknown) {
-//       return rejectWithValue(formatErrorResponse(error));
-//     }
-//   }
-// );
-
-// login
 
 // 登入
 export const loginUserThunk = createAsyncThunk<
@@ -197,12 +202,12 @@ export const initializeUserThunk = createAsyncThunk<
       const { error: insertError } = await supabase.from("users").insert({
         auth_id: authId,
         membership_type: "普通會員",
-        username: "",
+        user_name: "",
         avatar_url: "",
         phone: null,
-        address: null,
-        preferred_payment_method: null,
         default_shipping_address: null,
+        default_pickup_store: null,
+        // preferred_payment_method: null,
       });
 
       if (insertError) {
@@ -239,7 +244,6 @@ export const logoutUserThunk = createAsyncThunk<
     localStorage.clear();
     // 重置 Redux 狀態
     dispatch(clearUserInfo());
-    dispatch(clearCart());
   } catch (error: unknown) {
     console.log(error);
     return rejectWithValue({
@@ -251,8 +255,8 @@ export const logoutUserThunk = createAsyncThunk<
 
 // 獲取用戶 DB 資訊
 export const fetchUserData = createAsyncThunk<
-  UserInfo,
-  void,
+  UserInfo, // 返回的數據類型
+  void, // 無需傳入參數
   { rejectValue: RejectValue }
 >("user/fetchUserData", async (_, { rejectWithValue, getState }) => {
   const state = getState() as RootState;
@@ -273,10 +277,16 @@ export const fetchUserData = createAsyncThunk<
 
     const supabaseUserInfo = session.session.user;
 
-    // 獲取自定義部分
+    // 獲取自定義部分，聯結 addresses 和 stores 表
     const { data: customUserInfo, error: customError } = await supabase
       .from("users")
-      .select("*")
+      .select(
+        `
+    *,
+    default_shipping_address:addresses!users_default_shipping_address_fkey(*),
+    default_pickup_store:stores!users_default_pickup_store_fkey(*)
+  `
+      )
       .eq("auth_id", supabaseUserInfo.id)
       .maybeSingle(); // 改用 maybeSingle()，避免空結果時報錯
 
@@ -288,21 +298,53 @@ export const fetchUserData = createAsyncThunk<
         severity: "error",
       });
     }
+
     // 合併 映射 auth.user & user
     const userInfo: UserInfo = {
       id: supabaseUserInfo.id,
       email: supabaseUserInfo.email || "",
-      avatarUrl:
+      avatar_url:
         customUserInfo?.avatar_url ||
         supabaseUserInfo.user_metadata?.avatar_url ||
         "",
-      fullName: customUserInfo?.username || "",
+      user_name: customUserInfo?.user_name || "",
       phone: customUserInfo?.phone,
-      defaultShippingAddress: customUserInfo?.defaultShippingAddress,
-      preferredPaymentMethod: customUserInfo?.preferredPaymentMethod,
-      membershipType: customUserInfo?.membershipType,
+      // 預設收件地址格式
+      default_shipping_address: customUserInfo?.default_shipping_address
+        ? {
+            id: customUserInfo.default_shipping_address.id,
+            user_id: customUserInfo.default_shipping_address.auth_id,
+            recipient_name:
+              customUserInfo.default_shipping_address.recipient_name,
+            phone: customUserInfo.default_shipping_address.phone,
+            city: customUserInfo.default_shipping_address.city,
+            district: customUserInfo.default_shipping_address.district,
+            address_line: customUserInfo.default_shipping_address.address_line,
+            isDefault: customUserInfo.default_shipping_address.is_default,
+          }
+        : null,
+      // 預設取貨門市格式
+      default_pickup_store: customUserInfo?.default_pickup_store
+        ? {
+            id: customUserInfo.default_pickup_store.id,
+            user_id: customUserInfo.default_pickup_store.auth_id,
+            recipient_name: customUserInfo.default_pickup_store.recipient_name,
+            phone: customUserInfo.default_pickup_store.phone,
+            c_store: customUserInfo.default_pickup_store.c_store,
+            city: customUserInfo.default_pickup_store.city,
+            district: customUserInfo.default_pickup_store.district,
+            road_section: customUserInfo.default_pickup_store.road_section,
+            // store: {
+            //   store_name: customUserInfo.default_pickup_store.store_name,
+            //   store_address: customUserInfo.default_pickup_store.store_address,
+            // },
+            store_name: customUserInfo.default_pickup_store.store_name,
+            store_address: customUserInfo.default_pickup_store.store_address,
+            is_default: customUserInfo.default_pickup_store.is_default,
+          }
+        : null,
       provider: supabaseUserInfo.app_metadata?.provider,
-      updatedAt: customUserInfo?.updated_at || null,
+      updated_at: customUserInfo?.updated_at || null,
     };
 
     // 存入 localStorage
@@ -317,6 +359,35 @@ export const fetchUserData = createAsyncThunk<
   }
 });
 
+// // 修改使用者資訊
+// export const updateUserDataThunk = createAsyncThunk<
+//   void,
+//   { field: keyof UserInfo; value: UserInfo[keyof UserInfo] | null }, // 使用 keyof UserInfo 限制字段
+//   { state: RootState; rejectValue: string } // 訪問 Redux 狀態
+// >(
+//   "user/updateUserData",
+//   async ({ field, value }, { rejectWithValue, getState }) => {
+//     try {
+//       const state = getState();
+//       const authId = state.user.userInfo?.id; // 從狀態中獲取 authId
+
+//       if (!authId) {
+//         throw new Error("無法獲取用戶 ID，請重新登入");
+//       }
+
+//       const { error } = await supabase
+//         .from("users")
+//         .update({ [field]: value }) // 更新指定字段
+//         .eq("auth_id", authId); // 對象為與authId一樣的auth_id的項目
+
+//       if (error) throw error;
+//     } catch (error) {
+//       console.error("更新用戶字段失敗", error);
+//       return rejectWithValue("更新失敗，請稍後再試");
+//     }
+//   }
+// );
+
 // 獲取用戶 DB 購物車數據
 export const fetchCartThunk = createAsyncThunk<
   CartItem[], // 返回的數據類型
@@ -327,7 +398,7 @@ export const fetchCartThunk = createAsyncThunk<
     const { data, error } = await supabase
       .from("cart_items")
       .select("*")
-      .eq("user_id", authId);
+      .eq("auth_id", authId);
 
     if (error) {
       return rejectWithValue("獲取購物車數據失敗：" + error.message);
@@ -344,14 +415,14 @@ export const fetchCartThunk = createAsyncThunk<
 // 添加購物車項目
 export const addToCartThunk = createAsyncThunk<
   CartItem, // 返回類型
-  CartItem, // 接收的完整商品數據
+  CartItem, // 傳入完整的商品數據
   { rejectValue: string }
 >("cart/addToCart", async (cartItem, { rejectWithValue }) => {
   try {
     const { data, error } = await supabase
       .from("cart_items")
       .insert({
-        user_id: cartItem.user_id,
+        auth_id: cartItem.user_id,
         product_id: cartItem.product_id,
         product_name: cartItem.product_name,
         product_price: cartItem.product_price,
@@ -424,18 +495,18 @@ export const deleteCartItemThunk = createAsyncThunk<
   }
 });
 
-// 儲存訂單
+// 新增訂單
 export const saveOrderThunk = createAsyncThunk<
   Order, // 返回 Order 類型
-  { newOrder: Order; orderItems: OrderItem[] }, // 傳入的參數類型
+  { newOrder: OrderInput; orderItems: OrderItem[] }, // 傳入的參數類型
   { rejectValue: string }
 >("orders/saveOrder", async ({ newOrder, orderItems }, { rejectWithValue }) => {
   try {
     // 插入到 `orders` 表
     const { data: orderData, error: orderError } = await supabase
       .from("orders")
-      .insert(newOrder)
-      .select()
+      .insert(newOrder) // 插入數據，newOrder 沒有 id
+      .select() // 返回插入後的完整數據，包括生成的 id
       .single();
 
     if (orderError) {
@@ -473,7 +544,7 @@ export const fetchOrdersThunk = createAsyncThunk<
     const { data, error } = await supabase
       .from("orders")
       .select("*")
-      .eq("user_id", userId); // 在orders內 尋找user_id 符合userId的項目
+      .eq("auth_id", userId); // 在orders內 尋找auth_id 符合userId的項目
 
     if (error) {
       return rejectWithValue("獲取訂單失敗：" + error.message);
@@ -525,6 +596,174 @@ export const fetchOrderDetailsThunk = createAsyncThunk<
   } catch (error) {
     console.log(error);
     return rejectWithValue("發生未知錯誤，無法獲取訂單詳情");
+  }
+});
+
+// 新增收貨地址 Thunk
+export const saveAddressThunk = createAsyncThunk<
+  AddressItem, // 返回值類型
+  InsertAddressItem, // 傳入參數類型
+  { rejectValue: string }
+>("addresses/save", async (addressData, { rejectWithValue }) => {
+  try {
+    const { data, error } = await supabase
+      .from("addresses")
+      .insert({
+        auth_id: addressData.user_id,
+        recipient_name: addressData.recipient_name,
+        phone: addressData.phone,
+        city: addressData.city,
+        district: addressData.district,
+        address_line: addressData.address_line,
+        is_default: addressData.is_default,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
+      .select("*")
+      .single();
+
+    if (error) {
+      return rejectWithValue(`儲存地址失敗: ${error.message}`);
+    }
+    console.log("常用地址儲存成功", data);
+    return data as AddressItem;
+  } catch (error) {
+    console.error(error);
+    return rejectWithValue("儲存地址時發生未知錯誤");
+  }
+});
+
+// 獲取收貨地址 Thunk
+export const fetchAddressesThunk = createAsyncThunk<
+  AddressItem[], // 返回值類型
+  string, // user_id
+  { rejectValue: string }
+>("addresses/fetch", async (userId, { rejectWithValue }) => {
+  try {
+    const { data, error } = await supabase
+      .from("addresses")
+      .select("*")
+      .eq("auth_id", userId);
+
+    if (error) {
+      return rejectWithValue(`獲取地址失敗: ${error.message}`);
+    }
+
+    // console.log("常用地址獲取成功", data);
+    return data || [];
+  } catch (error) {
+    console.error(error);
+    return rejectWithValue("獲取地址時發生未知錯誤");
+  }
+});
+
+// 移除地址 Thunk
+export const deleteAddressThunk = createAsyncThunk<
+  string, // 返回被刪除的地址 ID
+  string, // 傳入的地址 ID
+  { rejectValue: string }
+>("user/deleteAddress", async (addressId, { rejectWithValue }) => {
+  try {
+    const { error } = await supabase
+      .from("addresses")
+      .delete()
+      .eq("id", addressId);
+
+    if (error) {
+      return rejectWithValue(`刪除地址失敗: ${error.message}`);
+    }
+
+    return addressId; // 成功返回刪除的地址 ID
+  } catch (error) {
+    console.error("刪除地址時發生錯誤:", error);
+    return rejectWithValue("刪除地址時發生未知錯誤");
+  }
+});
+
+// 新增取貨門市 Thunk
+export const saveStoreThunk = createAsyncThunk<
+  StoreItem, // 返回值類型
+  InsertStoreItem, // 傳入參數類型
+  { rejectValue: string }
+>("stores/save", async (storeData, { rejectWithValue }) => {
+  try {
+    const { data, error } = await supabase
+      .from("stores")
+      .insert({
+        auth_id: storeData.user_id,
+        recipient_name: storeData.recipient_name,
+        phone: storeData.phone,
+        c_store: storeData.c_store,
+        city: storeData.city,
+        district: storeData.district,
+        road_section: storeData.road_section,
+        store_name: storeData.store_name,
+        store_address: storeData.store_address,
+        is_default: storeData.is_default,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
+      .select("*")
+      .single();
+
+    if (error) {
+      return rejectWithValue(`儲存門市失敗: ${error.message}`);
+    }
+
+    // console.log("常用門市儲存成功", data);
+    return data as StoreItem;
+  } catch (error) {
+    console.error(error);
+    return rejectWithValue("儲存門市時發生未知錯誤");
+  }
+});
+
+// 獲取門市 Thunk
+export const fetchStoresThunk = createAsyncThunk<
+  StoreItem[], // 返回值類型
+  string, // auth_id
+  { rejectValue: string }
+>("stores/fetch", async (userId, { rejectWithValue }) => {
+  try {
+    const { data, error } = await supabase
+      .from("stores")
+      .select("*")
+      .eq("auth_id", userId);
+
+    if (error) {
+      return rejectWithValue(`獲取門市失敗: ${error.message}`);
+    }
+
+    // 將資料轉換為應用程式所需的格式
+    const storesData = (data || []).map((store) => ({
+      ...store,
+    }));
+
+    // console.log("常用門市獲取成功", data);
+    return storesData || [];
+  } catch (error) {
+    console.error(error);
+    return rejectWithValue("獲取門市時發生未知錯誤");
+  }
+});
+
+// 移除門市 thunk
+export const deleteStoreThunk = createAsyncThunk<
+  string, // 返回被刪除的門市 ID
+  string, // 傳入的門市 ID
+  { rejectValue: string }
+>("user/deleteStore", async (storeId, { rejectWithValue }) => {
+  try {
+    const { error } = await supabase.from("stores").delete().eq("id", storeId);
+
+    if (error) {
+      return rejectWithValue(`刪除門市失敗: ${error.message}`);
+    }
+
+    return storeId; // 成功返回刪除的門市 ID
+  } catch (error) {
+    console.error("刪除門市時發生錯誤:", error);
+    return rejectWithValue("刪除門市時發生未知錯誤");
   }
 });
 
@@ -584,23 +823,45 @@ const userSlice = createSlice({
     },
     // 運費
     setShippingCost(state, action: PayloadAction<number>) {
-      state.shippingCost = action.payload;
+      state.shipping_cost = action.payload;
     },
     // 設置收件人資訊
     setDeliveryInfo(state, action: PayloadAction<DeliveryInfo>) {
-      state.deliveryInfo = action.payload;
+      state.delivery_info = action.payload;
     },
     // 設置信用卡資訊
     setCreditCardInfo(state, action: PayloadAction<CreditCardInfo>) {
-      state.creditCardInfo = action.payload;
+      state.creditCard_info = action.payload;
     },
     // 設置超商取貨資訊
     setStoreInfo(state, action: PayloadAction<StoreInfo>) {
-      state.storeInfo = action.payload;
+      state.store_info = action.payload;
     },
     // 設置驗證
-    setErrors(state, action: PayloadAction<Errors>) {
-      state.errors = action.payload;
+    setErrors(state, action) {
+      state.errors = {
+        ...state.errors,
+        ...action.payload, // 合併新錯誤對象
+      };
+    },
+
+    // 宅配表單驗證結果
+    setDeliveryValidity(state, action: PayloadAction<boolean>) {
+      state.isDeliveryFormValid = action.payload;
+    },
+    // 門市表單驗證結果
+    setStoreValidity(state, action: PayloadAction<boolean>) {
+      state.isStoreFormValid = action.payload;
+    },
+    // 信用卡表單驗證結果
+    setCreditCardValidity(state, action: PayloadAction<boolean>) {
+      state.isCreditCardFormValid = action.payload;
+    },
+    // 重置表單驗證結果
+    resetFormValidity(state, action: PayloadAction<boolean>) {
+      state.isDeliveryFormValid = action.payload;
+      state.isStoreFormValid = action.payload;
+      state.isCreditCardFormValid = action.payload;
     },
     // Alert
     setAlert(state, action: PayloadAction<AlertState>) {
@@ -617,6 +878,15 @@ const userSlice = createSlice({
     setShowMember(state, action: PayloadAction<boolean>) {
       state.showMember = action.payload;
     },
+    // CreateDelivery Modal
+    setIsAddAddressModalOpen(state, action: PayloadAction<boolean>) {
+      state.isAddAddressModalOpen = action.payload;
+    },
+    // CreateStore Modal
+    setIsAddStoreModalOpen(state, action: PayloadAction<boolean>) {
+      state.isAddStoreModalOpen = action.payload;
+    },
+
     // loginOut 清除使用者資訊
     clearUserInfo(state) {
       state.userInfo = null;
@@ -674,7 +944,7 @@ const userSlice = createSlice({
       })
       .addCase(addToCartThunk.rejected, (state, action) => {
         // setAlertState(state, "error", "購物車商品添加失敗！");
-        console.log("action", action.payload);
+        console.error("添加商品失敗", action.payload);
       });
 
     // 獲取購物車項目
@@ -684,7 +954,7 @@ const userSlice = createSlice({
         state.cart = action.payload;
       })
       .addCase(fetchCartThunk.rejected, (_, action) => {
-        console.log("action", action.payload);
+        console.error("獲取購物車資訊失敗", action.payload);
         // setAlertState(state, "error", "購物車商品獲取失敗！");
       });
 
@@ -714,7 +984,7 @@ const userSlice = createSlice({
       })
       .addCase(updateCartItemThunk.rejected, (state, action) => {
         // setAlertState(state, "error", "購物車商品更新失敗！");
-        console.log("商品數量更新失敗", action.payload);
+        console.error("商品數量更新失敗", action.payload);
       });
 
     // 刪除購物車項目
@@ -725,9 +995,8 @@ const userSlice = createSlice({
         console.log("移除商品成功");
       })
       .addCase(deleteCartItemThunk.rejected, (state, action) => {
-        console.log("action", action.payload);
+        console.error("移除商品失敗", action.payload);
         // setAlertState(state, "error", "移除商品失敗！");
-        console.log("移除商品失敗");
       });
     // 獲取訂單紀錄
     builder
@@ -736,7 +1005,7 @@ const userSlice = createSlice({
         state.ordersHistory = action.payload;
       })
       .addCase(fetchOrdersThunk.rejected, (state, action) => {
-        console.log("獲取訂單紀錄失敗", action.payload);
+        console.error("獲取訂單紀錄失敗", action.payload);
       });
     // 獲取訂單詳細資訊
     builder
@@ -751,13 +1020,15 @@ const userSlice = createSlice({
           if (order.id) {
             // 使用 order.id 作為鍵
             state.currentOrderDetails[order.id] = { order, items };
-          } else {
-            console.error("訂單沒有 ID，無法更新 currentOrderDetails");
+            console.log(state.currentOrderDetails);
           }
+          // else {
+          //   console.error("訂單沒有 ID，無法更新 currentOrderDetails");
+          // }
         }
       )
       .addCase(fetchOrderDetailsThunk.rejected, (state, action) => {
-        console.log("獲取訂單詳細資訊失敗", action.payload);
+        console.error("獲取訂單詳細資訊失敗", action.payload);
       });
 
     // 儲存訂單
@@ -767,8 +1038,77 @@ const userSlice = createSlice({
         state.ordersHistory = [...state.ordersHistory, action.payload];
       })
       .addCase(saveOrderThunk.rejected, (state, action) => {
-        console.log("儲存訂單失敗", action.payload);
+        console.error("儲存訂單失敗", action.payload);
       });
+    // 新增常用門市
+    builder
+      .addCase(saveStoreThunk.fulfilled, (state, action) => {
+        console.log("新增門市成功: ", action.payload);
+        state.stores = [...state.stores, action.payload];
+      })
+      .addCase(saveStoreThunk.rejected, (state, action) => {
+        console.error("新增門市失敗: ", action.payload);
+      });
+    // 新增常用地址
+    builder
+      .addCase(saveAddressThunk.fulfilled, (state, action) => {
+        console.log("新增地址成功: ", action.payload);
+        state.addresses = [...state.addresses, action.payload];
+      })
+      .addCase(saveAddressThunk.rejected, (state, action) => {
+        console.error("新增地址失敗: ", action.payload);
+      });
+    // 獲取常用門市
+    builder
+      .addCase(fetchStoresThunk.fulfilled, (state, action) => {
+        console.log("獲取常用門市成功", action.payload);
+        state.stores = action.payload;
+      })
+      .addCase(fetchStoresThunk.rejected, (state, action) => {
+        console.error("獲取常用門市失敗: ", action.payload);
+      });
+    // 獲取常用地址
+    builder
+      .addCase(fetchAddressesThunk.fulfilled, (state, action) => {
+        console.log("獲取常用地址成功 ", action.payload);
+        state.addresses = action.payload;
+      })
+      .addCase(fetchAddressesThunk.rejected, (state, action) => {
+        console.error("獲取常用地址失敗: ", action.payload);
+      });
+    // 移除常用地址
+    builder.addCase(deleteAddressThunk.fulfilled, (state, action) => {
+      state.addresses = state.addresses.filter(
+        (address) => address.id !== action.payload
+      );
+      console.log("地址移除成功");
+    });
+
+    // 移除常用門市
+    builder.addCase(deleteStoreThunk.fulfilled, (state, action) => {
+      state.stores = state.stores.filter(
+        (store) => store.id !== action.payload
+      );
+      console.log("門市移除成功");
+    });
+    // 修改使用者資訊
+    // builder
+    //   .addCase(updateUserDataThunk.fulfilled, (state, action) => {
+    //     const { field, value } = action.meta.arg; // 獲取傳入的字段及其值
+    //     if (state.userInfo) {
+    //       // 確保 field 是 UserInfo 的鍵
+    //       state.userInfo[field as keyof UserInfo] = value as never;
+    //     }
+    //     setAlertState(state, "success", "更新成功！");
+    //   })
+    //   .addCase(updateUserDataThunk.rejected, (state, action) => {
+    //     console.error("更新用戶字段失敗", action.payload);
+    //     setAlertState(
+    //       state,
+    //       "error",
+    //       action.payload || "更新失敗，請稍後再試！"
+    //     );
+    //   });
   },
 });
 
@@ -779,14 +1119,20 @@ export const {
   setSelectedItems,
   setSelectedPayment,
   setShippingCost,
+  setStoreInfo,
   setDeliveryInfo,
   setCreditCardInfo,
-  setStoreInfo,
+  setDeliveryValidity,
+  setStoreValidity,
+  setCreditCardValidity,
+  resetFormValidity,
   setErrors,
   setAlert,
   clearAlert,
   setShowCart,
   setShowMember,
+  setIsAddAddressModalOpen,
+  setIsAddStoreModalOpen,
 } = userSlice.actions;
 
 export default userSlice.reducer;

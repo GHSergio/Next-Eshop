@@ -16,10 +16,13 @@ const DeliveryAndPayment = () => {
   // 選擇哪種運送方式 & 需支付運費
   const handleOptionShipping = (option: string) => {
     switch (option) {
-      case "7-11":
-        dispatch(setShippingCost(10));
-        break;
-      case "family":
+      // case "7-11":
+      //   dispatch(setShippingCost(10));
+      //   break;
+      // case "family":
+      //   dispatch(setShippingCost(10));
+      //   break;
+      case "c_store":
         dispatch(setShippingCost(10));
         break;
       case "delivery":
@@ -36,8 +39,13 @@ const DeliveryAndPayment = () => {
   };
 
   const deliveryOptions = [
-    { id: "7-11", label: "7-11 取貨付款", note: "滿 $100 元免運，運費 $10" },
-    { id: "family", label: "全家 取貨付款", note: "滿 $100 元免運，運費 $10" },
+    // { id: "7-11", label: "7-11 取貨付款", note: "滿 $100 元免運，運費 $10" },
+    // { id: "family", label: "全家 取貨付款", note: "滿 $100 元免運，運費 $10" },
+    {
+      id: "c_store",
+      label: "超商 取貨付款",
+      note: "滿 100 元免運，運費 $10",
+    },
     {
       id: "delivery",
       label: "宅配 貨到付款",

@@ -12,7 +12,7 @@ const useCartCalculations = () => {
     (state: RootState) => state.user.selectedPayment
   );
   const shippingCost = useSelector(
-    (state: RootState) => state.user.shippingCost
+    (state: RootState) => state.user.shipping_cost
   );
 
   // 計算總數量

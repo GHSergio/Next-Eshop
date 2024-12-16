@@ -52,7 +52,9 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ orderId }) => {
               配送地址：{order.delivery_address}
             </p>
           ) : (
-            <p className={commonTextClasses()}>取貨門市：{order.store_name}</p>
+            <p className={commonTextClasses()}>
+              取貨門市：{order.store?.store_name}
+            </p>
           )}
         </div>
 
@@ -104,7 +106,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ orderId }) => {
               <span
                 className={`xs:col-start-4 xs:row-start-2 xs:row-span-1 xs:col-span-1 md:col-span-2 ${commonSpanClasses()}`}
               >
-                $ {item.product_price}
+                $ {Math.ceil(item.product_price)}
               </span>
 
               {/* 數量 */}
@@ -128,7 +130,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ orderId }) => {
               <span
                 className={`xs:col-start-4 xs:row-start-4 xs:row-span-1 xs:col-span-1 md:col-span-2 ${commonSpanClasses()}`}
               >
-                $ {Math.floor(item.product_price * item.quantity)}
+                $ {Math.ceil(item.product_price * item.quantity)}
               </span>
             </div>
           ))}
@@ -136,12 +138,10 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ orderId }) => {
         {/* 訂單結算 */}
         <div className="mt-4 space-y-3 text-right text-sm">
           <p>共 {order.items_count} 件商品</p>
-          <p>商品金額：$ {order.total_items_price.toFixed(2)}</p>
-          <p>運費： $ {order.shipping_cost.toFixed(2)}</p>
+          <p>商品金額：$ {Math.ceil(order.total_items_price)}</p>
+          <p>運費： $ {order.shipping_cost}</p>
           <hr className="my-2" />
-          <h4 className="text-lg font-semibold">
-            小計：${order.total_price.toFixed(2)}
-          </h4>
+          <h4 className="text-lg font-semibold">小計：${order.total_price}</h4>
         </div>
       </div>
       {/* </div> */}

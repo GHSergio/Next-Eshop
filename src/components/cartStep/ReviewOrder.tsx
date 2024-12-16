@@ -12,12 +12,15 @@ const ReviewOrder = () => {
     (state: RootState) => state.user.selectedPayment
   );
   const deliveryInfo = useSelector(
-    (state: RootState) => state.user.deliveryInfo
+    (state: RootState) => state.user.delivery_info
   );
   const creditCardInfo = useSelector(
-    (state: RootState) => state.user.creditCardInfo
+    (state: RootState) => state.user.creditCard_info
   );
-  const storeInfo = useSelector((state: RootState) => state.user.storeInfo);
+  const storeInfo = useSelector((state: RootState) => state.user.store_info);
+  const c_store = useSelector(
+    (state: RootState) => state.user.store_info.c_store
+  );
 
   const commonTextClasses = () => "xs:text-xs md:text-sm";
 
@@ -25,8 +28,7 @@ const ReviewOrder = () => {
     "md:col-start-auto md:row-start-auto text-center text-textColor font-semibold xs:text-[0.5rem] md:text-sm";
 
   const paymentMethods = {
-    "7-11": "7-11 取貨付款",
-    family: "全家 取貨付款",
+    c_store: `${c_store} 取貨付款`,
     delivery: "宅配 貨到付款",
     credit: "宅配 信用卡",
   };
@@ -37,7 +39,7 @@ const ReviewOrder = () => {
       {/* 訂單個人資訊 */}
       <div className="grid gap-4 xs:text-start">
         {/* 根據付款和運送方式顯示不同資訊 */}
-        {selectedPayment === "7-11" || selectedPayment === "family" ? (
+        {selectedPayment === "c_store" ? (
           <>
             <h3 className="xs:text-sm md:text-lg font-semibold mb-2">
               超商取貨資訊
@@ -46,13 +48,13 @@ const ReviewOrder = () => {
               付款方式 : {paymentMethods[selectedPayment] || "未知付款方式"}
             </p>
             <p className={`${commonTextClasses()}`}>
-              訂購姓名 : {storeInfo.fullName}
+              訂購姓名 : {storeInfo.recipient_name}
             </p>
             <p className={`${commonTextClasses()}`}>
               聯絡方式 : {storeInfo.phone}
             </p>
             <p className={`${commonTextClasses()}`}>
-              取貨門市 : {storeInfo.store}
+              取貨門市 : {storeInfo.store_name}
             </p>
           </>
         ) : selectedPayment === "delivery" ? (
@@ -64,14 +66,14 @@ const ReviewOrder = () => {
               付款方式 : {paymentMethods[selectedPayment] || "未知付款方式"}
             </p>
             <p className={`${commonTextClasses()}`}>
-              訂購姓名 : {deliveryInfo.fullName}
+              訂購姓名 : {deliveryInfo.recipient_name}
             </p>
             <p className={`${commonTextClasses()}`}>
               聯絡方式 : {deliveryInfo.phone}
             </p>
             <p className={`${commonTextClasses()}`}>
               收件地址 : {deliveryInfo.city}-{deliveryInfo.district}-
-              {deliveryInfo.address}
+              {deliveryInfo.address_line}
             </p>
           </>
         ) : selectedPayment === "credit" ? (
@@ -83,17 +85,17 @@ const ReviewOrder = () => {
               付款方式 : {paymentMethods[selectedPayment] || "未知付款方式"}
             </p>
             <p className={`${commonTextClasses()}`}>
-              訂購姓名 : {deliveryInfo.fullName}
+              訂購姓名 : {deliveryInfo.recipient_name}
             </p>
             <p className={`${commonTextClasses()}`}>
               聯絡方式 : {deliveryInfo.phone}
             </p>
             <p className={`${commonTextClasses()}`}>
               收件地址 : {deliveryInfo.city}-{deliveryInfo.district}-
-              {deliveryInfo.address}
+              {deliveryInfo.address_line}
             </p>
             <p className={`${commonTextClasses()}`}>
-              信用卡號 : **** **** **** {creditCardInfo.cardNumber?.slice(-4)}
+              信用卡號 : **** **** **** {creditCardInfo.card_number?.slice(-4)}
             </p>
           </>
         ) : null}

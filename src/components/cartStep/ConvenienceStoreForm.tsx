@@ -1,208 +1,266 @@
 "use client";
-import React, { useCallback } from "react";
+import React, { useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
-import { setStoreInfo, setErrors } from "@/store/slice/userSlice";
 import {
+  updateStoreCities,
   updateStoreDistricts,
+  updateStoreRoadSections,
   updateStores,
 } from "@/store/slice/storeLocationSlice";
+import { StoreInfo, StoreErrors } from "@/types";
+import { renderInput, renderSelect } from "@/utils/formRenderers";
+import { validateStoreInfo } from "@/utils/validators";
 
 interface ConvenienceStoreFormProps {
+  user_id?: string;
+  Info: StoreInfo;
+  setInfo: (info: StoreInfo) => void;
+  errors: StoreErrors;
+  setErrors: (errors: StoreErrors) => void;
+  onValidate: (isValid: boolean) => void;
   submitted: boolean;
 }
 
 const ConvenienceStoreForm: React.FC<ConvenienceStoreFormProps> = ({
+  Info,
+  setInfo,
+  errors,
+  setErrors,
+  onValidate,
   submitted,
 }) => {
   const dispatch = useDispatch();
-  const storeInfo = useSelector((state: RootState) => state.user.storeInfo);
-  const errors = useSelector((state: RootState) => state.user.errors);
+  const cStores = useSelector(
+    (state: RootState) => state.storeLocation.cStores
+  );
   const cities = useSelector((state: RootState) => state.storeLocation.cities);
   const districts = useSelector(
     (state: RootState) => state.storeLocation.districts
   );
+  const roadSections = useSelector(
+    (state: RootState) => state.storeLocation.roadSections
+  );
   const stores = useSelector((state: RootState) => state.storeLocation.stores);
 
-  const handleChange = useCallback(
+  // 驗證 StoreInfo 是否通過
+  const validateForm = useCallback(() => {
+    const newErrors = validateStoreInfo(Info);
+
+    // 僅當錯誤狀態改變(單項符合驗證)時才執行
+    if (JSON.stringify(errors) !== JSON.stringify(newErrors)) {
+      console.log("比較差異:", "store:", errors, "newErrors:", newErrors);
+      // setErrors({ ...errors, store: newErrors });
+      setErrors(newErrors);
+    }
+
+    const isValid = !Object.values(newErrors).some((error) => error);
+    onValidate(isValid);
+  }, [Info, errors, onValidate, setErrors]);
+
+  // 提交時觸發驗證
+  useEffect(() => {
+    if (submitted) validateForm();
+  }, [submitted, validateForm]);
+
+  const handleInputChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const { name, value } = event.target;
-      // console.log(name, value);
-      dispatch(setStoreInfo({ ...storeInfo, [name]: value }));
-      // 動態地設置 name 對應的錯誤狀態，判斷該輸入框的值是否為空
-      dispatch(
-        setErrors({
-          ...errors,
-          store: { ...errors.store, [name]: value.trim() === "" },
-        })
-      );
+      const updatedInfo = { ...Info, [name]: value };
+      setInfo(updatedInfo);
+      // 即時驗證並更新狀態
+      const newErrors = validateStoreInfo(updatedInfo);
+      const isValid = !Object.values(newErrors).some((error) => error);
+      setErrors(newErrors);
+      onValidate(isValid); // 即時更新 valid 狀態
     },
-    [dispatch, errors, storeInfo]
+    [Info, setErrors, setInfo, onValidate]
   );
 
   const handleSelectChange = useCallback(
     (event: React.ChangeEvent<HTMLSelectElement>) => {
       const { name, value } = event.target;
+      let updatedInfo = { ...Info };
 
-      if (name === "city") {
-        // dispatch(setStoreCity(value)); // 更新城市並觸發 storeLocation Slice內 的地區state更新
-        dispatch(updateStoreDistricts(value)); // 通知 storeLocationSlice 更新地區列表
-
-        dispatch(
-          setStoreInfo({ ...storeInfo, city: value, district: "", store: "" })
-        ); // 清空相關字段
+      if (name === "c_store") {
+        // 通知 storeLocationSlice 更新city列表
+        dispatch(updateStoreCities(value));
+        // 更新 state 的 city 部分 & 清空 city以下項目
+        updatedInfo = {
+          ...Info,
+          c_store: value,
+          city: "",
+          district: "",
+          road_section: "",
+          store_name: "",
+          store_address: "",
+          // store: {
+          //   store_name: "",
+          //   store_address: "",
+          // },
+        };
+      } else if (name === "city") {
+        dispatch(updateStoreDistricts(value));
+        updatedInfo = {
+          ...Info,
+          city: value,
+          district: "",
+          road_section: "",
+          store_name: "",
+          store_address: "",
+          // store: {
+          //   store_name: "",
+          //   store_address: "",
+          // },
+        };
       } else if (name === "district") {
-        // dispatch(setStoreDistrict(value)); // 更新地區並觸發 storeLocation Slice內 的門市state更新
-        dispatch(updateStores(value)); // 通知 storeLocationSlice 更新門市列表
-
-        dispatch(setStoreInfo({ ...storeInfo, district: value, store: "" })); // 清空門市字段
+        dispatch(updateStoreRoadSections(value));
+        updatedInfo = {
+          ...Info,
+          district: value,
+          road_section: "",
+          store_name: "",
+          store_address: "",
+          // store: {
+          //   store_name: "",
+          //   store_address: "",
+          // },
+        };
+      } else if (name === "road_section") {
+        dispatch(updateStores(value));
+        updatedInfo = {
+          ...Info,
+          road_section: value,
+          store_name: "",
+          store_address: "",
+          // store: {
+          //   store_name: "",
+          //   store_address: "",
+          // },
+        };
       } else if (name === "store") {
-        // dispatch(setStore(value)); // 更新選中的門市
-        dispatch(setStoreInfo({ ...storeInfo, store: value })); // 更新 Redux storeInfo
+        const selectedStore = stores.find(
+          (store) => store.store_name === value
+        );
+        // const selectedAddress = stores.find((store) => store.address === value);
+        if (selectedStore) {
+          updatedInfo = {
+            ...Info,
+            store_name: selectedStore.store_name,
+            store_address: selectedStore.store_address,
+            // store: {
+            //   store_name: selectedStore.name,
+            //   store_address: selectedStore.address,
+            // },
+          };
+        }
       }
+      // 更新 Redux 的 deliveryInfo
+      setInfo(updatedInfo);
 
-      dispatch(
-        setErrors({
-          ...errors,
-          store: { ...errors.store, [name]: value.trim() === "" },
-        })
-      );
+      // 即時驗證並更新狀態
+      const newErrors = validateStoreInfo(updatedInfo);
+      const isValid = !Object.values(newErrors).some((error) => error);
+      setErrors(newErrors);
+      onValidate(isValid); // 即時更新 valid 狀態
     },
-    [dispatch, errors, storeInfo]
+    [dispatch, Info, stores, onValidate, setErrors, setInfo]
   );
+
+  // 自定義 錯誤提示訊息
+  const errorMessages: { [key: string]: string } = {
+    recipient_name: "姓名不能為空",
+    phone: "請輸入有效的10位手機號碼",
+    c_store: "請選擇超商類型",
+    city: "請選擇縣市",
+    district: "請選擇地區",
+    road_section: "請選擇路段",
+    store: "請選擇門市",
+  };
+
+  // console.log("Updated storeInfo:", storeInfo);
+  // console.log("Cities options:", cities);
 
   return (
     <>
-      <h2 className="text-lg font-semibold mb-4">超商取貨資訊</h2>
-      <div className="mb-4">
-        <label className="block font-medium mb-1" htmlFor="fullName">
-          姓名
-        </label>
-        <input
-          type="text"
-          id="fullName"
-          name="fullName"
-          placeholder="請輸入取件人姓名"
-          value={storeInfo.fullName}
-          onChange={handleChange}
-          className={`w-full px-3 py-2 border ${
-            submitted && errors.store.fullName
-              ? "border-red-500"
-              : "border-gray-300"
-          } rounded`}
-        />
-        {submitted && errors.store.fullName && (
-          <p className="text-red-500 text-sm mt-1">姓名為必填項</p>
-        )}
-      </div>
+      {/* Input */}
+      {renderInput({
+        type: "text",
+        id: "recipient_name",
+        name: "recipient_name",
+        label: "姓名",
+        placeholder: "請輸入取件人姓名",
+        value: Info.recipient_name,
+        onChange: handleInputChange,
+        error: errors.recipient_name,
+        errorMessage: errorMessages.recipient_name,
+        submitted,
+      })}
+      {renderInput({
+        type: "text",
+        id: "phone",
+        name: "phone",
+        label: "手機",
+        placeholder: "請輸入聯絡電話",
+        value: Info.phone,
+        onChange: handleInputChange,
+        error: errors.phone,
+        errorMessage: errorMessages.phone,
+        submitted,
+      })}
 
-      {/* 手機號碼 */}
-      <div className="mb-4">
-        <label className="block font-medium mb-1" htmlFor="phone">
-          手機
-        </label>
-        <input
-          type="tel"
-          id="phone"
-          name="phone"
-          placeholder="請輸入聯絡電話"
-          value={storeInfo.phone}
-          onChange={handleChange}
-          className={`w-full px-3 py-2 border ${
-            submitted && errors.store.phone
-              ? "border-red-500"
-              : "border-gray-300"
-          } rounded`}
-        />
-        {submitted && errors.store.phone && (
-          <p className="text-red-500 text-sm mt-1">請輸入有效的手機號碼</p>
-        )}
-      </div>
-
-      {/* 超商取貨地址選擇 */}
-      <div className="mb-4">
-        <label className="block font-medium mb-1" htmlFor="city">
-          縣市
-        </label>
-        <select
-          id="city"
-          name="city"
-          value={storeInfo.city}
-          // value={storeLocation.selectedCity} // 確保 value 綁定到 Redux 狀態
-          onChange={handleSelectChange}
-          className={`w-full px-3 py-2 border ${
-            submitted && errors.store.city
-              ? "border-red-500"
-              : "border-gray-300"
-          } rounded`}
-        >
-          <option value="">選擇縣市</option>
-          {cities.map((city) => (
-            <option key={city} value={city}>
-              {city}
-            </option>
-          ))}
-        </select>
-        {submitted && errors.store.city && (
-          <p className="text-red-500 text-sm mt-1">縣市為必填項</p>
-        )}
-      </div>
-
-      <div className="mb-4">
-        <label className="block font-medium mb-1" htmlFor="district">
-          地區
-        </label>
-        <select
-          id="district"
-          name="district"
-          // value={storeLocation.selectedDistrict} // 綁定到 Redux 狀態
-          value={storeInfo.district}
-          onChange={handleSelectChange}
-          className={`w-full px-3 py-2 border ${
-            submitted && errors.store.district
-              ? "border-red-500"
-              : "border-gray-300"
-          } rounded`}
-        >
-          <option value="">選擇地區</option>
-          {districts.map((district) => (
-            <option key={district} value={district}>
-              {district}
-            </option>
-          ))}
-        </select>
-        {submitted && errors.store.district && (
-          <p className="text-red-500 text-sm mt-1">地區為必填項</p>
-        )}
-      </div>
-
-      <div className="mb-4">
-        <label className="block font-medium mb-1" htmlFor="store">
-          門市
-        </label>
-        <select
-          id="store"
-          name="store"
-          // value={storeLocation.selectedStore} // 綁定到 Redux 狀態
-          value={storeInfo.store}
-          onChange={handleSelectChange}
-          className={`w-full px-3 py-2 border ${
-            submitted && errors.store.store
-              ? "border-red-500"
-              : "border-gray-300"
-          } rounded`}
-        >
-          <option value="">選擇門市</option>
-          {stores.map((store) => (
-            <option key={store.name} value={store.name}>
-              {store.name}
-            </option>
-          ))}
-        </select>
-        {submitted && errors.store.store && (
-          <p className="text-red-500 text-sm mt-1">門市為必填項</p>
-        )}
-      </div>
+      {/* Select */}
+      {renderSelect({
+        id: "c_store",
+        name: "c_store",
+        label: "超商類型",
+        value: Info.c_store,
+        options: cStores,
+        onChange: handleSelectChange,
+        error: errors.c_store,
+        submitted,
+      })}
+      {renderSelect({
+        id: "city",
+        name: "city",
+        label: "縣市",
+        value: Info.city,
+        options: cities,
+        onChange: handleSelectChange,
+        error: errors.city,
+        submitted,
+      })}
+      {renderSelect({
+        id: "district",
+        name: "district",
+        label: "地區",
+        value: Info.district,
+        options: districts,
+        onChange: handleSelectChange,
+        error: errors.district,
+        submitted,
+      })}
+      {renderSelect({
+        id: "road_section",
+        name: "road_section",
+        label: "路段",
+        value: Info.road_section,
+        options: roadSections,
+        onChange: handleSelectChange,
+        error: errors.road_section,
+        submitted,
+      })}
+      {renderSelect({
+        id: "store",
+        name: "store",
+        label: "門市",
+        value: Info.store_name,
+        // options: stores, // 傳入 object[]
+        options: stores.map((store) => store.store_name), // 提取 store_name 列表
+        onChange: handleSelectChange,
+        error: errors.store_name,
+        submitted,
+      })}
     </>
   );
 };
