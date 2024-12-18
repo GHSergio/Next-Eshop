@@ -1,8 +1,10 @@
 // src/utils/validators.ts
 import {
-  DeliveryInfo,
+  // StoreInfo,
+  // DeliveryInfo,
   CreditCardInfo,
-  StoreInfo,
+  InsertStoreItem,
+  InsertAddressItem,
   DeliveryErrors,
   CreditCardErrors,
   StoreErrors,
@@ -10,7 +12,7 @@ import {
 // 接收一個符合 DeliveryInfo 類型的物件，這表示它包含如 recipient_name、phone 等屬性。
 // 返回一個符合 DeliveryErrors 類型的物件，每個屬性（例如 recipient_name、phone 等）是 boolean，用於指示是否有錯誤。
 export const validateDeliveryInfo = (
-  deliveryInfo: DeliveryInfo
+  deliveryInfo: InsertAddressItem
 ): DeliveryErrors => {
   return {
     recipient_name: deliveryInfo.recipient_name.trim() === "",
@@ -21,7 +23,7 @@ export const validateDeliveryInfo = (
   };
 };
 
-export const validateStoreInfo = (storeInfo: StoreInfo): StoreErrors => {
+export const validateStoreInfo = (storeInfo: InsertStoreItem): StoreErrors => {
   return {
     recipient_name: storeInfo.recipient_name.trim() === "",
     phone: !/^\d{10}$/.test(storeInfo.phone),

@@ -7,9 +7,9 @@ import {
   OrderInput,
   OrderItem,
   AlertState,
-  DeliveryInfo,
+  // StoreInfo,
+  // DeliveryInfo,
   CreditCardInfo,
-  StoreInfo,
   AddressItem,
   InsertAddressItem,
   StoreItem,
@@ -17,7 +17,7 @@ import {
   // Errors,
 } from "@/types";
 import { supabase } from "@/supabaseClient";
-import { RootState } from "@/store/store";
+import { RootState, AppDispatch } from "@/store/store";
 
 interface RejectValue {
   message: string;
@@ -39,6 +39,7 @@ const initialState: UserState = {
   shipping_cost: 0,
   // 收件資訊表格
   delivery_info: {
+    id: "",
     user_id: "",
     recipient_name: "",
     phone: "",
@@ -57,6 +58,7 @@ const initialState: UserState = {
   },
   // 門市資訊表格
   store_info: {
+    id: "",
     user_id: "",
     recipient_name: "",
     phone: "",
@@ -660,10 +662,17 @@ export const fetchAddressesThunk = createAsyncThunk<
 // 移除地址 Thunk
 export const deleteAddressThunk = createAsyncThunk<
   string, // 返回被刪除的地址 ID
-  string, // 傳入的地址 ID
-  { rejectValue: string }
->("user/deleteAddress", async (addressId, { rejectWithValue }) => {
+  string, // 傳入的地址 ID 和用戶 ID
+  { dispatch: AppDispatch; rejectValue: string } //
+>("user/deleteAddress", async (addressId, { dispatch, rejectWithValue }) => {
   try {
+    // 從 localStorage 獲取 user_id
+    const userData = localStorage.getItem("userData");
+    const authId = userData ? JSON.parse(userData).id : null;
+    if (!authId) {
+      return rejectWithValue("無法找到用戶 ID，請重新登入");
+    }
+
     const { error } = await supabase
       .from("addresses")
       .delete()
@@ -672,7 +681,8 @@ export const deleteAddressThunk = createAsyncThunk<
     if (error) {
       return rejectWithValue(`刪除地址失敗: ${error.message}`);
     }
-
+    // 刪除成功後重新獲取地址列表 -> 避免選擇地址時 未更新select
+    dispatch(fetchAddressesThunk(authId));
     return addressId; // 成功返回刪除的地址 ID
   } catch (error) {
     console.error("刪除地址時發生錯誤:", error);
@@ -751,15 +761,23 @@ export const fetchStoresThunk = createAsyncThunk<
 export const deleteStoreThunk = createAsyncThunk<
   string, // 返回被刪除的門市 ID
   string, // 傳入的門市 ID
-  { rejectValue: string }
->("user/deleteStore", async (storeId, { rejectWithValue }) => {
+  { dispatch: AppDispatch; rejectValue: string }
+>("user/deleteStore", async (storeId, { dispatch, rejectWithValue }) => {
   try {
+    // 從 localStorage 獲取 user_id
+    const userData = localStorage.getItem("userData");
+    const authId = userData ? JSON.parse(userData).id : null;
+    if (!authId) {
+      return rejectWithValue("無法找到用戶 ID，請重新登入");
+    }
+
     const { error } = await supabase.from("stores").delete().eq("id", storeId);
 
     if (error) {
       return rejectWithValue(`刪除門市失敗: ${error.message}`);
     }
-
+    // 刪除成功後重新獲取地址列表 -> 避免選擇門市時 未更新select
+    dispatch(fetchStoresThunk(authId));
     return storeId; // 成功返回刪除的門市 ID
   } catch (error) {
     console.error("刪除門市時發生錯誤:", error);
@@ -825,18 +843,27 @@ const userSlice = createSlice({
     setShippingCost(state, action: PayloadAction<number>) {
       state.shipping_cost = action.payload;
     },
+    // 設置超商取貨資訊
+    setStoreInfo(state, action: PayloadAction<StoreItem>) {
+      state.store_info = action.payload;
+    },
     // 設置收件人資訊
-    setDeliveryInfo(state, action: PayloadAction<DeliveryInfo>) {
+    setDeliveryInfo(state, action: PayloadAction<AddressItem>) {
       state.delivery_info = action.payload;
     },
+    // // 設置超商取貨資訊
+    // setStoreInfo(state, action: PayloadAction<StoreInfo>) {
+    //   state.store_info = action.payload;
+    // },
+    // // 設置收件人資訊
+    // setDeliveryInfo(state, action: PayloadAction<DeliveryInfo>) {
+    //   state.delivery_info = action.payload;
+    // },
     // 設置信用卡資訊
     setCreditCardInfo(state, action: PayloadAction<CreditCardInfo>) {
       state.creditCard_info = action.payload;
     },
-    // 設置超商取貨資訊
-    setStoreInfo(state, action: PayloadAction<StoreInfo>) {
-      state.store_info = action.payload;
-    },
+
     // 設置驗證
     setErrors(state, action) {
       state.errors = {
@@ -1063,6 +1090,10 @@ const userSlice = createSlice({
       .addCase(fetchStoresThunk.fulfilled, (state, action) => {
         console.log("獲取常用門市成功", action.payload);
         state.stores = action.payload;
+        if (action.payload.length > 0) {
+          state.store_info = action.payload[0]; // 初始設置 store_info
+          console.log(state.store_info);
+        }
       })
       .addCase(fetchStoresThunk.rejected, (state, action) => {
         console.error("獲取常用門市失敗: ", action.payload);
@@ -1072,6 +1103,10 @@ const userSlice = createSlice({
       .addCase(fetchAddressesThunk.fulfilled, (state, action) => {
         console.log("獲取常用地址成功 ", action.payload);
         state.addresses = action.payload;
+        if (action.payload.length > 0) {
+          state.delivery_info = action.payload[0]; // 初始設置 delivery_info
+          console.log(state.delivery_info);
+        }
       })
       .addCase(fetchAddressesThunk.rejected, (state, action) => {
         console.error("獲取常用地址失敗: ", action.payload);

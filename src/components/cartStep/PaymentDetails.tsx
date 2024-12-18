@@ -57,8 +57,7 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({ submitted }) => {
           <h2 className="text-lg font-semibold mb-4">超商取貨資訊</h2>
 
           <ConvenienceStoreForm
-            Info={storeInfo}
-            // setInfo={setStoreInfo}
+            info={storeInfo}
             setInfo={(info) => dispatch(setStoreInfo(info))}
             errors={errors.store}
             setErrors={setStoreErrors}
@@ -74,7 +73,7 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({ submitted }) => {
           <h2 className="text-lg font-semibold mb-4">收件人資訊</h2>
 
           <DeliveryForm
-            Info={deliveryInfo}
+            info={deliveryInfo}
             setInfo={(info) => dispatch(setDeliveryInfo(info))}
             errors={errors.delivery}
             setErrors={setDeliveryErrors}
@@ -90,7 +89,7 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({ submitted }) => {
           <h2 className="text-xl font-semibold mb-4">支付細節</h2>
 
           <CreditCardForm
-            Info={creditCardInfo}
+            info={creditCardInfo}
             setInfo={(info) => dispatch(setCreditCardInfo(info))}
             errors={errors.creditCard}
             setErrors={setCreditCardErrors}

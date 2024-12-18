@@ -5,7 +5,7 @@ import { validateCreditCardInfo } from "@/utils/validators";
 import { CreditCardInfo, CreditCardErrors } from "@/types";
 interface CreditCardFormProps {
   user_id?: string;
-  Info: CreditCardInfo;
+  info: CreditCardInfo;
   setInfo: (info: CreditCardInfo) => void;
   errors: CreditCardErrors;
   setErrors: (errors: CreditCardErrors) => void;
@@ -14,7 +14,7 @@ interface CreditCardFormProps {
 }
 
 const CreditCardForm: React.FC<CreditCardFormProps> = ({
-  Info,
+  info,
   setInfo,
   errors,
   setErrors,
@@ -23,17 +23,17 @@ const CreditCardForm: React.FC<CreditCardFormProps> = ({
 }) => {
   // 驗證 creditCardInfo 是否通過
   const validateForm = useCallback(() => {
-    const newErrors = validateCreditCardInfo(Info);
+    const newErrors = validateCreditCardInfo(info);
 
     // 僅當錯誤狀態改變(單項符合驗證)時才執行
     if (JSON.stringify(errors) !== JSON.stringify(newErrors)) {
-      console.log("比較差異:", "creditCard:", errors, "newErrors:", newErrors);
+      // console.log("比較差異:", "creditCard:", errors, "newErrors:", newErrors);
       setErrors(newErrors);
     }
 
     const isValid = !Object.values(newErrors).some((error) => error);
     onValidate(isValid);
-  }, [Info, errors, setErrors, onValidate]);
+  }, [info, errors, setErrors, onValidate]);
 
   // 提交時觸發驗證
   useEffect(() => {
@@ -43,7 +43,7 @@ const CreditCardForm: React.FC<CreditCardFormProps> = ({
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const { name, value } = e.target;
-      const updateInfo = { ...Info, [name]: value };
+      const updateInfo = { ...info, [name]: value };
       // 將target value set 到 creditCardInfo state
       setInfo(updateInfo);
 
@@ -53,7 +53,7 @@ const CreditCardForm: React.FC<CreditCardFormProps> = ({
       setErrors(newErrors);
       onValidate(isValid); // 即時更新 valid 狀態
     },
-    [Info, onValidate, setErrors, setInfo]
+    [info, onValidate, setErrors, setInfo]
   );
 
   const errorMessages: { [key: string]: string } = {
@@ -71,7 +71,7 @@ const CreditCardForm: React.FC<CreditCardFormProps> = ({
         name: "card_number",
         label: "信用卡卡號",
         placeholder: "請輸入信用卡卡號",
-        value: Info.card_number,
+        value: info.card_number,
         onChange: handleChange,
         error: errors.card_number,
         errorMessage: errorMessages.card_number,
@@ -85,7 +85,7 @@ const CreditCardForm: React.FC<CreditCardFormProps> = ({
         name: "expiry_date",
         label: "有限期限",
         placeholder: "請輸入有限期限",
-        value: Info.expiry_date,
+        value: info.expiry_date,
         onChange: handleChange,
         error: errors.expiry_date,
         errorMessage: errorMessages.expiry_date,
@@ -99,7 +99,7 @@ const CreditCardForm: React.FC<CreditCardFormProps> = ({
         name: "cvv",
         label: "背面末三碼",
         placeholder: "請輸入背面末三碼",
-        value: Info.cvv,
+        value: info.cvv,
         onChange: handleChange,
         error: errors.cvv,
         errorMessage: errorMessages.cvv,

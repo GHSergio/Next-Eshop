@@ -11,7 +11,7 @@ const DeliveryAndPayment = () => {
     (state: RootState) => state.user.selectedPayment
   );
 
-  console.log(selectedPayment);
+  // console.log(selectedPayment);
 
   // 選擇哪種運送方式 & 需支付運費
   const handleOptionShipping = (option: string) => {

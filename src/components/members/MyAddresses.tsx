@@ -1,34 +1,58 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store/store";
 import {
-  setIsAddAddressModalOpen,
-  setIsAddStoreModalOpen,
+  // setIsAddAddressModalOpen,
+  // setIsAddStoreModalOpen,
+  // saveStoreThunk,
   deleteAddressThunk,
   deleteStoreThunk,
+  // fetchAddressesThunk,
 } from "@/store/slice/userSlice";
-import AddressModal from "@/components/members/AddressModal";
-import StoreModal from "@/components/members/StoreModal";
+import AddressModal from "@/components/address/AddressModal";
+import StoreModal from "@/components/store/StoreModal";
+import StoreComponent from "@/components/store/StoreComponent";
+import AddressComponent from "@/components/address/AddressComponent";
 
 const MyAddresses: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const addresses = useSelector((state: RootState) => state.user.addresses);
   const stores = useSelector((state: RootState) => state.user.stores);
+  // 新增 Modal 控制
+  const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
+  const [isStoreModalOpen, setIsStoreModalOpen] = useState(false);
 
-  // 新增
-  const handleAddAddress = () => {
-    dispatch(setIsAddAddressModalOpen(true));
+  // 開啟 Addres Modal
+  const handleOpenAddressModal = () => {
+    setIsAddressModalOpen(true);
   };
 
-  const handleAddStore = () => {
-    dispatch(setIsAddStoreModalOpen(true));
+  // 關閉 Addres Modal
+  const handleCloseAddressModal = () => {
+    setIsAddressModalOpen(false);
+  };
+
+  // 開啟 Store Modal
+  const handleOpenStoreModal = () => {
+    setIsStoreModalOpen(true);
+  };
+
+  // 關閉 Addres Modal
+  const handleCloseStoreModal = () => {
+    setIsStoreModalOpen(false);
   };
 
   // 移除
-  const handleDeleteAddress = (addressId: string) => {
+  const handleDeleteAddress = async (addressId: string) => {
     if (confirm("確認刪除此地址？")) {
-      dispatch(deleteAddressThunk(addressId));
+      await dispatch(deleteAddressThunk(addressId));
+
+      // try {
+      //   await dispatch(deleteAddressThunk(addressId));
+      // } catch (err) {
+      //   console.log("刪除失敗", err);
+      // }
     }
   };
 
@@ -40,23 +64,21 @@ const MyAddresses: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto p-4">
-      {/* <h1 className="text-2xl font-bold mb-4">我的地址與門市</h1> */}
       {/* header 按鈕 */}
       <div className="flex justify-between mb-6">
         <button
           className="bg-blue-500 text-white px-4 py-2 rounded"
-          onClick={handleAddAddress}
+          onClick={handleOpenAddressModal}
         >
           新增收貨地址
         </button>
         <button
           className="bg-blue-500 text-white px-4 py-2 rounded"
-          onClick={handleAddStore}
+          onClick={handleOpenStoreModal}
         >
           新增取貨門市
         </button>
       </div>
-
       {/* 收件地址 */}
       <div className="mb-8">
         <h2 className="text-lg font-semibold mb-4">收貨地址</h2>
@@ -65,31 +87,12 @@ const MyAddresses: React.FC = () => {
         ) : (
           <div className="space-y-4">
             {addresses.map((address) => (
-              <div
+              <AddressComponent
                 key={address.id}
-                className="border p-4 rounded shadow flex justify-between items-start"
-              >
-                <div>
-                  <p>
-                    <strong>收件人：</strong>
-                    {address.recipient_name}
-                  </p>
-                  <p>
-                    <strong>聯絡手機：</strong>
-                    {address.phone}
-                  </p>
-                  <p>
-                    <strong>收貨地址：</strong>
-                    {address.city} {address.district} {address.address_line}
-                  </p>
-                </div>
-                <button
-                  className="text-blue-500 underline"
-                  onClick={() => handleDeleteAddress(address.id)}
-                >
-                  刪除
-                </button>
-              </div>
+                address={address}
+                onDelete={handleDeleteAddress}
+                isDeletable={true}
+              />
             ))}
           </div>
         )}
@@ -103,44 +106,24 @@ const MyAddresses: React.FC = () => {
         ) : (
           <div className="space-y-4">
             {stores.map((store) => (
-              <div
+              <StoreComponent
                 key={store.id}
-                className="border p-4 rounded shadow flex justify-between items-start"
-              >
-                <div>
-                  <p>
-                    <strong>
-                      {store.c_store} : {store.store_name}
-                    </strong>
-                  </p>
-                  <p>
-                    <strong>取貨人：</strong>
-                    {store.recipient_name}
-                  </p>
-                  <p>
-                    <strong>聯絡手機：</strong>
-                    {store.phone}
-                  </p>
-                  <p>
-                    <strong>門市地址：</strong>
-                    {store.city} {store.district} {store.store_address}
-                  </p>
-                </div>
-                <button
-                  className="text-blue-500 underline"
-                  onClick={() => handleDeleteStore(store.id)}
-                >
-                  刪除
-                </button>
-              </div>
+                store={store}
+                onDelete={handleDeleteStore}
+                isDeletable={true}
+              />
             ))}
           </div>
         )}
       </div>
 
       {/* Modals */}
-      <AddressModal />
-      <StoreModal />
+      <AddressModal
+        onOpen={isAddressModalOpen}
+        onClose={handleCloseAddressModal}
+      />
+
+      <StoreModal onOpen={isStoreModalOpen} onClose={handleCloseStoreModal} />
     </div>
   );
 };

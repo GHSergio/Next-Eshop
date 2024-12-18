@@ -1,15 +1,10 @@
 "use client";
 import React, { useState, useEffect } from "react";
-// import UserProfile from "@/components/members/UserProfile";
 import MyAddresses from "@/components/members/MyAddresses";
 import OrderHistory from "@/components/members/OrderHistory";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/store/store";
-import {
-  fetchOrdersThunk,
-  fetchAddressesThunk,
-  fetchStoresThunk,
-} from "@/store/slice/userSlice";
+import { fetchOrdersThunk } from "@/store/slice/userSlice";
 const MemberPage: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const [activeTab, setActiveTab] = useState("");
@@ -20,12 +15,8 @@ const MemberPage: React.FC = () => {
     const userData = localStorage.getItem("userData");
     // 假如有(沒有該key會回傳null) 從JSON 格式轉換成 JS object
     const authId = userData ? JSON.parse(userData).id : null;
-    if (authId) {
-      dispatch(fetchAddressesThunk(authId));
-      dispatch(fetchStoresThunk(authId));
-      if (activeTab === "orders") {
-        dispatch(fetchOrdersThunk(authId));
-      }
+    if (activeTab === "orders") {
+      dispatch(fetchOrdersThunk(authId));
     }
   }, [activeTab, dispatch]);
 
@@ -43,7 +34,7 @@ const MemberPage: React.FC = () => {
             activeTab === "address" ? "text-blue-500" : "text-gray-500"
           }`}
         >
-          我的地址
+          地址&門市
         </button>
         <button
           onClick={() => setActiveTab("orders")}
@@ -53,14 +44,14 @@ const MemberPage: React.FC = () => {
         >
           訂單紀錄
         </button>
-        <button
+        {/* <button
           onClick={() => setActiveTab("modifyPassword")}
           className={`${tabFontStyle} ${
             activeTab === "modify-password" ? "text-blue-500" : "text-gray-500"
           }`}
         >
           修改密碼
-        </button>
+        </button> */}
       </div>
 
       {/* 動態內容顯示 */}

@@ -16,6 +16,8 @@ import {
   saveOrderThunk,
   deleteCartItemThunk,
   setAlert,
+  // fetchAddressesThunk,
+  // fetchStoresThunk,
 } from "@/store/slice/userSlice";
 import useCartCalculations from "@/hook/useCartCalculations";
 
@@ -37,19 +39,12 @@ const CartPage: React.FC = () => {
   const deliveryInfo = useSelector(
     (state: RootState) => state.user.delivery_info
   );
-  // const creditCardInfo = useSelector(
-  //   (state: RootState) => state.user.creditCard_info
-  // );
-  // const errors = useSelector((state: RootState) => state.user.errors);
-  const isDeliveryFormValid = useSelector(
-    (state: RootState) => state.user.isDeliveryFormValid
-  );
-  const isStoreFormValid = useSelector(
-    (state: RootState) => state.user.isStoreFormValid
-  );
+  const addresses = useSelector((state: RootState) => state.user.addresses);
+  const stores = useSelector((state: RootState) => state.user.stores);
   const isCreditCardFormValid = useSelector(
     (state: RootState) => state.user.isCreditCardFormValid
   );
+
   const { calculateItemsCount, totalAmount, shippingCost, finalTotal } =
     useCartCalculations();
 
@@ -94,7 +89,7 @@ const CartPage: React.FC = () => {
         selectedPayment === "delivery" || selectedPayment === "credit"
           ? `${deliveryInfo.city}-${deliveryInfo.district}-${deliveryInfo.address_line}`
           : null,
-      store_name: selectedPayment === "c_store" ? storeInfo.store : null,
+      store_name: selectedPayment === "c_store" ? storeInfo.store_name : null,
     };
 
     // 訂單
@@ -154,7 +149,7 @@ const CartPage: React.FC = () => {
     shippingCost,
     storeInfo.recipient_name,
     storeInfo.phone,
-    storeInfo.store,
+    storeInfo.store_name,
     totalAmount,
     userInfo?.id,
     dispatch,
@@ -166,17 +161,16 @@ const CartPage: React.FC = () => {
       setSubmitted(true);
 
       if (
-        (selectedPayment === "c_store" && !isStoreFormValid) ||
-        (selectedPayment === "delivery" && !isDeliveryFormValid) ||
-        // 信用卡需要 delivery & credit 表單都通過驗證
+        (selectedPayment === "c_store" && stores.length === 0) ||
+        (selectedPayment === "delivery" && addresses.length === 0) ||
+        // 信用卡需要地址和信用卡表單都通過驗證
         (selectedPayment === "credit" &&
-          (!isCreditCardFormValid || !isDeliveryFormValid))
+          (addresses.length === 0 || !isCreditCardFormValid))
       ) {
-        console.log("selectedPayment", selectedPayment);
         dispatch(
           setAlert({
             open: true,
-            message: "請完成表單的所有欄位！",
+            message: "請確認填寫所有資訊！",
             severity: "info",
           })
         );
@@ -196,11 +190,11 @@ const CartPage: React.FC = () => {
   }, [
     dispatch,
     activeStep,
-    isCreditCardFormValid,
-    isDeliveryFormValid,
-    isStoreFormValid,
     selectedPayment,
     handleConfirmOrder,
+    addresses.length,
+    stores.length,
+    isCreditCardFormValid,
   ]);
 
   const handleBack = () => {

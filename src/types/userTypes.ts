@@ -60,10 +60,6 @@ export interface StoreItem {
   city: string;
   district: string;
   road_section: string;
-  // store: {
-  //   store_name: string;
-  //   store_address: string;
-  // };
   store_name: string;
   store_address: string;
   is_default: boolean;
@@ -100,10 +96,6 @@ export interface OrderInput {
   c_store?: string; // 可空，僅超取需要
   store_name?: string;
   store_address?: string;
-  // store?: {
-  //   store_name: string;
-  //   store_address: string;
-  // };
   status: string;
   created_at: string;
   updated_at: string;
@@ -124,10 +116,6 @@ export interface Order {
   c_store?: string; // 可空，僅超取需要
   store_name?: string;
   store_address?: string;
-  // store?: {
-  //   store_name: string;
-  //   store_address: string;
-  // };
   status: string;
   created_at: string;
   updated_at: string;
@@ -204,9 +192,12 @@ export interface UserState {
   selectedItems: CartItem[] | [];
   selectedPayment: string;
   shipping_cost: number;
-  delivery_info: DeliveryInfo; // 收件人資訊
+  // delivery_info: DeliveryInfo; // 收件人資訊
+  // creditCard_info: CreditCardInfo; // 信用卡資訊
+  // store_info: StoreInfo; // 超商取貨資訊
+  store_info: StoreItem; // 超商取貨資訊
+  delivery_info: AddressItem; // 收件人資訊
   creditCard_info: CreditCardInfo; // 信用卡資訊
-  store_info: StoreInfo; // 超商取貨資訊
   errors: Errors; // 資訊填寫驗證
 
   alert: AlertState;

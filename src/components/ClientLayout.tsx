@@ -12,6 +12,8 @@ import {
   fetchUserData,
   fetchCartThunk,
   initializeUserThunk,
+  fetchAddressesThunk,
+  fetchStoresThunk,
 } from "../store/slice/userSlice";
 import { fetchProductsAndCategories } from "../store/slice/productSlice";
 import NavLinks from "./NavLinks";
@@ -34,6 +36,8 @@ const ClientLayout: React.FC<{ children: React.ReactNode }> = ({
   const cartItemCount = useSelector(
     (state: RootState) => state.user.cart?.length
   );
+  // const stores = useSelector((state: RootState) => state.user.stores);
+  // console.log(stores);
 
   // 加載分類和產品信息
   useEffect(() => {
@@ -72,6 +76,8 @@ const ClientLayout: React.FC<{ children: React.ReactNode }> = ({
       await handleInitialization(authId);
       dispatch(fetchUserData());
       dispatch(fetchCartThunk(authId));
+      dispatch(fetchAddressesThunk(authId));
+      dispatch(fetchStoresThunk(authId));
       dispatch(setIsLoggedIn(true));
     } else {
       dispatch(clearUserInfo());
@@ -89,6 +95,8 @@ const ClientLayout: React.FC<{ children: React.ReactNode }> = ({
           await handleInitialization(authId);
           dispatch(fetchUserData());
           dispatch(fetchCartThunk(authId));
+          dispatch(fetchAddressesThunk(authId));
+          dispatch(fetchStoresThunk(authId));
           dispatch(setIsLoggedIn(true));
         } else if (event === "SIGNED_OUT") {
           dispatch(clearUserInfo());

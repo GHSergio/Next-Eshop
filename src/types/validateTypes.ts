@@ -1,13 +1,13 @@
-// Info
-export interface DeliveryInfo {
-  user_id: string;
-  recipient_name: string;
-  phone: string;
-  city: string;
-  district: string;
-  address_line: string;
-  is_default: boolean;
-}
+// // Info
+// export interface DeliveryInfo {
+//   user_id: string;
+//   recipient_name: string;
+//   phone: string;
+//   city: string;
+//   district: string;
+//   address_line: string;
+//   is_default: boolean;
+// }
 
 export interface CreditCardInfo {
   user_id: string;
@@ -16,22 +16,22 @@ export interface CreditCardInfo {
   cvv: string;
 }
 
-export interface StoreInfo {
-  user_id: string;
-  recipient_name: string;
-  phone: string;
-  c_store: string;
-  city: string;
-  district: string;
-  road_section: string;
-  // store: {
-  //   store_name: string;
-  //   store_address: string;
-  // };
-  store_name: string;
-  store_address: string;
-  is_default: boolean;
-}
+// export interface StoreInfo {
+//   user_id: string;
+//   recipient_name: string;
+//   phone: string;
+//   c_store: string;
+//   city: string;
+//   district: string;
+//   road_section: string;
+//   // store: {
+//   //   store_name: string;
+//   //   store_address: string;
+//   // };
+//   store_name: string;
+//   store_address: string;
+//   is_default: boolean;
+// }
 
 // Errors
 export interface DeliveryErrors {
