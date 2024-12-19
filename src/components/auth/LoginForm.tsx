@@ -1,49 +1,49 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
+// import React, { useState } from "react";
 // import { supabase } from "@/supabaseClient";
 import { useRouter } from "next/navigation";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+// import { useDispatch, useSelector } from "react-redux";
 // import { setAlert } from "@/store/slice/userSlice";
-import { RootState, AppDispatch } from "@/store/store";
-import {
-  loginUserThunk,
-  loginWithGoogleThunk,
-} from "@/store/slice/userSlice";
+import { AppDispatch } from "@/store/store";
+// import { RootState, AppDispatch } from "@/store/store";
+import { loginUserThunk, loginWithGoogleThunk } from "@/store/slice/userSlice";
 const LoginForm: React.FC = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const isLoggedIn = useSelector((state: RootState) => state.user.isLoggedIn);
+  // const [email, setEmail] = useState("");
+  // const [password, setPassword] = useState("");
+  // const isLoggedIn = useSelector((state: RootState) => state.user.isLoggedIn);
   const dispatch: AppDispatch = useDispatch();
   const router = useRouter();
-  // 信箱輸入處理
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEmail(e.target.value);
-  };
+  // // 信箱輸入處理
+  // const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   setEmail(e.target.value);
+  // };
 
-  console.log(isLoggedIn);
+  // console.log(isLoggedIn);
 
-  // 密碼輸入處理
-  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPassword(e.target.value);
-  };
+  // // 密碼輸入處理
+  // const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   setPassword(e.target.value);
+  // };
 
-  // 一般登入
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // // 一般登入
+  // const handleLogin = async (e: React.FormEvent) => {
+  //   e.preventDefault();
 
-    try {
-      await dispatch(loginUserThunk({ email, password })).unwrap();
-      router.push("/");
-    } catch (error: unknown) {
-      // 檢查 error 是否為標準的 Error 實例。
-      if (error instanceof Error) {
-        console.error("登入失敗：", error.message);
-      } else {
-        // 如果不是 Error，可以將其當作普通物件記錄。
-        console.error("未知錯誤：", error);
-      }
-    }
-  };
+  //   try {
+  //     await dispatch(loginUserThunk({ email, password })).unwrap();
+  //     router.push("/");
+  //   } catch (error: unknown) {
+  //     // 檢查 error 是否為標準的 Error 實例。
+  //     if (error instanceof Error) {
+  //       console.error("登入失敗：", error.message);
+  //     } else {
+  //       // 如果不是 Error，可以將其當作普通物件記錄。
+  //       console.error("未知錯誤：", error);
+  //     }
+  //   }
+  // };
 
   // Google 登入
   const handleGoogleLogin = async () => {
@@ -206,8 +206,8 @@ const LoginForm: React.FC = () => {
   // };
 
   const labelClasses = "block xs:text-[0.5rem] md:text-lg font-bold";
-  const inputClasses =
-    "mt-1 xs:p-0 md:p-2 xs:h-4 md:h-full w-full border xs:rounded-sm md:rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 xs:placeholder-xs md:placeholder-md";
+  // const inputClasses =
+  //   "mt-1 xs:p-0 md:p-2 xs:h-4 md:h-full w-full border xs:rounded-sm md:rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 xs:placeholder-xs md:placeholder-md";
 
   return (
     <div className="bg-loginBgc xs:z-1 md:z-0 xs:p-4 md:p-8 rounded-md shadow-md xs:w-50 md:w-full max-w-md">
@@ -216,8 +216,7 @@ const LoginForm: React.FC = () => {
       </h2>
 
       {/* 表單內容 */}
-      <form onSubmit={handleLogin} className="space-y-4">
-        {/* 信箱輸入區塊 */}
+      {/* <form onSubmit={handleLogin} className="space-y-4">
         <div>
           <label className={`${labelClasses} `} htmlFor="emailInput">
             信箱
@@ -233,7 +232,6 @@ const LoginForm: React.FC = () => {
           />
         </div>
 
-        {/* 密碼輸入區塊 */}
         <div>
           <label className={`${labelClasses}`} htmlFor="passwordInput">
             密碼
@@ -249,27 +247,13 @@ const LoginForm: React.FC = () => {
           />
         </div>
 
-        {/* 提交按鈕 */}
         <button
           type="submit"
           className={`${labelClasses} w-full xs:p-1 md:p-1 xs:rounded-sm md:rounded-md text-white transition`}
         >
           登入
         </button>
-      </form>
-
-      {/* 註冊切換按鈕 */}
-      <div className="text-center mt-4">
-        <p className="xs:text-[0.4rem] md:text-sm">
-          還沒有帳號？{" "}
-          <button
-            className="xs:text-[0.5rem] md:text-lg p-1 xs:rounded-sm md:rounded-md font-bold text-blue-500"
-            onClick={() => router.push("/register")}
-          >
-            前往註冊
-          </button>
-        </p>
-      </div>
+      </form> */}
 
       {/* Google 登入按鈕 */}
       <div className="mt-4">
@@ -289,6 +273,19 @@ const LoginForm: React.FC = () => {
           以訪客身份登入
         </button>
       </div>
+
+      {/* 註冊切換按鈕 */}
+      {/* <div className="text-center mt-4">
+        <p className="xs:text-[0.4rem] md:text-sm">
+          還沒有帳號？{" "}
+          <button
+            className="xs:text-[0.5rem] md:text-lg p-1 xs:rounded-sm md:rounded-md font-bold text-blue-500"
+            onClick={() => router.push("/register")}
+          >
+            前往註冊
+          </button>
+        </p>
+      </div> */}
     </div>
   );
 };

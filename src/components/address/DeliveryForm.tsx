@@ -13,7 +13,7 @@ interface DeliveryFormProps {
   errors: DeliveryErrors;
   setErrors: (errors: DeliveryErrors) => void;
   onValidate: (isValid: boolean) => void;
-  submitted: boolean;
+  // submitted?: boolean;
 }
 
 const DeliveryForm: React.FC<DeliveryFormProps> = ({ info, setInfo }) => {

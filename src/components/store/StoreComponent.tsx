@@ -4,7 +4,7 @@ import { StoreItem } from "@/types";
 interface StoreItemProps {
   store: StoreItem;
   onDelete?: (id: string) => void;
-  onSelect?: () => void; // 可選的點擊回調
+  onSelect?: () => void;
   isStoreModalOpen?: boolean;
   isDeletable?: boolean;
 }

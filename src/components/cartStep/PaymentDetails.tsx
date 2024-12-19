@@ -62,7 +62,7 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({ submitted }) => {
             errors={errors.store}
             setErrors={setStoreErrors}
             onValidate={(isValid) => dispatch(setStoreValidity(isValid))}
-            submitted={submitted}
+            // submitted={submitted}
           />
         </div>
       )}
@@ -78,7 +78,7 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({ submitted }) => {
             errors={errors.delivery}
             setErrors={setDeliveryErrors}
             onValidate={(isValid) => dispatch(setDeliveryValidity(isValid))}
-            submitted={submitted}
+            // submitted={submitted}
           />
         </div>
       )}

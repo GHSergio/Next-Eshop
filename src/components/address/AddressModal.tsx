@@ -4,8 +4,8 @@ import { AppDispatch, RootState } from "@/store/store";
 import { saveAddressThunk } from "@/store/slice/userSlice";
 import { InsertAddressItem } from "@/types";
 import { renderInput, renderSelect } from "@/utils/formRenderers";
-import { validateDeliveryInfo } from "@/utils/validators";
 import { updateDeliveryCity } from "@/store/slice/deliveryLocationSlice";
+import { validateDeliveryInfo } from "@/utils/validators";
 
 interface AddressModalProps {
   onOpen: boolean;
@@ -72,7 +72,6 @@ const AddressModal: React.FC<AddressModalProps> = ({ onOpen, onClose }) => {
     [formData, setErrors]
   );
 
-  // 自定義 錯誤提示訊息
   const handleSelectChange = useCallback(
     (event: React.ChangeEvent<HTMLSelectElement>) => {
       const { name, value } = event.target;
@@ -101,12 +100,13 @@ const AddressModal: React.FC<AddressModalProps> = ({ onOpen, onClose }) => {
     [formData, dispatch, setErrors]
   );
 
+  // 自定義 錯誤提示訊息
   const errorMessages: { [key: string]: string } = {
-    recipient_name: "姓名不能為空",
+    recipient_name: "不能為空 & 特殊字符",
     phone: "請輸入有效的10位手機號碼",
     city: "請選擇縣市",
     district: "請選擇地區",
-    address_line: "詳細地址不可為空",
+    address_line: "最少輸入5個字",
   };
 
   // 提交時觸發驗證
@@ -142,7 +142,7 @@ const AddressModal: React.FC<AddressModalProps> = ({ onOpen, onClose }) => {
 
   return onOpen ? (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center backdrop-blur-sm">
-      <div className="bg-[#25A0A7] p-4 rounded shadow w-full max-w-md">
+      <div className="bg-[#1D8085] p-4 rounded shadow w-full max-w-md">
         <h2 className="text-lg font-semibold mb-4">新增收貨地址</h2>
 
         {/* Input */}
@@ -154,6 +154,7 @@ const AddressModal: React.FC<AddressModalProps> = ({ onOpen, onClose }) => {
           placeholder: "請輸入取件人姓名",
           value: formData.recipient_name,
           onChange: handleInputChange,
+          maxLength: 50,
           error: errors.recipient_name,
           errorMessage: errorMessages.recipient_name,
           submitted,
@@ -166,6 +167,7 @@ const AddressModal: React.FC<AddressModalProps> = ({ onOpen, onClose }) => {
           placeholder: "請輸入聯絡電話",
           value: formData.phone,
           onChange: handleInputChange,
+          maxLength: 10,
           error: errors.phone,
           errorMessage: errorMessages.phone,
           submitted,
@@ -199,6 +201,8 @@ const AddressModal: React.FC<AddressModalProps> = ({ onOpen, onClose }) => {
           placeholder: "請輸入詳細地址",
           value: formData.address_line,
           onChange: handleInputChange,
+          minLength: 15,
+          maxLength: 100,
           error: errors.address_line,
           errorMessage: errorMessages.address_line,
           submitted,

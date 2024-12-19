@@ -1,8 +1,9 @@
 "use client";
 import React, { useEffect, useCallback } from "react";
-import { renderInput } from "@/utils/formRenderers";
+import { renderInput, renderMaskedInput } from "@/utils/formRenderers";
 import { validateCreditCardInfo } from "@/utils/validators";
 import { CreditCardInfo, CreditCardErrors } from "@/types";
+
 interface CreditCardFormProps {
   user_id?: string;
   info: CreditCardInfo;
@@ -43,6 +44,7 @@ const CreditCardForm: React.FC<CreditCardFormProps> = ({
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const { name, value } = e.target;
+
       const updateInfo = { ...info, [name]: value };
       // 將target value set 到 creditCardInfo state
       setInfo(updateInfo);
@@ -57,9 +59,9 @@ const CreditCardForm: React.FC<CreditCardFormProps> = ({
   );
 
   const errorMessages: { [key: string]: string } = {
-    card_number: "請輸入信用卡卡號",
-    expiry_date: "請輸入有限期限",
-    cvv: "請輸入背面末三碼",
+    card_number: "請輸入有效數字(16位)",
+    expiry_date: "請輸入有效期限(月/年)",
+    cvv: "請輸入有效數字(3位)",
   };
 
   return (
@@ -70,21 +72,22 @@ const CreditCardForm: React.FC<CreditCardFormProps> = ({
         id: "card_number",
         name: "card_number",
         label: "信用卡卡號",
-        placeholder: "請輸入信用卡卡號",
+        placeholder: "請輸入16位數字",
         value: info.card_number,
         onChange: handleChange,
+        maxLength: 16, // 限制長度為16
         error: errors.card_number,
         errorMessage: errorMessages.card_number,
         submitted,
       })}
 
       {/* 有效期限輸入框 */}
-      {renderInput({
-        type: "month",
+      {renderMaskedInput({
+        mask: "99/99", // 掩碼格式
         id: "expiry_date",
         name: "expiry_date",
-        label: "有限期限",
-        placeholder: "請輸入有限期限",
+        label: "有效期限 (MM/YY)",
+        placeholder: "請輸入(MM/YY)",
         value: info.expiry_date,
         onChange: handleChange,
         error: errors.expiry_date,
@@ -98,9 +101,10 @@ const CreditCardForm: React.FC<CreditCardFormProps> = ({
         id: "cvv",
         name: "cvv",
         label: "背面末三碼",
-        placeholder: "請輸入背面末三碼",
+        placeholder: "請輸入3位數字",
         value: info.cvv,
         onChange: handleChange,
+        maxLength: 3, // 限制長度為3
         error: errors.cvv,
         errorMessage: errorMessages.cvv,
         submitted,

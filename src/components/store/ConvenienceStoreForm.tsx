@@ -13,7 +13,7 @@ interface ConvenienceStoreFormProps {
   errors: StoreErrors;
   setErrors: (errors: StoreErrors) => void;
   onValidate: (isValid: boolean) => void;
-  submitted: boolean;
+  // submitted?: boolean;
 }
 
 const ConvenienceStoreForm: React.FC<ConvenienceStoreFormProps> = ({

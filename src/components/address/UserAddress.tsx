@@ -14,7 +14,7 @@ interface UserAddressProps {
 
 const UserStore: React.FC<UserAddressProps> = ({
   addresses,
-  currentAddressId,
+  // currentAddressId,
   onSelectAddress,
   onClose,
   isAddressModalOpen,
@@ -22,9 +22,9 @@ const UserStore: React.FC<UserAddressProps> = ({
   const [isAddAddressModalOpen, setIsAddAddressModalOpen] = useState(false);
 
   // 過濾出目前選中門市以外的其他門市資料
-  const filteredStores = addresses.filter(
-    (address) => address.id !== currentAddressId
-  );
+  // const filteredAddresses = addresses.filter(
+  //   (address) => address.id !== currentAddressId
+  // );
 
   const handleOpenAddAddressModal = () => {
     setIsAddAddressModalOpen(true);
@@ -40,7 +40,7 @@ const UserStore: React.FC<UserAddressProps> = ({
       <div className="bg-[#25A0A7] p-6 rounded-lg shadow-lg w-full max-w-3xl relative">
         {/* Header */}
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold text-white">選擇其他門市</h2>
+          <h2 className="text-xl font-semibold text-white">選擇其他地址</h2>
           <button
             onClick={handleOpenAddAddressModal}
             className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
@@ -51,11 +51,13 @@ const UserStore: React.FC<UserAddressProps> = ({
 
         {/* 門市清單 */}
         <div className="bg-[#25A0A7] max-h-[500px] overflow-y-auto rounded-md shadow-inner">
-          {filteredStores.length === 0 ? (
-            <p className="text-center text-gray-500">沒有其他門市可供選擇</p>
+          {addresses.length === 0 ? (
+            <h2 className="text-center text-xl font-semibold my-2">
+              請新增地址
+            </h2>
           ) : (
             <div className="space-y-2 p-2 cursor-pointer">
-              {filteredStores.map((address) => (
+              {addresses.map((address) => (
                 <AddressComponent
                   key={address.id}
                   address={address}

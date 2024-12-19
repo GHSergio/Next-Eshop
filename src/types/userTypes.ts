@@ -1,4 +1,4 @@
-import { DeliveryInfo, CreditCardInfo, StoreInfo, Errors } from "@/types";
+import { CreditCardInfo, Errors } from "@/types";
 // 註冊
 export interface RegisterUserPayload {
   email: string;
@@ -93,9 +93,9 @@ export interface OrderInput {
   recipient_name: string;
   recipient_phone: string;
   delivery_address?: string | null; // 可空，僅宅配需要
-  c_store?: string; // 可空，僅超取需要
-  store_name?: string;
-  store_address?: string;
+  c_store?: string | null; // 可空，僅超取需要
+  store_name?: string | null;
+  store_address?: string | null;
   status: string;
   created_at: string;
   updated_at: string;

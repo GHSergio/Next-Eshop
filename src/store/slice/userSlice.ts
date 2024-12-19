@@ -7,14 +7,11 @@ import {
   OrderInput,
   OrderItem,
   AlertState,
-  // StoreInfo,
-  // DeliveryInfo,
   CreditCardInfo,
   AddressItem,
   InsertAddressItem,
   StoreItem,
   InsertStoreItem,
-  // Errors,
 } from "@/types";
 import { supabase } from "@/supabaseClient";
 import { RootState, AppDispatch } from "@/store/store";
@@ -322,7 +319,7 @@ export const fetchUserData = createAsyncThunk<
             city: customUserInfo.default_shipping_address.city,
             district: customUserInfo.default_shipping_address.district,
             address_line: customUserInfo.default_shipping_address.address_line,
-            isDefault: customUserInfo.default_shipping_address.is_default,
+            is_default: customUserInfo.default_shipping_address.is_default,
           }
         : null,
       // 預設取貨門市格式
@@ -1063,6 +1060,35 @@ const userSlice = createSlice({
       .addCase(saveOrderThunk.fulfilled, (state, action) => {
         console.log("儲存訂單成功", action.payload);
         state.ordersHistory = [...state.ordersHistory, action.payload];
+        state.store_info = {
+          id: "",
+          user_id: "",
+          recipient_name: "",
+          phone: "",
+          c_store: "",
+          city: "",
+          district: "",
+          road_section: "",
+          store_name: "",
+          store_address: "",
+          is_default: false,
+        };
+        state.delivery_info = {
+          id: "",
+          user_id: "",
+          recipient_name: "",
+          phone: "",
+          city: "",
+          district: "",
+          address_line: "",
+          is_default: false,
+        };
+        state.creditCard_info = {
+          user_id: "",
+          card_number: "",
+          expiry_date: "",
+          cvv: "",
+        };
       })
       .addCase(saveOrderThunk.rejected, (state, action) => {
         console.error("儲存訂單失敗", action.payload);

@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { AppDispatch, RootState } from "@/store/store";
 import { fetchOrderDetailsThunk } from "@/store/slice/userSlice";
-import OrderDetails from "./OrderDetails";
+import OrderDetails from "./OrderContent";
 
 const OrderHistory: React.FC = () => {
   const [activeOrderId, setActiveOrderId] = useState<string | null>(null);

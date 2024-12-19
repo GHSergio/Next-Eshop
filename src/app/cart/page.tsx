@@ -11,17 +11,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store/store";
 import { useRouter } from "next/navigation";
 import {
-  // setErrors,
   setSelectedItems,
   saveOrderThunk,
   deleteCartItemThunk,
   setAlert,
-  // fetchAddressesThunk,
-  // fetchStoresThunk,
 } from "@/store/slice/userSlice";
 import useCartCalculations from "@/hook/useCartCalculations";
 
-const steps = ["確認購物車", "付費方式&運送資訊", "填寫資料", "確認訂單"];
+const steps = ["購物車內容", "選擇付費方式", "填寫詳細資料", "確認訂單內容"];
 
 const CartPage: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -87,9 +84,12 @@ const CartPage: React.FC = () => {
         selectedPayment === "c_store" ? storeInfo.phone : deliveryInfo.phone,
       delivery_address:
         selectedPayment === "delivery" || selectedPayment === "credit"
-          ? `${deliveryInfo.city}-${deliveryInfo.district}-${deliveryInfo.address_line}`
+          ? `${deliveryInfo.city} ${deliveryInfo.district} ${deliveryInfo.address_line}`
           : null,
+      c_store: selectedPayment === "c_store" ? storeInfo.c_store : null,
       store_name: selectedPayment === "c_store" ? storeInfo.store_name : null,
+      store_address:
+        selectedPayment === "c_store" ? storeInfo.store_address : null,
     };
 
     // 訂單
@@ -103,7 +103,9 @@ const CartPage: React.FC = () => {
       recipient_name: paymentInfo.recipient_name,
       recipient_phone: paymentInfo.phone,
       delivery_address: paymentInfo.delivery_address || null,
+      c_store: paymentInfo.c_store || null,
       store_name: paymentInfo.store_name || null,
+      store_address: paymentInfo.store_address || null,
       status: "pending",
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
@@ -149,7 +151,9 @@ const CartPage: React.FC = () => {
     shippingCost,
     storeInfo.recipient_name,
     storeInfo.phone,
+    storeInfo.c_store,
     storeInfo.store_name,
+    storeInfo.store_address,
     totalAmount,
     userInfo?.id,
     dispatch,
@@ -160,17 +164,40 @@ const CartPage: React.FC = () => {
     if (activeStep === 2) {
       setSubmitted(true);
 
+      // 超商取貨判斷
+      if (selectedPayment === "c_store" && stores.length === 0) {
+        dispatch(
+          setAlert({
+            open: true,
+            message: "請選擇取貨門市",
+            severity: "info",
+          })
+        );
+        return;
+      }
+
+      // 宅配判斷
+      if (selectedPayment === "delivery" && addresses.length === 0) {
+        dispatch(
+          setAlert({
+            open: true,
+            message: "請選擇收件地址",
+            severity: "info",
+          })
+        );
+        return;
+      }
+
+      // 信用卡判斷
       if (
-        (selectedPayment === "c_store" && stores.length === 0) ||
-        (selectedPayment === "delivery" && addresses.length === 0) ||
-        // 信用卡需要地址和信用卡表單都通過驗證
-        (selectedPayment === "credit" &&
-          (addresses.length === 0 || !isCreditCardFormValid))
+        selectedPayment === "credit" &&
+        (addresses.length === 0 || !isCreditCardFormValid)
       ) {
         dispatch(
           setAlert({
             open: true,
-            message: "請確認填寫所有資訊！",
+            message:
+              addresses.length === 0 ? "請選擇收件地址" : "請確認填寫所有資訊",
             severity: "info",
           })
         );

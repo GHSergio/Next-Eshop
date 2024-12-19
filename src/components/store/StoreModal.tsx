@@ -155,7 +155,7 @@ const StoreModal: React.FC<StoreModalProps> = ({ onOpen, onClose }) => {
 
   // 自定義 錯誤提示訊息
   const errorMessages: { [key: string]: string } = {
-    recipient_name: "姓名不能為空",
+    recipient_name: "不能為空&特殊字符",
     phone: "請輸入有效的10位手機號碼",
     c_store: "請選擇超商類型",
     city: "請選擇縣市",

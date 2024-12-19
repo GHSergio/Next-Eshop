@@ -2,14 +2,7 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store/store";
-import {
-  // setIsAddAddressModalOpen,
-  // setIsAddStoreModalOpen,
-  // saveStoreThunk,
-  deleteAddressThunk,
-  deleteStoreThunk,
-  // fetchAddressesThunk,
-} from "@/store/slice/userSlice";
+import { deleteAddressThunk, deleteStoreThunk } from "@/store/slice/userSlice";
 import AddressModal from "@/components/address/AddressModal";
 import StoreModal from "@/components/store/StoreModal";
 import StoreComponent from "@/components/store/StoreComponent";
@@ -47,12 +40,6 @@ const MyAddresses: React.FC = () => {
   const handleDeleteAddress = async (addressId: string) => {
     if (confirm("確認刪除此地址？")) {
       await dispatch(deleteAddressThunk(addressId));
-
-      // try {
-      //   await dispatch(deleteAddressThunk(addressId));
-      // } catch (err) {
-      //   console.log("刪除失敗", err);
-      // }
     }
   };
 

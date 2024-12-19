@@ -14,7 +14,7 @@ interface UserStoreProps {
 
 const UserStore: React.FC<UserStoreProps> = ({
   stores,
-  currentStoreId,
+  // currentStoreId,
   onSelectStore,
   onClose,
   isStoreModalOpen,
@@ -22,7 +22,7 @@ const UserStore: React.FC<UserStoreProps> = ({
   const [isAddStoreModalOpen, setIsAddStoreModalOpen] = useState(false);
 
   // 過濾出目前選中門市以外的其他門市資料
-  const filteredStores = stores.filter((store) => store.id !== currentStoreId);
+  // const filteredStores = stores.filter((store) => store.id !== currentStoreId);
 
   const handleOpenAddStoreModal = () => {
     setIsAddStoreModalOpen(true);
@@ -49,11 +49,13 @@ const UserStore: React.FC<UserStoreProps> = ({
 
         {/* 門市清單 */}
         <div className="bg-[#25A0A7] max-h-[500px] overflow-y-auto rounded-md shadow-inner">
-          {filteredStores.length === 0 ? (
-            <p className="text-center text-gray-500">沒有其他門市可供選擇</p>
+          {stores.length === 0 ? (
+            <h2 className="text-center text-xl font-semibold my-2">
+              請新增門市
+            </h2>
           ) : (
             <div className="space-y-2 p-3 border-2 border-gray-300 rounded-md cursor-pointer">
-              {filteredStores.map((store) => (
+              {stores.map((store) => (
                 <StoreComponent
                   key={store.id}
                   store={store}
