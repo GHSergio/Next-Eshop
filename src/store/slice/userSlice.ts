@@ -97,8 +97,8 @@ const initialState: UserState = {
     message: "",
     severity: "info",
   },
-  showCart: false,
-  showMember: false,
+  showCart: true,
+  showMember: true,
   // 表單驗證是否通過
   isDeliveryFormValid: false,
   isStoreFormValid: false,
@@ -902,6 +902,9 @@ const userSlice = createSlice({
     setShowMember(state, action: PayloadAction<boolean>) {
       state.showMember = action.payload;
     },
+    toggleMember(state) {
+      state.showMember = !state.showMember;
+    },
     // CreateDelivery Modal
     setIsAddAddressModalOpen(state, action: PayloadAction<boolean>) {
       state.isAddAddressModalOpen = action.payload;
@@ -1192,6 +1195,7 @@ export const {
   clearAlert,
   setShowCart,
   setShowMember,
+  toggleMember,
   setIsAddAddressModalOpen,
   setIsAddStoreModalOpen,
 } = userSlice.actions;

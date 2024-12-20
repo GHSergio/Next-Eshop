@@ -1,7 +1,7 @@
 "use client";
 import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
-import { RootState } from "../store/store";
+import { RootState } from "../../store/store";
 
 const CartDropdown: React.FC = () => {
   const cart = useSelector((state: RootState) => state.user.cart);
@@ -16,6 +16,12 @@ const CartDropdown: React.FC = () => {
       "overflow-hidden text-ellipsis whitespace-nowrap text-center text-black xs:text-[0.6rem] sm:text-sm",
     []
   );
+
+  const divStyleXs =
+    "bottom-[60] top-auto max-w-[320px] w-[80vw] min-w-[250px] max-h-[300px] min-h-[5rem] p-[0.2rem]";
+
+  const divStyleSm =
+    "bottom-auto top-full max-w-300 w-[50vw] min-w-[400px] max-h-96 min-h-[7rem] p-2";
 
   // 根據 cart 資料生成商品項目列表
   const renderedItems = useMemo(() => {
@@ -32,7 +38,10 @@ const CartDropdown: React.FC = () => {
   }, [cart, cellStyle]);
 
   return (
-    <div className="absolute xs:bottom-[60]  sm:bottom-0 sm:top-9 sm:top-full right-0 xs:w-30 sm:w-72 bg-white shadow-lg xs:p-[0.2rem] sm:p-2 z-10 xs:max-h-24 sm:max-h-96 sm:min-h-[7rem] sm:overflow-y-auto rounded-md">
+    <div
+      className={`absolute right-0 bg-white shadow-lg z-10 rounded-md overflow-y-auto ${divStyleXs} sm:${divStyleSm}`}
+    >
+      {/* <div className="absolute right-0 min-w-[300px] min-h-[7rem] bg-white shadow-lg z-10 rounded-md overflow-y-auto xs:bottom-[60px] xs:top-auto xs:max-w-72 xs:max-h-48 xs:p-[0.2rem] sm:bottom-auto sm:top-full sm:max-w-120 sm:max-h-96 sm:p-2"> */}
       {/* 標題區 */}
       <div className="flex justify-between">
         <div className={`w-1/2 ${headerStyle}`}>商品名稱</div>

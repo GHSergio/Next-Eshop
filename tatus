@@ -1,0 +1,31 @@
+[33m3ac9356[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m feat: Enhance form validation logic and input restrictions
+[33m8c04154[m feat: Enhance form handling and modal behavior
+[33m05d3fc7[m * Enhance Form Reusability and Optimize Member Page Features:
+[33m5651f01[m refactor: Separate filter logic to deliverySlice and storeSlice, retain user selection in userSlice info state
+[33ma1b099e[m Simulate order process completion: - Add selected items to DB cart_items. - Step 1: Select items from the cart to order. - Step 2: Choose a payment method. - Step 3: Display corresponding form based on the selected payment method and validate input. - Step 4: Display relevant form details and item summary for user confirmation. - On submit: Save order details to the DB using saveOrderThunk. - Step 5: Notify the user that they can view order history in the Member Center after submission. - Fetch order history via fetchOrderThunk for user review in the order history section.
+[33m8e7c1df[m UseEffect fetchProduct is moved from MainContent to ClinentLayout: to ensure that products & categories can be obtained during each page reorganization. And the categories will be displayed in Navbar
+[33me132511[m - Added safeguards in  to handle undefined values gracefully. - Refactored  and  to ensure correct value handling. - Adjusted form field bindings to prevent non-controlled behavior. - Verified synchronization between userSlice and locationSlice for city and district fields.
+[33mbdf63c8[m CartStep, transfer the status to Slice, split Payment into store & modify receipt & credit card components to facilitate future expansion, input verification is unified in CartPage
+[33m7ca12bb[m feat: CartStep - Add SelectedItems & ShippingCost to Slice, add CartFooter modification component
+[33m970371a[m feat(ClientLayout): Check the user login status and initialize the database
+[33m045edc5[m modify state
+[33m5926e85[m add README
+[33m7bab016[m delete error
+[33m5d39591[m modify component error any type
+[33m68b2653[m remove pg module-2
+[33m2d615fb[m remove pg module
+[33me3fb321[m Add Supabase as the database; Login interface: Member login (incomplete), Google OAuth login (completed), Guest login (completed); Registration interface: Input email to send verification link (completed) & verification page flow (incomplete)
+[33m1d73405[m Completed Postgres API testing - Successfully built registration and login functionality, with frontend interacting with the database - Documenting progress before switching to Supabase for simplified backend development
+[33mbcfa6b7[m modift deploy error-4
+[33m4ac605d[m modift deploy error-3
+[33meeeb72f[m modift deploy error-2
+[33m92d03b5[m modift deploy error
+[33md54cf87[m feat:add AlertState & formatErrorResponse function
+[33m84f25ce[m feat:add member Page basic format
+[33mf4b15ac[m feat:add part of memberPage
+[33m999462f[m feat:add userSlice -1
+[33mbb53670[m feat:add userSlice
+[33mdacea5b[m modify deploy error-3
+[33m840f09d[m modify deploy error-2
+[33m0b5bfb5[m modify deploy error
+[33m07bdcc2[m Initial commit

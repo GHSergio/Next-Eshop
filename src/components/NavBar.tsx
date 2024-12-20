@@ -5,8 +5,8 @@ import Link from "next/link";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../store/store";
 import { setShowCart, setShowMember } from "../store/slice/userSlice";
-import CartDropdown from "./CartDropdown";
-import MemberDropdown from "./MemberDropdown";
+import CartDropdown from "./cartStep/CartDropdown";
+import MemberDropdown from "./members/MemberDropdown";
 import NavLinks from "./NavLinks";
 
 const NavBar: React.FC = () => {
