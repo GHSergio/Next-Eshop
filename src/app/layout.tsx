@@ -21,6 +21,13 @@ export const metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
+      <head>
+        {/* 添加視窗適配的 meta */}
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+        />
+      </head>
       <body className="min-h-screen flex flex-col">
         <ClientProvider>
           <header className="sticky top-0 z-50">
