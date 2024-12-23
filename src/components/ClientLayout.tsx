@@ -18,7 +18,7 @@ import {
 } from "../store/slice/userSlice";
 import { fetchProductsAndCategories } from "../store/slice/productSlice";
 import NavLinks from "./NavLinks";
-import CartDropdown from "./cartStep/CartDropdown";
+// import CartDropdown from "./cartStep/CartDropdown";
 import MemberDropdown from "./members/MemberDropdown";
 import Alert from "@/components/Alert";
 import { supabase } from "@/supabaseClient";
@@ -31,7 +31,7 @@ const ClientLayout: React.FC<{ children: React.ReactNode }> = ({
   const categories = useSelector(
     (state: RootState) => state.products.categories
   );
-  const showCart = useSelector((state: RootState) => state.user.showCart);
+  // const showCart = useSelector((state: RootState) => state.user.showCart);
   const showMember = useSelector((state: RootState) => state.user.showMember);
   const isLoggedIn = useSelector((state: RootState) => state.user.isLoggedIn);
   const cart = useSelector((state: RootState) => state.user.cart);
@@ -134,6 +134,15 @@ const ClientLayout: React.FC<{ children: React.ReactNode }> = ({
     dispatch(toggleMember());
   }, [dispatch]);
 
+  // const handleMemberClick = () => {
+  //   dispatch(toggleMember());
+  //   if (isLoggedIn) {
+  //     router.push("/member");
+  //   } else {
+  //     router.push("/login");
+  //   }
+  // };
+
   // console.log("alert state內容", alert);
 
   return (
@@ -143,14 +152,14 @@ const ClientLayout: React.FC<{ children: React.ReactNode }> = ({
       {/* 全局的 AuthModal */}
       {/* <AuthModal /> */}
       {/* 小螢幕才出現 NavLinks */}
-      <div className="xs:flex justify-center sm:hidden sticky top-16 bg-white w-full z-10 p-1">
+      <div className="xs:flex justify-center sm:hidden sticky top-16 bg-[#9EF7D9] w-full z-10 p-1">
         <NavLinks links={categories} />
       </div>
 
       <main className="flex-1">{children}</main>
 
       {/* 小螢幕才出現 Bottom Navigation */}
-      <div className="sticky bottom-0 left-0 w-full bg-white flex sm:hidden justify-around items-center shadow-md z-20 h-12">
+      <div className="sticky bottom-0 left-0 w-full bg-[#9EF7D9] flex sm:hidden justify-around items-center shadow-md z-20 h-12">
         {/* Home Button */}
         <div className="flex flex-col items-center">
           <button
@@ -171,10 +180,8 @@ const ClientLayout: React.FC<{ children: React.ReactNode }> = ({
         </div>
 
         {/* Cart Icon */}
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center relative">
           <button
-            // onMouseEnter={handleCartMouseEnter}
-            // onMouseLeave={handleCartMouseLeave}
             onClick={handleCartClick}
             className="text-inherit p-0 text-lg mb-[-1px] relative"
           >
@@ -194,14 +201,13 @@ const ClientLayout: React.FC<{ children: React.ReactNode }> = ({
             )}
           </button>
           <span className="text-xs">購物車</span>
-          {showCart && <CartDropdown />}
         </div>
 
         {/* User Icon */}
-        <div className="flex flex-col items-center relative">
+        <div className="flex flex-col items-center">
           <button
             onClick={handleMemberClick}
-            className="text-inherit p-0 text-lg mb-[-1px] relative"
+            className="text-inherit p-0 text-lg mb-[-1px]"
           >
             {/* User Icon */}
             <svg
@@ -214,9 +220,14 @@ const ClientLayout: React.FC<{ children: React.ReactNode }> = ({
             </svg>
           </button>
           <span className="text-xs">個人</span>
-          {showMember && <MemberDropdown />}
         </div>
       </div>
+      {/* Member dropdown 小螢幕才顯示 */}
+      {showMember && (
+        <div className="xs:block md:hidden">
+          <MemberDropdown />
+        </div>
+      )}
     </div>
   );
 };

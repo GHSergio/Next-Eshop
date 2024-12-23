@@ -37,6 +37,7 @@ const config: Config = {
         xs: "0px",
         xs1: "321px",
         xs2: "376px",
+        xs3: "426px",
       },
       fontSize: {
         xxs: "0.625rem", // 10px

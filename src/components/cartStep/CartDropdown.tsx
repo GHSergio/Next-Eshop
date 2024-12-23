@@ -8,7 +8,7 @@ const CartDropdown: React.FC = () => {
 
   // 標題樣式
   const headerStyle =
-    "font-bold text-center xs:text-[0.6rem] sm:text-sm text-black";
+    "font-bold text-center xs:text-[0.6rem] sm:text-base text-black";
 
   // 單元格樣式，使用 useMemo 避免不必要的重渲染
   const cellStyle = useMemo(
@@ -32,19 +32,20 @@ const CartDropdown: React.FC = () => {
   }, [cart, cellStyle]);
 
   return (
-    <div className="absolute right-0 min-w-[280px] min-h-[7rem] bg-white shadow-lg z-10 rounded-md overflow-y-auto xs:bottom-[60] xs:top-auto xs:max-w-72 xs:max-h-20 xs:p-[0.2rem] sm:bottom-auto sm:top-full sm:max-w-120 sm:max-h-96 sm:p-2">
-      {/* 標題區 */}
-      <div className="flex justify-between items-center">
-        <div className={`w-1/2 ${headerStyle}`}>商品名稱</div>
-        <div className={`w-1/6 ${headerStyle}`}>顏色</div>
-        <div className={`w-1/6 ${headerStyle}`}>尺寸</div>
-        <div className={`w-1/6 ${headerStyle}`}>數量</div>
+    <>
+      <div className="xs:hidden sm:block absolute xs:right-[15px] sm:right-[80px] min-w-100 min-h-[7rem] bg-[#C4FAE8] shadow-lg z-10 rounded-md overflow-y-auto xs:bottom-[60px] xs:top-auto xs:max-w-72 xs:max-h-20 xs:p-[0.2rem] sm:bottom-auto sm:top-full sm:max-w-120 sm:max-h-50 sm:p-2">
+        {/* 標題區 */}
+        <div className="flex justify-between items-center">
+          <div className={`w-1/2 ${headerStyle}`}>商品名稱</div>
+          <div className={`w-1/6 ${headerStyle}`}>顏色</div>
+          <div className={`w-1/6 ${headerStyle}`}>尺寸</div>
+          <div className={`w-1/6 ${headerStyle}`}>數量</div>
+        </div>
+        <hr className="my-2" />
+        {/* 商品列表 */}
+        {renderedItems}
       </div>
-      <hr className="my-2" />
-
-      {/* 商品列表 */}
-      {renderedItems}
-    </div>
+    </>
   );
 };
 

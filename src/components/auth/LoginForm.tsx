@@ -205,7 +205,7 @@ const LoginForm: React.FC = () => {
   //   }
   // };
 
-  const labelClasses = "block xs:text-[0.5rem] md:text-lg font-bold";
+  const labelStyle = "block xs:text-sm md:text-lg font-bold";
   // const inputClasses =
   //   "mt-1 xs:p-0 md:p-2 xs:h-4 md:h-full w-full border xs:rounded-sm md:rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 xs:placeholder-xs md:placeholder-md";
 
@@ -259,7 +259,7 @@ const LoginForm: React.FC = () => {
       <div className="mt-4">
         <button
           onClick={handleGoogleLogin}
-          className={`${labelClasses} w-full bg-blue-500 text-white py-2 rounded-lg mb-4 hover:bg-blue-600 transition`}
+          className={`${labelStyle} w-full bg-blue-500 text-white py-2 rounded-lg mb-4 hover:bg-blue-600 transition-all duration-300`}
         >
           使用 Google 登入
         </button>
@@ -268,7 +268,7 @@ const LoginForm: React.FC = () => {
       <div>
         <button
           onClick={handleGuestLogin}
-          className={`${labelClasses} w-full bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-400 transition`}
+          className={`${labelStyle} w-full bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-400 transition-all duration-300`}
         >
           以訪客身份登入
         </button>

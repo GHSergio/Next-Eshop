@@ -4,7 +4,11 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../store/store";
-import { setShowCart, toggleMember } from "../store/slice/userSlice";
+import {
+  setShowCart,
+  toggleMember,
+  setShowMember,
+} from "../store/slice/userSlice";
 import CartDropdown from "./cartStep/CartDropdown";
 import MemberDropdown from "./members/MemberDropdown";
 import NavLinks from "./NavLinks";
@@ -36,6 +40,10 @@ const NavBar: React.FC = () => {
     dispatch(toggleMember());
   }, [dispatch]);
 
+  const handleMemberMouseLeave = useCallback(() => {
+    dispatch(setShowMember(false));
+  }, [dispatch]);
+
   const handleCartClick = () => {
     if (isLoggedIn) {
       router.push("/cart");
@@ -45,7 +53,7 @@ const NavBar: React.FC = () => {
   };
 
   return (
-    <nav className="bg-navbarBgc">
+    <nav className="bg-navbarBgc relative">
       <div className="mx-auto px-3 ">
         <div className="xs:flex xs:justify-center sm:grid grid-cols-[1fr_3fr_1fr] items-center h-16">
           {/* Logo */}
@@ -59,17 +67,16 @@ const NavBar: React.FC = () => {
             </Link>
           </div>
 
-          {/* 中間：NavLinks (只在大螢幕顯示) */}
+          {/* 中間：NavLinks 大螢幕才顯示 */}
           <div className="xs:hidden sm:flex justify-center">
             <NavLinks links={categories} />
           </div>
 
-          {/* 右側：Cart and User Icons (只在大螢幕顯示) */}
+          {/* 右側：Cart and User Icons 大螢幕才顯示 */}
           <div className="xs:hidden sm:flex justify-end items-center space-x-4">
             <div className="relative">
               <button
                 onMouseEnter={handleCartMouseEnter}
-                onMouseLeave={handleCartMouseLeave}
                 className="focus:outline-none p-1"
                 onClick={handleCartClick}
               >
@@ -89,12 +96,10 @@ const NavBar: React.FC = () => {
                 )}
               </button>
 
-              {showCart && <CartDropdown />}
+              {/* {showCart && <CartDropdown />} */}
             </div>
             {/* 使用者 登入 */}
-            <div
-              className="relative"
-            >
+            <div className="">
               <button
                 className="focus:outline-none p-1"
                 onClick={handleMemberClick}
@@ -108,11 +113,24 @@ const NavBar: React.FC = () => {
                   <path d="M12 12a5 5 0 100-10 5 5 0 000 10zm0 2a7 7 0 00-7 7h2a5 5 0 0110 0h2a7 7 0 00-7-7z" />
                 </svg>
               </button>
-              {showMember && <MemberDropdown />}
             </div>
           </div>
         </div>
       </div>
+      {/* dropdown 大螢幕才顯示 */}
+      {showMember && (
+        <div
+          className="xs:hidden sm:block"
+          onMouseLeave={handleMemberMouseLeave}
+        >
+          <MemberDropdown />
+        </div>
+      )}
+      {showCart && (
+        <div className="xs:hidden sm:block" onMouseLeave={handleCartMouseLeave}>
+          <CartDropdown />
+        </div>
+      )}
     </nav>
   );
 };

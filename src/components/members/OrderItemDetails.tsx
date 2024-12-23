@@ -8,7 +8,7 @@ interface OrderItemDetailsProps {
 
 const OrderItemDetails: React.FC<OrderItemDetailsProps> = ({ item }) => {
   const commonSpanClasses = () =>
-    "md:col-start-auto md:row-start-auto text-center text-textColor font-semibold xs:text-[0.5rem] md:text-sm";
+    "md:col-start-auto md:row-start-auto text-center text-textColor font-semibold xs:text-[0.7rem] md:text-sm";
   return (
     <div
       key={item.id}
@@ -19,12 +19,12 @@ const OrderItemDetails: React.FC<OrderItemDetailsProps> = ({ item }) => {
         className={`w-[100px] xs:col-start-1 xs:row-start-1 xs:row-span-1 xs:col-span-2 md:col-span-4 md:col-start-auto md:row-start-auto md:col-span-auto md:row-span-auto flex flex-col justify-center`}
       >
         <span
-          className="font-semibold text-textColor truncate xs:text-[0.5rem] md:text-sm"
+          className={`truncate ${commonSpanClasses()}`}
           title={item.product_name}
         >
           {item.product_name}
         </span>
-        <span className="text-xs text-textColor xs:text-[0.5rem] md:text-sm">
+        <span className={`${commonSpanClasses()}`}>
           {item.color || "N/A"} - {item.size || "N/A"}
         </span>
       </div>
@@ -38,7 +38,7 @@ const OrderItemDetails: React.FC<OrderItemDetailsProps> = ({ item }) => {
           alt={item.product_name || "Image"}
           width={80}
           height={80}
-          className="object-contain h-16 w-16 sm:h-20 sm:w-20"
+          className="object-contain h-20 w-20 sm:h-20 sm:w-20"
           priority
         />
       </div>
