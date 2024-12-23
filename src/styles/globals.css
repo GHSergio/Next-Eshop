@@ -145,19 +145,19 @@ input[type="checkbox"] {
 }
 
 @layer base {
-  input::placeholder {
-    font-size: 1rem;
+  input::placeholder:not([class*="placeholder:"]) {
+    font-size: 1rem; /* 默認大小 */
   }
+  /* md 以上 */
   @media (min-width: 768px) {
-    /* md 以上 */
-    input::placeholder {
+    input::placeholder:not([class*="placeholder:"]) {
       font-size: 1rem;
     }
   }
+  /* xs 或小螢幕 */
   @media (max-width: 640px) {
-    /* xs 或小螢幕 */
-    input::placeholder {
-      font-size: 0.5rem;
+    input::placeholder:not([class*="placeholder:"]) {
+      font-size: 0.8rem;
     }
   }
 }

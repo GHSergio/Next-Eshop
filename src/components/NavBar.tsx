@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../store/store";
-import { setShowCart, setShowMember } from "../store/slice/userSlice";
+import { setShowCart, toggleMember } from "../store/slice/userSlice";
 import CartDropdown from "./cartStep/CartDropdown";
 import MemberDropdown from "./members/MemberDropdown";
 import NavLinks from "./NavLinks";
@@ -17,7 +17,6 @@ const NavBar: React.FC = () => {
   );
   const showCart = useSelector((state: RootState) => state.user.showCart);
   const showMember = useSelector((state: RootState) => state.user.showMember);
-  // const cartItemCount = useSelector(selectCartItemCount);
   const isLoggedIn = useSelector((state: RootState) => state.user.isLoggedIn);
   const cart = useSelector((state: RootState) => state.user.cart);
 
@@ -33,12 +32,8 @@ const NavBar: React.FC = () => {
     dispatch(setShowCart(false));
   }, [dispatch]);
 
-  const handleMemberMouseEnter = useCallback(() => {
-    dispatch(setShowMember(true));
-  }, [dispatch]);
-
-  const handleMemberMouseLeave = useCallback(() => {
-    dispatch(setShowMember(false));
+  const handleMemberClick = useCallback(() => {
+    dispatch(toggleMember());
   }, [dispatch]);
 
   const handleCartClick = () => {
@@ -71,12 +66,10 @@ const NavBar: React.FC = () => {
 
           {/* 右側：Cart and User Icons (只在大螢幕顯示) */}
           <div className="xs:hidden sm:flex justify-end items-center space-x-4">
-            <div
-              className="relative"
-              onMouseEnter={handleCartMouseEnter}
-              onMouseLeave={handleCartMouseLeave}
-            >
+            <div className="relative">
               <button
+                onMouseEnter={handleCartMouseEnter}
+                onMouseLeave={handleCartMouseLeave}
                 className="focus:outline-none p-1"
                 onClick={handleCartClick}
               >
@@ -101,10 +94,11 @@ const NavBar: React.FC = () => {
             {/* 使用者 登入 */}
             <div
               className="relative"
-              onMouseEnter={handleMemberMouseEnter}
-              onMouseLeave={handleMemberMouseLeave}
             >
-              <button className="focus:outline-none p-1">
+              <button
+                className="focus:outline-none p-1"
+                onClick={handleMemberClick}
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="currentColor"

@@ -50,13 +50,13 @@ const UserStore: React.FC<UserAddressProps> = ({
         </div>
 
         {/* 門市清單 */}
-        <div className="bg-[#25A0A7] max-h-[500px] overflow-y-auto rounded-md shadow-inner">
+        <div className="bg-[#25A0A7] xs:max-h-80 overflow-y-auto rounded-md shadow-inner">
           {addresses.length === 0 ? (
             <h2 className="text-center text-xl font-semibold my-2">
               請新增地址
             </h2>
           ) : (
-            <div className="space-y-2 p-2 cursor-pointer">
+            <div className="xs:max-h-70 space-y-2 p-3 border-2 border-gray-300 rounded-md cursor-pointer overflow-y-auto">
               {addresses.map((address) => (
                 <AddressComponent
                   key={address.id}

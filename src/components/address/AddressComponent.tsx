@@ -17,6 +17,8 @@ const AddressComponent: React.FC<AddressComponentProps> = ({
   isDeletable = false,
 }) => {
   const { id, recipient_name, phone, city, district, address_line } = address;
+
+  const textStyle = "font-bold xs:text-[0.9rem] sm:text-[1rem]";
   return (
     <div
       key={id}
@@ -26,16 +28,16 @@ const AddressComponent: React.FC<AddressComponentProps> = ({
       onClick={onSelect}
     >
       <div>
-        <p>
-          <strong>收件人：</strong>
+        <p className={textStyle}>
+          收件人：
           {recipient_name}
         </p>
-        <p>
-          <strong>聯絡手機：</strong>
+        <p className={textStyle}>
+          聯絡手機：
           {phone}
         </p>
-        <p>
-          <strong>收貨地址：</strong>
+        <p className={textStyle}>
+          收貨地址：
           {city} {district} {address_line}
         </p>
       </div>
@@ -44,7 +46,7 @@ const AddressComponent: React.FC<AddressComponentProps> = ({
       {isDeletable && onDelete && (
         <button
           onClick={() => onDelete(address.id)}
-          className="mt-2 px-2 py-1 text-black-500"
+          className="xs:max-w-[70] xs:min-w-[65] xs:text-[0.8rem]sm:max-w-[80] sm:min-w-[70] sm:text-[1rem] font-semibold px-2 py-1"
         >
           刪除
         </button>

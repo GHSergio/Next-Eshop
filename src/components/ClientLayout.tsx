@@ -6,8 +6,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { AppDispatch, RootState } from "../store/store";
 import {
   setIsLoggedIn,
-  setShowCart,
-  // setShowMember,
+  // setShowCart,
   toggleMember,
   clearUserInfo,
   fetchUserData,
@@ -15,6 +14,7 @@ import {
   initializeUserThunk,
   fetchAddressesThunk,
   fetchStoresThunk,
+  toggleCart,
 } from "../store/slice/userSlice";
 import { fetchProductsAndCategories } from "../store/slice/productSlice";
 import NavLinks from "./NavLinks";
@@ -34,16 +34,11 @@ const ClientLayout: React.FC<{ children: React.ReactNode }> = ({
   const showCart = useSelector((state: RootState) => state.user.showCart);
   const showMember = useSelector((state: RootState) => state.user.showMember);
   const isLoggedIn = useSelector((state: RootState) => state.user.isLoggedIn);
-  // const cartItemCount = useSelector(
-  //   (state: RootState) => state.user.cart?.length
-  // );
   const cart = useSelector((state: RootState) => state.user.cart);
 
   const totalItems = useMemo(() => {
     return cart && cart.reduce((sum, item) => sum + item.quantity, 0);
   }, [cart]);
-  // const stores = useSelector((state: RootState) => state.user.stores);
-  // console.log(stores);
 
   // 加載分類和產品信息
   useEffect(() => {
@@ -118,29 +113,22 @@ const ClientLayout: React.FC<{ children: React.ReactNode }> = ({
 
   // console.log("userInfo state: ", userInfo);
 
-  const handleCartMouseEnter = useCallback(() => {
-    dispatch(setShowCart(true));
-  }, [dispatch]);
+  // const handleCartMouseEnter = useCallback(() => {
+  //   dispatch(setShowCart(true));
+  // }, [dispatch]);
 
-  const handleCartMouseLeave = useCallback(() => {
-    dispatch(setShowCart(false));
-  }, [dispatch]);
+  // const handleCartMouseLeave = useCallback(() => {
+  //   dispatch(setShowCart(false));
+  // }, [dispatch]);
 
   const handleCartClick = () => {
+    dispatch(toggleCart());
     if (isLoggedIn) {
       router.push("/cart");
     } else {
       router.push("/login");
     }
   };
-
-  // const handleMemberMouseEnter = useCallback(() => {
-  //   dispatch(setShowMember(true));
-  // }, [dispatch]);
-
-  // const handleMemberMouseLeave = useCallback(() => {
-  //   dispatch(setShowMember(false));
-  // }, [dispatch]);
 
   const handleMemberClick = useCallback(() => {
     dispatch(toggleMember());
@@ -183,12 +171,10 @@ const ClientLayout: React.FC<{ children: React.ReactNode }> = ({
         </div>
 
         {/* Cart Icon */}
-        <div
-          className="flex flex-col items-center"
-          onMouseEnter={handleCartMouseEnter}
-          onMouseLeave={handleCartMouseLeave}
-        >
+        <div className="flex flex-col items-center">
           <button
+            // onMouseEnter={handleCartMouseEnter}
+            // onMouseLeave={handleCartMouseLeave}
             onClick={handleCartClick}
             className="text-inherit p-0 text-lg mb-[-1px] relative"
           >
@@ -214,8 +200,6 @@ const ClientLayout: React.FC<{ children: React.ReactNode }> = ({
         {/* User Icon */}
         <div className="flex flex-col items-center relative">
           <button
-            // onMouseEnter={handleMemberMouseEnter}
-            // onMouseLeave={handleMemberMouseLeave}
             onClick={handleMemberClick}
             className="text-inherit p-0 text-lg mb-[-1px] relative"
           >

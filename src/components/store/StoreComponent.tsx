@@ -26,6 +26,9 @@ const StoreComponent: React.FC<StoreItemProps> = ({
     store_name,
     store_address,
   } = store;
+
+  const textStyle = "font-bold xs:text-[0.9rem] sm:text-[1rem]";
+
   return (
     <div
       key={id}
@@ -35,21 +38,19 @@ const StoreComponent: React.FC<StoreItemProps> = ({
       onClick={onSelect}
     >
       <div>
-        <p>
-          <strong>
-            {c_store} : {store_name}
-          </strong>
+        <p className={textStyle}>
+          {c_store} : {store_name}
         </p>
-        <p>
-          <strong>取貨人：</strong>
+        <p className={textStyle}>
+          取貨人：
           {recipient_name}
         </p>
-        <p>
-          <strong>聯絡手機：</strong>
+        <p className={textStyle}>
+          聯絡手機：
           {phone}
         </p>
-        <p>
-          <strong>門市地址：</strong>
+        <p className={textStyle}>
+          門市地址：
           {city} {district} {store_address}
         </p>
       </div>
@@ -58,7 +59,7 @@ const StoreComponent: React.FC<StoreItemProps> = ({
       {isDeletable && onDelete && (
         <button
           onClick={() => onDelete(store.id)}
-          className="mt-2 px-2 py-1 text-black-500"
+          className="xs:max-w-[70] xs:min-w-[65] xs:text-[0.8rem]sm:max-w-[80] sm:min-w-[70] sm:text-[1rem] font-semibold px-2 py-1"
         >
           刪除
         </button>

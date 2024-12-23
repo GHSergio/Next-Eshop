@@ -200,8 +200,8 @@ const StoreModal: React.FC<StoreModalProps> = ({ onOpen, onClose }) => {
   };
 
   return onOpen ? (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center backdrop-blur-sm">
-      <div className="bg-[#25A0A7] p-4 rounded shadow w-full max-w-md">
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center">
+      <div className="bg-[#25A0A7] xs:w-95 sm:w-full max-w-md sm:max-w-lg max-h-[80vh] p-4 rounded shadow overflow-y-auto">
         <h2 className="text-lg font-semibold mb-4">新增取貨門市</h2>
 
         {/* Input */}

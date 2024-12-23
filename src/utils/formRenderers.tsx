@@ -1,6 +1,5 @@
 // src/utils/formRenderers.tsx
 import React from "react";
-import InputMask from "react-input-mask";
 
 // 一般 input
 export const renderInput = ({
@@ -59,9 +58,8 @@ export const renderInput = ({
   </div>
 );
 
-// 特殊格式 input
-export const renderMaskedInput = ({
-  mask,
+export const renderFormatInput = ({
+  type,
   id,
   name,
   label,
@@ -71,8 +69,12 @@ export const renderMaskedInput = ({
   error,
   errorMessage,
   submitted,
+  minLength,
+  maxLength,
+  pattern,
+  formatter, // 新增 formatter 屬性
 }: {
-  mask: string; // 指定輸入格式，例如 "99/99" 或 "+886 9xx xxx xxx"
+  type: string;
   id: string;
   name: string;
   label: string;
@@ -82,32 +84,36 @@ export const renderMaskedInput = ({
   error: boolean;
   errorMessage?: string;
   submitted: boolean;
+  minLength?: number;
+  maxLength?: number;
+  pattern?: string;
+  formatter?: (value: string) => string; // 格式化函數
 }) => (
   <div className="mb-4">
     <label className="block font-medium mb-1" htmlFor={id}>
       {label}
     </label>
-    <InputMask
-      mask={mask}
-      value={value}
-      // onChange={onChange}
+    <input
+      type={type}
+      id={id}
+      name={name}
+      placeholder={placeholder}
+      value={value} // 不再對 value 進行多次格式化
       onChange={(e) => {
-        const cleanValue = e.target.value.replace(/[^0-9/]/g, ""); // 僅保留數字和 "/"
-        onChange({ ...e, target: { ...e.target, value: cleanValue } });
+        const rawValue = e.target.value.replace(/\s/g, ""); // 移除空格
+        const formattedValue = formatter ? formatter(rawValue) : rawValue; // 格式化後的值
+        onChange({
+          ...e,
+          target: { ...e.target, value: formattedValue, name }, // 傳遞格式化值
+        });
       }}
-    >
-      {(inputProps) => (
-        <input
-          {...inputProps}
-          id={id}
-          name={name}
-          placeholder={placeholder}
-          className={`w-full px-3 py-2 border ${
-            submitted && error ? "border-red-500" : "border-gray-300"
-          } rounded`}
-        />
-      )}
-    </InputMask>
+      minLength={minLength}
+      maxLength={maxLength}
+      pattern={pattern}
+      className={`w-full px-3 py-2 border ${
+        submitted && error ? "border-red-500" : "border-gray-300"
+      } rounded`}
+    />
     {submitted && error && (
       <p className="text-red-500 font-semibold text-md mt-1">{errorMessage}</p>
     )}
@@ -159,6 +165,69 @@ export const renderSelect = ({
     )}
   </div>
 );
+
+// 特殊格式 input
+// export const renderMaskedInput = ({
+//   mask,
+//   id,
+//   name,
+//   label,
+//   placeholder,
+//   value,
+//   onChange,
+//   error,
+//   errorMessage,
+//   submitted,
+// }: {
+//   mask: string; // 指定輸入格式，例如 "99/99" 或 "+886 9xx xxx xxx"
+//   id: string;
+//   name: string;
+//   label: string;
+//   placeholder: string;
+//   value: string;
+//   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+//   error: boolean;
+//   errorMessage?: string;
+//   submitted: boolean;
+// }) => (
+//   <div className="mb-4">
+//     <label className="block font-medium mb-1" htmlFor={id}>
+//       {label}
+//     </label>
+//     <InputMask
+//       mask={mask}
+//       value={value}
+//       // onChange={onChange}
+//       onChange={(e) => {
+//         const cleanValue = e.target.value.replace(/[^0-9/]/g, "").slice(0, 5); // 最多5個字符
+//         console.log(
+//           "Raw input:",
+//           e.target.value,
+//           "Processed value:",
+//           cleanValue
+//         );
+
+//         onChange({ ...e, target: { ...e.target, value: cleanValue } });
+//       }}
+//       // maskPlaceholder={null} // 禁用占位符
+//     >
+//       {(inputProps) => (
+//         <input
+//           {...inputProps}
+//           id={id}
+//           name={name}
+//           placeholder={placeholder}
+//           className={`w-full px-3 py-2 border ${
+//             submitted && error ? "border-red-500" : "border-gray-300"
+//           } rounded`}
+//         />
+//       )}
+//     </InputMask>
+//     {submitted && error && (
+//       <p className="text-red-500 font-semibold text-md mt-1">{errorMessage}</p>
+//     )}
+//   </div>
+// );
 
 // type SelectOption = string | { name: string; address?: string }; // 替換成你預期的 object 結構
 

@@ -64,7 +64,7 @@ export const validateCreditCardInfo = (
 
   return {
     card_number:
-      !/^\d{16}$/.test(creditCardInfo.card_number) || // 必須是16位純數字
+      !/^\d{16}$/.test(creditCardInfo.card_number.replace(/\s+/g, "")) ||
       creditCardInfo.card_number.trim() === "",
     expiry_date:
       !expiryDateRegex.test(creditCardInfo.expiry_date) || !isFutureDate,

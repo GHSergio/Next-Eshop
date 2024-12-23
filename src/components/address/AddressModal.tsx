@@ -141,8 +141,8 @@ const AddressModal: React.FC<AddressModalProps> = ({ onOpen, onClose }) => {
   };
 
   return onOpen ? (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center backdrop-blur-sm">
-      <div className="bg-[#1D8085] p-4 rounded shadow w-full max-w-md">
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center">
+      <div className="bg-[#1D8085] xs:w-95 sm:w-full max-w-md sm:max-w-lg max-h-[80vh] p-4 rounded shadow overflow-y-auto text-sm sm:text-base">
         <h2 className="text-lg font-semibold mb-4">新增收貨地址</h2>
 
         {/* Input */}
@@ -216,11 +216,7 @@ const AddressModal: React.FC<AddressModalProps> = ({ onOpen, onClose }) => {
             取消
           </button>
           <button
-            className={`px-4 py-2 rounded ${
-              isFormValid
-                ? "bg-blue-500 text-white"
-                : "bg-gray-300 text-gray-500 cursor-pointer"
-            }`}
+            className="bg-blue-500 text-white px-4 py-2 rounded"
             onClick={handleSaveClick}
           >
             新增

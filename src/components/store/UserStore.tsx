@@ -41,20 +41,20 @@ const UserStore: React.FC<UserStoreProps> = ({
           <h2 className="text-xl font-semibold text-white">選擇其他門市</h2>
           <button
             onClick={handleOpenAddStoreModal}
-            className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+            className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600"
           >
             新增
           </button>
         </div>
 
         {/* 門市清單 */}
-        <div className="bg-[#25A0A7] max-h-[500px] overflow-y-auto rounded-md shadow-inner">
+        <div className="xs:max-h-50 bg-[#25A0A7] rounded-md shadow-inner overflow-y-auto">
           {stores.length === 0 ? (
             <h2 className="text-center text-xl font-semibold my-2">
               請新增門市
             </h2>
           ) : (
-            <div className="space-y-2 p-3 border-2 border-gray-300 rounded-md cursor-pointer">
+            <div className="xs:max-h-40 space-y-2 p-3 border-2 border-gray-300 rounded-md cursor-pointer overflow-y-auto">
               {stores.map((store) => (
                 <StoreComponent
                   key={store.id}
@@ -71,7 +71,7 @@ const UserStore: React.FC<UserStoreProps> = ({
         <div className="mt-4 flex justify-end">
           <button
             onClick={onClose}
-            className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400"
+            className="bg-gray-300 text-black px-2 py-1 rounded hover:bg-gray-400"
           >
             關閉
           </button>

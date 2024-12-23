@@ -97,8 +97,8 @@ const initialState: UserState = {
     message: "",
     severity: "info",
   },
-  showCart: true,
-  showMember: true,
+  showCart: false,
+  showMember: false,
   // 表單驗證是否通過
   isDeliveryFormValid: false,
   isStoreFormValid: false,
@@ -898,10 +898,15 @@ const userSlice = createSlice({
     setShowCart(state, action: PayloadAction<boolean>) {
       state.showCart = action.payload;
     },
+    // toggle Cart Dropdown
+    toggleCart(state) {
+      state.showCart = !state.showCart;
+    },
     // Member Dropdown
     setShowMember(state, action: PayloadAction<boolean>) {
       state.showMember = action.payload;
     },
+    // toggle Memeber Dropdown
     toggleMember(state) {
       state.showMember = !state.showMember;
     },
@@ -1194,6 +1199,7 @@ export const {
   setAlert,
   clearAlert,
   setShowCart,
+  toggleCart,
   setShowMember,
   toggleMember,
   setIsAddAddressModalOpen,
