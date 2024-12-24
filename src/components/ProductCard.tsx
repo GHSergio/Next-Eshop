@@ -39,13 +39,13 @@ const ProductCard: React.FC<ProductCardProps> = ({
           {/* 顯示產品標題，並設置溢出效果 */}
           <div
             // title={title}
-            className="text-sm font-semibold truncate text-foreground"
+            className="text-[1rem] sm:text-md font-semibold truncate text-foreground"
           >
             {title}
           </div>
 
           {/* 價格顯示，區分是否有折扣價格 */}
-          <p className="text-xs mt-2 text-secondary">
+          <p className="text-[1rem] sm:text-md mt-2 text-secondary">
             {discountPrice ? (
               <>
                 <span className="line-through text-gray-500">

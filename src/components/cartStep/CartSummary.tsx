@@ -75,6 +75,9 @@ const CartSummary = () => {
     return price * quantity;
   };
 
+  const commomStyle =
+    "font-semibold text-textColor xs:text-[0.8rem] md:text-lg";
+
   // console.log(cart);
   // console.log(cartItems);
   return (
@@ -86,13 +89,11 @@ const CartSummary = () => {
           onChange={handleSelectAll}
           className="xs:h-3 xs:w-3 md:h-4 md:w-4 rounded"
         />
-        <span className="xs:ml-1 md:ml-2 xs:text-xs md:text-lg font-semibold text-textColor">
-          全選
-        </span>
+        <span className={`xs:ml-1 md:ml-2 ${commomStyle}`}>全選</span>
       </div>
 
       {/* Main Content */}
-      <div className="grid gap-4 xs:text-start  md:text-center">
+      <div className="grid gap-4 xs:text-start md:text-center">
         {cart.map((item) => (
           <div
             key={item.id}
@@ -124,20 +125,20 @@ const CartSummary = () => {
                 alt={item.product_name}
                 width="300"
                 height="200"
-                className="object-contain h-16 w-16 sm:h-20 sm:w-20"
+                className="object-contain h-20 w-20 sm:h-25 sm:w-25"
                 priority // 優化圖片的加載 提高LCP性能
               />
             </div>
 
             {/* Product Info */}
-            <div className="xs:col-start-3 xs:row-start-2 xs:row-span-2 xs:col-span-2 md:col-span-4 md:col-start-auto md:row-start-auto flex flex-col justify-center ">
+            <div className="xs:col-start-3 xs:row-start-2 xs:row-span-2 xs:col-span-3 md:col-span-4 md:col-start-auto md:row-start-auto flex flex-col justify-center ">
               <h4
-                className="xs:text-[0.8rem] md:text-lg font-semibold truncate"
+                className={`truncate ${commomStyle}`}
                 title={item.product_name}
               >
                 {item.product_name}
               </h4>
-              <p className="xs:text-[0.6rem] md:text-lg">
+              <p className={commomStyle}>
                 {item.color || "N/A"} - {item.size || "N/A"}
               </p>
             </div>
@@ -151,9 +152,7 @@ const CartSummary = () => {
               >
                 <span className="xs:text-sm md:text-lg">-</span>
               </button>
-              <span className="xs:text-[0.5rem] md:text-lg text-textColor">
-                {item.quantity}
-              </span>
+              <span className={commomStyle}>{item.quantity}</span>
               <button
                 className="xs:p-[0.35rem] md:p-[0.6rem] w-2 h-2 flex justify-center items-center border rounded text-xs"
                 onClick={() => handleQuantityChange(item, item.quantity + 1)}
@@ -163,7 +162,9 @@ const CartSummary = () => {
             </div>
 
             {/* Price */}
-            <p className="xs:col-start-3 xs:row-start-4  md:col-span-2 xs:text-[0.5rem] md:text-sm md:col-start-auto md:row-start-auto font-semibold">
+            <p
+              className={`xs:col-start-3 xs:row-start-4  md:col-span-2 md:col-start-auto md:row-start-auto ${commomStyle}`}
+            >
               ${" "}
               {singleProductTotal(item.product_price, item.quantity).toFixed()}
             </p>
@@ -173,7 +174,9 @@ const CartSummary = () => {
               onClick={() => handleDeleteItem(item.id)}
               className="absolute top-0 right-2 text-red-500 cursor-pointer"
             >
-              <span className="xs:text-xs md:text-xl lg:text-3xl">×</span>
+              <span className="font-semibold xs:text-[1.5rem] md:text-xl">
+                ×
+              </span>
             </div>
           </div>
         ))}

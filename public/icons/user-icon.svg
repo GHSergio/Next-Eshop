@@ -1,0 +1,8 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  fill="currentColor"
+  viewBox="0 0 24 24"
+  className="sm:w-5 sm:h-5 md:w-6 md:h-6 lg:w-7 lg:h-7 text-iconColor"
+>
+  <path d="M12 12a5 5 0 100-10 5 5 0 000 10zm0 2a7 7 0 00-7 7h2a5 5 0 0110 0h2a7 7 0 00-7-7z" />
+</svg>
