@@ -2,7 +2,7 @@ import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import { RootState } from "../store";
 import { fetchAllProducts, fetchAllCategories } from "@/api";
 import { createSelector } from "reselect";
-import { ProductState } from "@/types";
+import { ProductState, Product } from "@/types";
 
 //定義 狀態 初始值
 const initialState: ProductState = {
@@ -31,6 +31,12 @@ const productSlice = createSlice({
   name: "products",
   initialState, // 初始化狀態
   reducers: {
+    setProducts(state, action: PayloadAction<Product[]>) {
+      state.products = action.payload; // 初始化產品數據
+    },
+    setCategories(state, action: PayloadAction<string[]>) {
+      state.categories = action.payload; // 初始化分類數據
+    },
     setSearchQuery(state, action: PayloadAction<string>) {
       state.searchQuery = action.payload;
     },
@@ -73,7 +79,8 @@ export const selectFilteredProducts = createSelector(
 );
 
 // 導出 actions 給元件使用
-export const { setSearchQuery } = productSlice.actions;
+export const { setProducts, setCategories, setSearchQuery } =
+  productSlice.actions;
 
 // 導出 reducer 給 store 使用
 export default productSlice.reducer;

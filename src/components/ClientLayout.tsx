@@ -114,14 +114,6 @@ const ClientLayout: React.FC<{ children: React.ReactNode }> = ({
 
   // console.log("userInfo state: ", userInfo);
 
-  // const handleCartMouseEnter = useCallback(() => {
-  //   dispatch(setShowCart(true));
-  // }, [dispatch]);
-
-  // const handleCartMouseLeave = useCallback(() => {
-  //   dispatch(setShowCart(false));
-  // }, [dispatch]);
-
   const handleCartClick = () => {
     dispatch(toggleCart());
     if (isLoggedIn) {

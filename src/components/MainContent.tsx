@@ -4,24 +4,35 @@ import SearchBar from "./SearchBar";
 import ProductCard from "./ProductCard";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "../store/store";
+import { Product } from "@/types";
 import {
+  setProducts,
+  setCategories,
   setSearchQuery,
-  // fetchProductsAndCategories,
   selectFilteredProducts,
-} from "../store/slice/productSlice";
+  // fetchProductsAndCategories,
+} from "@/store/slice/productSlice";
 
 interface MainContentProps {
+  products?: Product[];
+  categories?: string[];
   category?: string;
 }
 
-const MainContent: React.FC<MainContentProps> = ({ category }) => {
+const MainContent: React.FC<MainContentProps> = ({
+  products,
+  categories,
+  category,
+}) => {
   const dispatch: AppDispatch = useDispatch();
   const loading = useSelector((state: RootState) => state.products.loading);
 
-  // 使用 useCallback 確保這些函數只有在 dispatch 改變時才重新創建
-  // const fetchProducts = useCallback(() => {
-  //   dispatch(fetchProductsAndCategories());
-  // }, [dispatch]);
+  // 在客戶端初始化 Redux store
+  useEffect(() => {
+    if (!products || !categories) return;
+    dispatch(setProducts(products)); // 將產品數據存入 Redux
+    dispatch(setCategories(categories)); // 將分類數據存入 Redux
+  }, [dispatch, products, categories]);
 
   const clearSearchQuery = useCallback(() => {
     dispatch(setSearchQuery(""));
@@ -57,17 +68,17 @@ const MainContent: React.FC<MainContentProps> = ({ category }) => {
 
         {/* 符合結果數量 */}
         <h2 className="text-sm my-4">
-          符合的結果為 {filteredProducts.length} 筆
+          符合的結果為 {filteredProducts?.length} 筆
         </h2>
 
         {/* 商品卡片的容器 */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
-          {filteredProducts.length === 0 ? (
+          {filteredProducts?.length === 0 ? (
             <p className="text-center text-lg col-span-full">
               搜尋不到相關結果
             </p>
           ) : (
-            filteredProducts.map((product) => (
+            filteredProducts?.map((product) => (
               <ProductCard
                 key={product.id}
                 id={product.id}
