@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -12,14 +12,16 @@ import {
 } from "../store/slice/userSlice";
 import CartDropdown from "./cartStep/CartDropdown";
 import MemberDropdown from "./members/MemberDropdown";
+import { fetchTopRatedProducts } from "@/api";
 import NavLinks from "./NavLinks";
 
 const NavBar: React.FC = () => {
   const router = useRouter();
   const dispatch = useDispatch();
-  const categories = useSelector(
-    (state: RootState) => state.products.categories
-  );
+  const [topRatedProducts, setTopRatedProducts] = useState<
+    { id: number; title: string; rating: number }[]
+  >([]);
+
   const showCart = useSelector((state: RootState) => state.user.showCart);
   const showMember = useSelector((state: RootState) => state.user.showMember);
   const isLoggedIn = useSelector((state: RootState) => state.user.isLoggedIn);
@@ -53,6 +55,19 @@ const NavBar: React.FC = () => {
     }
   };
 
+  // 獲取 Top 5 商品
+  useEffect(() => {
+    const getTopRatedProducts = async () => {
+      try {
+        const products = await fetchTopRatedProducts();
+        setTopRatedProducts(products);
+      } catch (error) {
+        console.error("Failed to fetch top-rated products:", error);
+      }
+    };
+    getTopRatedProducts();
+  }, [dispatch]);
+
   return (
     <nav className="bg-navbarBgc relative">
       <div className="mx-auto px-3 ">
@@ -70,7 +85,7 @@ const NavBar: React.FC = () => {
 
           {/* 中間：NavLinks 大螢幕才顯示 */}
           <div className="xs:hidden sm:flex justify-center">
-            <NavLinks links={categories} />
+            <NavLinks links={topRatedProducts} />
           </div>
 
           {/* 右側：Cart and User Icons 大螢幕才顯示 */}

@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
+// import SearchBar from "@/components/SearchBar";
 import "@/styles/globals.css";
 import ClientProvider from "@/components/ClientProvider"; // 使用客戶端的 Provider
 import ClientLayout from "@/components/ClientLayout";
@@ -33,6 +34,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <header className="sticky top-0 z-50">
             <NavBar />
           </header>
+
+          {/* <div className="w-10/12 mx-auto my-8">
+            <SearchBar />
+          </div> */}
 
           {/* 小螢幕專屬 ClientLayout & 全局AuthModal */}
           <ClientLayout>

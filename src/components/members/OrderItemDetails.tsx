@@ -38,7 +38,7 @@ const OrderItemDetails: React.FC<OrderItemDetailsProps> = ({ item }) => {
           alt={item.product_name || "Image"}
           width={80}
           height={80}
-          className="object-contain h-20 w-20 sm:h-20 sm:w-20"
+          className="object-contain bg-[#DDF0E9] h-20 w-20 sm:h-20 sm:w-20"
           priority
         />
       </div>

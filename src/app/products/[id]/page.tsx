@@ -73,10 +73,12 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ params }) => {
         product_id: String(product.id),
         product_name: product.title,
         product_price: product.price,
-        product_image: product.image,
+        product_image: product.images[0],
         color: selectedColor,
         size: selectedSize,
         quantity,
+        stock: product.stock,
+        rating: product.rating,
         added_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };
@@ -110,32 +112,47 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ params }) => {
     );
   }
 
+  const stockOptions =
+    product.stock > 0
+      ? Array.from({ length: product.stock }, (_, i) => i + 1)
+      : [];
+
+  const commonStyles = "mb-4 text-textColor";
+  const labelStyles = "mr-2 font-semibold xs:text-[0.8rem] sm:text-lg";
+  const selectStyles =
+    "text-black mt-2 w-full p-2 border rounded-md cursor-pointer";
+
   return (
     <div className="max-w-5xl mx-auto p-4">
       {/* <AuthModal /> */}
       <div className="flex flex-col md:flex-row gap-6">
-        <div className="flex-1 flex justify-center items-center">
+        {/* Image */}
+        <div className="flex-1 flex justify-center items-center border-2 border-yellow-100 rounded-lg">
           <Image
-            src={product.image || "/path/to/default-image.jpg"}
+            src={product.images[0] || "https://via.placeholder.com/150"}
             alt={product.title || "Default Title"}
             width={500}
             height={400}
             style={{ width: "auto", height: "100%" }}
-            className="object-contain"
-            priority // 優化圖片的加載 提高LCP性能
+            className="object-contain bg-[#DDF0E9]"
+            // priority // 優化圖片的加載 提高LCP性能
           />
         </div>
+
         {/* Product Content */}
         <div className="flex-1">
-          <h1 className="font-bold mb-4">{product.title}</h1>
+          <h1 className="font-bold mb-4 xs:text-[1rem] sm:text-xl">
+            {product.title}
+          </h1>
           <hr className="my-4" />
+
           {/* color */}
-          <div className="mb-4">
-            <label className="block mb-2 font-semibold ">Color</label>
+          <div className={commonStyles}>
+            <label className={labelStyles}>Color</label>
             <select
               value={selectedColor}
               onChange={(e) => setSelectedColor(e.target.value)}
-              className="w-full p-2 border rounded-md"
+              className={selectStyles}
             >
               {product.colors?.map((color) => (
                 <option key={color} value={color}>
@@ -144,13 +161,14 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ params }) => {
               ))}
             </select>
           </div>
+
           {/* Size */}
-          <div className="mb-4 ">
-            <label className="block mb-2 font-semibold ">Size</label>
+          <div className="mb-4">
+            <label className={labelStyles}>Size</label>
             <select
               value={selectedSize}
               onChange={(e) => setSelectedSize(e.target.value)}
-              className="w-full p-2 border rounded-md "
+              className={selectStyles}
             >
               {product.sizes?.map((size) => (
                 <option key={size} value={size}>
@@ -159,40 +177,107 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ params }) => {
               ))}
             </select>
           </div>
+
           {/* Price */}
-          <div className="text-xl font-semibold mb-4 text-textColor">
-            Price: ${product.price.toFixed()}
+          <div className={commonStyles}>
+            <span className={labelStyles}>Price</span>
+            <span className="text-red-500 text-xl">
+              ${product.price.toFixed()}
+            </span>
           </div>
+
+          {/* Stock */}
+          <div className={commonStyles}>
+            <span className={labelStyles}>Stock</span>
+            <span className="text-yellow-200 text-xl">{product.stock} 件</span>
+          </div>
+
+          {/* Rating */}
+          <div className={commonStyles}>
+            <span className={labelStyles}>Rating</span>
+            <span className="text-yellow-500 text-xl">★</span>
+            <span className="text-black-500 text-xl">
+              {product.rating.toFixed(1)}
+            </span>{" "}
+          </div>
+
           <hr className="my-4" />
+
           {/* Quantity */}
-          <div className="flex items-center gap-4 mb-6">
-            <div>
-              <label className="block mb-2 font-semibold ">Quantity</label>
-              <select
-                value={quantity}
-                onChange={(e) => setQuantity(Number(e.target.value))}
-                className="w-20 p-2 border rounded-md"
-              >
-                {[1, 2, 3, 4, 5].map((num) => (
+          <div className={commonStyles}>
+            <label className={labelStyles}>Quantity</label>
+            <select
+              value={quantity}
+              onChange={(e) => setQuantity(Number(e.target.value))}
+              className={selectStyles}
+              disabled={stockOptions.length === 0}
+            >
+              {stockOptions.length > 0 ? (
+                stockOptions.map((num) => (
                   <option key={num} value={num}>
                     {num}
                   </option>
-                ))}
-              </select>
-            </div>
+                ))
+              ) : (
+                <option value={0}>Out of Stock</option>
+              )}
+            </select>
           </div>
+
           {/* Add to Cart Button */}
           <button
             onClick={handleAddToCart}
             className="bg-blue-500 text-white py-2 px-4 rounded-md w-full hover:bg-blue-600 transition duration-300"
           >
-            Add to Cart
+            {product.stock > 0 ? "Add to Cart" : "Out of Stock"}
           </button>
         </div>
       </div>
       <div className="mt-8">
-        <h3 className=" font-semibold mb-2">Product Description</h3>
+        <h3 className="font-semibold mb-2">Product Description</h3>
         <p className="text-textColor">{product.description}</p>
+      </div>
+
+      <hr className="my-4" />
+
+      {/* Reviews Section */}
+      <div className="mt-8">
+        <h3 className="font-semibold text-xl mb-4">Customer Reviews</h3>
+        {product.reviews && product.reviews.length > 0 ? (
+          <div>
+            <p className="mb-4">
+              <span className="font-semibold">Average Rating:</span>{" "}
+              {(
+                product.reviews.reduce(
+                  (sum, review) => sum + review.rating,
+                  0
+                ) / product.reviews.length
+              ).toFixed(1)}{" "}
+              ({product.reviews.length} Reviews)
+            </p>
+
+            {/* 評論 */}
+            <ul className="space-y-4">
+              {product.reviews.map((review, index) => (
+                <li key={index} className="border p-4 rounded-md shadow-sm">
+                  <div className="flex items-center mb-2">
+                    <span className="text-yellow-500 mr-2">★</span>
+                    <span className="text-white font-medium">
+                      {review.rating}
+                    </span>
+                  </div>
+                  <p className="text-white-700">{review.comment}</p>
+                  <p className="text-white-500 text-sm mt-1">
+                    - {review.reviewerName},{" "}
+                    {new Date(review.date).toLocaleDateString()}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : (
+          <p className="text-white">No reviews yet for this product.</p>
+        )}
       </div>
     </div>
   );

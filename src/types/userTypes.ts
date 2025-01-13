@@ -22,6 +22,8 @@ export interface CartItem {
   color: string;
   size: string;
   quantity: number;
+  stock: number;
+  rating: number;
   added_at: string;
   updated_at: string;
 }

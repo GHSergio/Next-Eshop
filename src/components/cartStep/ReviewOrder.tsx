@@ -110,7 +110,8 @@ const ReviewOrder = () => {
 
       {/* CartFooter */}
       <div className="mt-6 text-right">
-        <CartFooter />
+        {/* 傳遞 prop 隱藏運費提示 */}
+        <CartFooter showRemainingShippingMessage={false} />
       </div>
     </div>
   );

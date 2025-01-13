@@ -10,7 +10,11 @@ const DeliveryAndPayment = () => {
   const selectedPayment = useSelector(
     (state: RootState) => state.user.selectedPayment
   );
+  const selectedItems = useSelector(
+    (state: RootState) => state.user.selectedItems
+  );
 
+  console.log("選中的商品:", selectedItems);
   // console.log(selectedPayment);
 
   // 選擇哪種運送方式 & 需支付運費

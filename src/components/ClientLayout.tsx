@@ -17,7 +17,7 @@ import {
   toggleCart,
 } from "../store/slice/userSlice";
 import { fetchProductsAndCategories } from "../store/slice/productSlice";
-import NavLinks from "./NavLinks";
+// import NavLinks from "./NavLinks";
 // import CartDropdown from "./cartStep/CartDropdown";
 import MemberDropdown from "./members/MemberDropdown";
 import Alert from "@/components/Alert";
@@ -29,9 +29,9 @@ const ClientLayout: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const router = useRouter();
   const dispatch: AppDispatch = useDispatch();
-  const categories = useSelector(
-    (state: RootState) => state.products.categories
-  );
+  // const categories = useSelector(
+  //   (state: RootState) => state.products.categories
+  // );
   // const showCart = useSelector((state: RootState) => state.user.showCart);
   const showMember = useSelector((state: RootState) => state.user.showMember);
   const isLoggedIn = useSelector((state: RootState) => state.user.isLoggedIn);
@@ -136,9 +136,9 @@ const ClientLayout: React.FC<{ children: React.ReactNode }> = ({
       {/* 全局的 AuthModal */}
       {/* <AuthModal /> */}
       {/* 小螢幕才出現 NavLinks */}
-      <div className="xs:flex justify-center sm:hidden sticky top-16 bg-[#9EF7D9] w-full z-10 p-1">
+      {/* <div className="xs:flex justify-center sm:hidden sticky top-16 bg-[#9EF7D9] w-full z-10 p-1">
         <NavLinks links={categories} />
-      </div>
+      </div> */}
 
       <main className="flex-1">{children}</main>
 

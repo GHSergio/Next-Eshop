@@ -1,5 +1,5 @@
 import { useSelector, useDispatch } from "react-redux";
-import { useMemo, useEffect } from "react";
+import { useMemo } from "react";
 import { RootState } from "@/store/store";
 import { setShippingCost } from "@/store/slice/userSlice";
 
@@ -11,18 +11,15 @@ const useCartCalculations = () => {
   const selectedPayment = useSelector(
     (state: RootState) => state.user.selectedPayment
   );
-  const shippingCost = useSelector(
-    (state: RootState) => state.user.shipping_cost
-  );
 
-  // 計算總數量
-  const calculateItemsCount = useMemo(
+  // 計算商品總數量
+  const product_amount = useMemo(
     () => selectedItems.reduce((count, item) => count + item.quantity, 0),
     [selectedItems]
   );
 
-  // 計算總金額
-  const totalAmount = useMemo(
+  // 計算商品金額
+  const product_price = useMemo(
     () =>
       selectedItems.reduce(
         (sum, item) => sum + Math.ceil(item.product_price) * item.quantity,
@@ -31,36 +28,40 @@ const useCartCalculations = () => {
     [selectedItems]
   );
 
-  // 動態調整運費折抵
-  useEffect(() => {
-    let adjustedShippingCost = shippingCost;
-
-    switch (selectedPayment) {
-      case "7-11":
-      case "family":
-        adjustedShippingCost = totalAmount > 100 ? 0 : shippingCost;
-        break;
-      case "delivery":
-      case "credit":
-        adjustedShippingCost = totalAmount > 120 ? 0 : shippingCost;
-        break;
-      default:
-        adjustedShippingCost = shippingCost;
+  // 運費和免運條件
+  const { threshold, baseShippingCost } = useMemo(() => {
+    if (selectedPayment === "c_store") {
+      return { threshold: 100, baseShippingCost: 10 };
+    } else if (selectedPayment === "delivery" || selectedPayment === "credit") {
+      return { threshold: 120, baseShippingCost: 15 };
     }
+    return { threshold: 0, baseShippingCost: 0 };
+  }, [selectedPayment]);
 
-    dispatch(setShippingCost(adjustedShippingCost));
-  }, [selectedPayment, totalAmount, shippingCost, dispatch]);
+  // 判斷是否免運
+  const isFreeShipping = product_price >= threshold;
 
-  // 計算最終金額
-  const finalTotal = useMemo(
-    () => totalAmount + shippingCost,
-    [totalAmount, shippingCost]
-  );
+  // 剩餘金額以達免運
+  const remainingToFreeShipping = !isFreeShipping
+    ? threshold - product_price
+    : 0;
+
+  // 實際運費
+  const shippingCost = isFreeShipping ? 0 : baseShippingCost;
+
+  // 寫入 Redux 狀態
+  useMemo(() => {
+    dispatch(setShippingCost(shippingCost));
+  }, [shippingCost, dispatch]);
+
+  // 最終總金額
+  const finalTotal = product_price + shippingCost;
 
   return {
-    calculateItemsCount,
-    totalAmount,
+    product_amount,
+    product_price,
     shippingCost,
+    remainingToFreeShipping,
     finalTotal,
   };
 };

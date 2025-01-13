@@ -125,7 +125,7 @@ const CartSummary = () => {
                 alt={item.product_name}
                 width="300"
                 height="200"
-                className="object-contain h-20 w-20 sm:h-25 sm:w-25"
+                className="object-contain bg-[#DDF0E9] h-20 w-20 sm:h-25 sm:w-25"
                 priority // 優化圖片的加載 提高LCP性能
               />
             </div>

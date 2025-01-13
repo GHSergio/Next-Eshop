@@ -1,28 +1,22 @@
 "use client";
-import React, { useEffect, useCallback } from "react";
+import React, { useEffect } from "react";
 import SearchBar from "./SearchBar";
-import ProductCard from "./ProductCard";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "../store/store";
-import { Product } from "@/types";
-import {
-  setProducts,
-  setCategories,
-  setSearchQuery,
-  selectFilteredProducts,
-  // fetchProductsAndCategories,
-} from "@/store/slice/productSlice";
+import { Product, Category } from "@/types";
+import { setProducts, setCategories } from "@/store/slice/productSlice";
+import CategoryCard from "@/components/CategoryCard";
 
 interface MainContentProps {
   products?: Product[];
-  categories?: string[];
+  categories?: Category[];
   category?: string;
 }
 
 const MainContent: React.FC<MainContentProps> = ({
   products,
   categories,
-  category,
+  // category,
 }) => {
   const dispatch: AppDispatch = useDispatch();
   const loading = useSelector((state: RootState) => state.products.loading);
@@ -34,22 +28,6 @@ const MainContent: React.FC<MainContentProps> = ({
     dispatch(setCategories(categories)); // 將分類數據存入 Redux
   }, [dispatch, products, categories]);
 
-  const clearSearchQuery = useCallback(() => {
-    dispatch(setSearchQuery(""));
-  }, [dispatch]);
-
-  // useEffect(() => {
-  //   fetchProducts();
-  // }, [fetchProducts]);
-
-  useEffect(() => {
-    clearSearchQuery();
-  }, [category, clearSearchQuery]);
-
-  const filteredProducts = useSelector((state: RootState) =>
-    selectFilteredProducts(state, category)
-  );
-
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -58,37 +36,28 @@ const MainContent: React.FC<MainContentProps> = ({
     );
   }
 
+  // console.log("Filtered Products:", filteredProducts);
+
   return (
     <>
-      <div className="w-11/12 mx-auto my-5 flex flex-col">
-        {/* Search Bar */}
-        <div className="w-full md:w-1/3 lg:w-1/4 mb-4">
+      <div className="w-11/12 mx-auto">
+        {/* SearchBar */}
+        <div className="w-full mx-auto my-8">
           <SearchBar />
         </div>
 
-        {/* 符合結果數量 */}
-        <h2 className="text-sm my-4">
-          符合的結果為 {filteredProducts?.length} 筆
-        </h2>
-
-        {/* 商品卡片的容器 */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
-          {filteredProducts?.length === 0 ? (
-            <p className="text-center text-lg col-span-full">
-              搜尋不到相關結果
-            </p>
-          ) : (
-            filteredProducts?.map((product) => (
-              <ProductCard
-                key={product.id}
-                id={product.id}
-                image={product.image}
-                title={product.title}
-                price={product.price}
-                discountPrice={product.discountPrice}
-              />
-            ))
-          )}
+        {/* 顯示分類卡片 */}
+        <h1 className="text-2xl font-bold mb-6">所有分類</h1>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5">
+          {categories?.map((category) => (
+            <CategoryCard
+              key={category.slug}
+              name={category.name}
+              slug={category.slug}
+              url={category.url}
+              image={category.image}
+            />
+          ))}
         </div>
       </div>
     </>

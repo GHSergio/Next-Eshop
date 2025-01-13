@@ -42,7 +42,7 @@ const CartPage: React.FC = () => {
     (state: RootState) => state.user.isCreditCardFormValid
   );
 
-  const { calculateItemsCount, totalAmount, shippingCost, finalTotal } =
+  const { product_amount, product_price, shippingCost, finalTotal } =
     useCartCalculations();
 
   const [activeStep, setActiveStep] = useState(0);
@@ -96,8 +96,8 @@ const CartPage: React.FC = () => {
     const newOrder = {
       auth_id: userInfo.id,
       total_price: finalTotal,
-      items_count: calculateItemsCount,
-      total_items_price: totalAmount,
+      items_count: product_amount,
+      total_items_price: product_price,
       shipping_cost: shippingCost,
       payment_method: paymentInfo.payment_method,
       recipient_name: paymentInfo.recipient_name,
@@ -139,7 +139,7 @@ const CartPage: React.FC = () => {
       alert("提交訂單失敗，請稍後再試！");
     }
   }, [
-    calculateItemsCount,
+    product_amount,
     deliveryInfo.address_line,
     deliveryInfo.city,
     deliveryInfo.district,
@@ -154,7 +154,7 @@ const CartPage: React.FC = () => {
     storeInfo.c_store,
     storeInfo.store_name,
     storeInfo.store_address,
-    totalAmount,
+    product_price,
     userInfo?.id,
     dispatch,
   ]);
@@ -246,7 +246,7 @@ const CartPage: React.FC = () => {
               <h2 className="text-xl mb-2 font-semibold text-green-600">
                 訂單已成功提交！
               </h2>
-              <p className="text-sm text-gray-600 mb-4">
+              <p className="text-sm text-white mb-4">
                 您的訂單已提交成功，您可以到{" "}
                 <a href="/member" className="text-blue-500 underline">
                   會員中心

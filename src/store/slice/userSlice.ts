@@ -952,6 +952,7 @@ const userSlice = createSlice({
     builder
       .addCase(logoutUserThunk.fulfilled, (state) => {
         setAlertState(state, "success", "用戶登出成功！");
+        state.cart = [];
       })
       .addCase(logoutUserThunk.rejected, (state, action) => {
         console.log("logout rejected:", action.payload);
