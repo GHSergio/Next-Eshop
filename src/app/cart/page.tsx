@@ -15,6 +15,10 @@ import {
   saveOrderThunk,
   deleteCartItemThunk,
   setAlert,
+  // resetOrder,
+  setIsOrderSubmitted,
+  setActiveStep,
+  setShouldReset,
 } from "@/store/slice/userSlice";
 import useCartCalculations from "@/hook/useCartCalculations";
 
@@ -38,6 +42,11 @@ const CartPage: React.FC = () => {
   );
   const addresses = useSelector((state: RootState) => state.user.addresses);
   const stores = useSelector((state: RootState) => state.user.stores);
+  const activeStep = useSelector((state: RootState) => state.user.activeStep);
+  const isOrderSubmitted = useSelector(
+    (state: RootState) => state.user.isOrderSubmitted
+  );
+
   const isCreditCardFormValid = useSelector(
     (state: RootState) => state.user.isCreditCardFormValid
   );
@@ -45,15 +54,19 @@ const CartPage: React.FC = () => {
   const { product_amount, product_price, shippingCost, finalTotal } =
     useCartCalculations();
 
-  const [activeStep, setActiveStep] = useState(0);
   // onClick下一步 狀態改為true -> 觸發表單驗證 -> 未通過則顯示錯誤提示
   const [submitted, setSubmitted] = useState(false);
-  const [isOrderSubmitted, setIsOrderSubmitted] = useState(false);
 
+  console.log("當前步驟為: ", activeStep);
   // 在組件掛載時重置
   useEffect(() => {
-    setIsOrderSubmitted(false); // 重置提交狀態
-  }, []);
+    dispatch(setIsOrderSubmitted(false)); // 重置提交狀態
+  }, [dispatch]);
+
+  // 當 activeStep 更新時，保存到 localStorage
+  useEffect(() => {
+    localStorage.setItem("activeStep", String(activeStep));
+  }, [activeStep]);
 
   // 提交訂單邏輯(支付資訊&商品明細)
   const handleConfirmOrder = useCallback(async () => {
@@ -208,11 +221,15 @@ const CartPage: React.FC = () => {
     // 如果是最後一步，執行訂單提交邏輯
     if (activeStep === steps.length - 1) {
       await handleConfirmOrder();
-      setIsOrderSubmitted(true);
+
+      // 設置為超出範圍的步驟值，讓 default 區塊顯示
+      dispatch(setIsOrderSubmitted(true));
+      dispatch(setActiveStep(steps.length));
+      return;
     }
 
     // 前進到下一步
-    setActiveStep((prev) => prev + 1);
+    dispatch(setActiveStep(activeStep + 1));
     setSubmitted(false); // 重置表單提交狀態
   }, [
     dispatch,
@@ -225,7 +242,7 @@ const CartPage: React.FC = () => {
   ]);
 
   const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
+    dispatch(setActiveStep(activeStep - 1));
   };
 
   // 渲染內容
@@ -241,6 +258,7 @@ const CartPage: React.FC = () => {
         case 3:
           return <ReviewOrder />;
         default:
+          console.log("這是步驟幾:", step);
           return (
             <div className="text-center mt-4">
               <h2 className="text-xl mb-2 font-semibold text-green-600">
@@ -275,17 +293,19 @@ const CartPage: React.FC = () => {
   // console.log("Store Info:", storeInfo);
   // console.log("Errors:", errors.store);
 
-  // 提交後 跳轉
+  // 提交後跳轉
   useEffect(() => {
     if (isOrderSubmitted) {
       const timer = setTimeout(() => {
-        router.push("/"); // 跳轉回首頁
-        setIsOrderSubmitted(false); // 跳轉後重置狀態
+        // 跳轉到首頁
+        router.push("/");
+        // 設置 shouldReset 為 true
+        dispatch(setShouldReset(true));
       }, 2000);
 
-      return () => clearTimeout(timer); // 清理計時器，防止內存洩漏
+      return () => clearTimeout(timer); // 清理計時器
     }
-  }, [isOrderSubmitted, router]);
+  }, [isOrderSubmitted, router, dispatch]);
 
   // console.log("選擇的商品: ", selectedItems);
   return (

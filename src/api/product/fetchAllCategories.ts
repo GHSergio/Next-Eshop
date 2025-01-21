@@ -1,8 +1,9 @@
+import { cache } from "react";
 import apiClient from "@/api/dummyApiClient";
 import { Category } from "@/types";
 import { fetchProductsByCategory } from "@/api";
 
-export const fetchAllCategories = async (): Promise<Category[]> => {
+export const fetchAllCategories = cache(async (): Promise<Category[]> => {
   // 獲取分類列表，返回格式包含 slug, name, url
   const response = await apiClient.get<Category[]>("/products/categories");
   const categories = response.data;
@@ -37,4 +38,4 @@ export const fetchAllCategories = async (): Promise<Category[]> => {
       }
     })
   );
-};
+});

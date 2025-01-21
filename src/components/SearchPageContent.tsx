@@ -9,7 +9,7 @@ import SearchBar from "@/components/SearchBar";
 
 const SearchPageContent: React.FC = () => {
   const searchParams = useSearchParams();
-  const query = searchParams?.get("q") || "";
+  const query = searchParams?.get("q") || ""; // 獲取 `q` 的值，
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 

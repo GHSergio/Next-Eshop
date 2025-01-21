@@ -15,6 +15,8 @@ import {
   fetchAddressesThunk,
   fetchStoresThunk,
   toggleCart,
+  resetOrder,
+  setShouldReset,
 } from "../store/slice/userSlice";
 import { fetchProductsAndCategories } from "../store/slice/productSlice";
 // import NavLinks from "./NavLinks";
@@ -29,13 +31,10 @@ const ClientLayout: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const router = useRouter();
   const dispatch: AppDispatch = useDispatch();
-  // const categories = useSelector(
-  //   (state: RootState) => state.products.categories
-  // );
-  // const showCart = useSelector((state: RootState) => state.user.showCart);
   const showMember = useSelector((state: RootState) => state.user.showMember);
   const isLoggedIn = useSelector((state: RootState) => state.user.isLoggedIn);
   const cart = useSelector((state: RootState) => state.user.cart);
+  const shouldReset = useSelector((state: RootState) => state.user.shouldReset);
 
   const totalItems = useMemo(() => {
     return cart && cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -45,6 +44,15 @@ const ClientLayout: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     dispatch(fetchProductsAndCategories());
   }, [dispatch]);
+
+  // 根據 shouldReset 執行 resetOrder
+  useEffect(() => {
+    if (shouldReset) {
+      dispatch(resetOrder()); // 重置訂單狀態
+      // console.log("reset訂單");
+      dispatch(setShouldReset(false)); // 清除 shouldReset 狀態
+    }
+  }, [shouldReset, dispatch]);
 
   // 檢查是否需要初始化 & 調用初始化
   const handleInitialization = useCallback(

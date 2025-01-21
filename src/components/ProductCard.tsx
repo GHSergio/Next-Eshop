@@ -33,8 +33,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
     // onClick 商品Card 導航到商品的詳細頁
     // id 通過 URL 動態參數傳遞
     <Link href={`/products/${id}`} passHref title={title}>
-      <div className="card xs:h-60 sm:h-full p-4 rounded-lg shadow-md transition-all duration-300 hover:shadow-lg hover:bg-cardHoverBgc cursor-pointer">
-        <div className="w-full h-40 overflow-hidden border-2 border-yellow-100 rounded-lg">
+      <div className="card xs:h-60 sm:h-full p-4 rounded-lg transition-bg duration-300 hover:bg-productHoverBgc cursor-pointer">
+        <div className="bg-imageBgc w-full h-40 overflow-hidden rounded-lg">
           {/* 使用 Next.js 的 Image 來優化圖片 */}
           <Image
             src={image || "https://via.placeholder.com/150"}
@@ -42,7 +42,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
             width={500}
             height={500}
             className="object-contain w-full h-full"
-            priority
+            // priority
+            loading="lazy"
           />
         </div>
 
@@ -51,13 +52,13 @@ const ProductCard: React.FC<ProductCardProps> = ({
           {/* 顯示產品標題，並設置溢出效果 */}
           <div
             // title={title}
-            className="xs:text-[0.8rem] sm:text-lg font-semibold truncate text-foreground"
+            className="xs:text-[0.8rem] sm:text-lg font-semibold truncate text-titleColor"
           >
             {title}
           </div>
 
           {/* 價格顯示，區分是否有折扣價格 */}
-          <p className="xs:text-[0.8rem] sm:text-lg text-secondary">
+          <p className="xs:text-[0.8rem] sm:text-lg text-priceColor font-semibold">
             {discountPrice ? (
               <>
                 <span className="line-through text-gray-500">
@@ -66,12 +67,15 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 <span className="text-accent">${discountPrice}</span>
               </>
             ) : (
-              `$${Math.ceil(price)}`
+              <>
+                <span className="mr-1">$</span>
+                <span>{Math.ceil(price)}</span>
+              </>
             )}
           </p>
 
           {/* 評分 */}
-          <div className="xs:text-[0.8rem] sm:text-lg flex items-center">
+          <div className="flex items-center xs:text-[0.8rem] sm:text-lg text-secondary">
             {renderStars()}
           </div>
         </div>

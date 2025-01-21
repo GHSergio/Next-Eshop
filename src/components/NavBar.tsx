@@ -1,15 +1,16 @@
 "use client";
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "../store/store";
+import { RootState, AppDispatch } from "@/store/store";
 import {
   setShowCart,
   toggleMember,
   setShowMember,
-} from "../store/slice/userSlice";
+} from "@/store/slice/userSlice";
+// import { setTheme } from "@/store/slice/themeSlice";
 import CartDropdown from "./cartStep/CartDropdown";
 import MemberDropdown from "./members/MemberDropdown";
 import { fetchTopRatedProducts } from "@/api";
@@ -17,7 +18,8 @@ import NavLinks from "./NavLinks";
 
 const NavBar: React.FC = () => {
   const router = useRouter();
-  const dispatch = useDispatch();
+  const dispatch: AppDispatch = useDispatch();
+
   const [topRatedProducts, setTopRatedProducts] = useState<
     { id: number; title: string; rating: number }[]
   >([]);
@@ -26,26 +28,36 @@ const NavBar: React.FC = () => {
   const showMember = useSelector((state: RootState) => state.user.showMember);
   const isLoggedIn = useSelector((state: RootState) => state.user.isLoggedIn);
   const cart = useSelector((state: RootState) => state.user.cart);
+  const theme = useSelector((state: RootState) => state.theme.theme);
 
   const totalItems = useMemo(() => {
     return cart && cart.reduce((sum, item) => sum + item.quantity, 0);
   }, [cart]);
 
-  const handleCartMouseEnter = useCallback(() => {
+  // console.log("當前主題:", theme);
+
+  // 在切換主題時，為 html 標籤設置 class
+  useEffect(() => {
+    const rootElement = document.documentElement; // 獲取 <html> 標籤
+    rootElement.classList.remove("theme-light", "theme-dark");
+    rootElement.classList.add(`theme-${theme}`);
+  }, [theme]);
+
+  const handleCartMouseEnter = () => {
     dispatch(setShowCart(true));
-  }, [dispatch]);
+  };
 
-  const handleCartMouseLeave = useCallback(() => {
+  const handleCartMouseLeave = () => {
     dispatch(setShowCart(false));
-  }, [dispatch]);
+  };
 
-  const handleMemberClick = useCallback(() => {
+  const handleMemberClick = () => {
     dispatch(toggleMember());
-  }, [dispatch]);
+  };
 
-  const handleMemberMouseLeave = useCallback(() => {
+  const handleMemberMouseLeave = () => {
     dispatch(setShowMember(false));
-  }, [dispatch]);
+  };
 
   const handleCartClick = () => {
     if (isLoggedIn) {
@@ -54,6 +66,18 @@ const NavBar: React.FC = () => {
       router.push("/login");
     }
   };
+
+  // const handleThemeToggle = () => {
+  //   const newTheme = theme === "light" ? "dark" : "light";
+  //   dispatch(setTheme(newTheme));
+  // };
+
+  const memoizedTopRatedProducts = useMemo(
+    () => topRatedProducts,
+    [topRatedProducts]
+  );
+
+  const buttonStyle = "buttonBgc rounded-lg p-1";
 
   // 獲取 Top 5 商品
   useEffect(() => {
@@ -70,7 +94,7 @@ const NavBar: React.FC = () => {
 
   return (
     <nav className="bg-navbarBgc relative">
-      <div className="mx-auto px-3 ">
+      <div className="mx-auto px-3">
         <div className="xs:flex xs:justify-center sm:grid grid-cols-[1fr_3fr_1fr] items-center h-16">
           {/* Logo */}
           <div
@@ -85,20 +109,43 @@ const NavBar: React.FC = () => {
 
           {/* 中間：NavLinks 大螢幕才顯示 */}
           <div className="xs:hidden sm:flex justify-center">
-            <NavLinks links={topRatedProducts} />
+            {/* <NavLinks links={topRatedProducts} /> */}
+            <NavLinks links={memoizedTopRatedProducts} />
           </div>
 
           {/* 右側：Cart and User Icons 大螢幕才顯示 */}
           <div className="xs:hidden sm:flex justify-end items-center space-x-4">
+            {/* Theme Toggle Icon */}
+            {/* <div>
+              <button
+                className={buttonStyle}
+                onClick={handleThemeToggle}
+                aria-label="切換主題"
+              >
+                <Image
+                  src={
+                    theme === "dark"
+                      ? "/icons/sun-icon.svg" // （切換到淺色模式）
+                      : "/icons/moon-icon.svg" // （切換到深色模式）
+                  }
+                  alt={theme === "dark" ? "切換到淺色模式" : "切換到深色模式"}
+                  width={24}
+                  height={24}
+                  className="w-6 h-6"
+                />
+              </button>
+            </div> */}
+
+            {/* Cart */}
             <div className="relative">
               <button
                 onMouseEnter={handleCartMouseEnter}
-                className="focus:outline-none p-1"
+                className={buttonStyle}
                 onClick={handleCartClick}
               >
                 <Image
                   src="/icons/cart-icon.svg"
-                  alt="Cart"
+                  alt="前往購物車"
                   width={24}
                   height={24}
                   className="w-6 h-6"
@@ -113,13 +160,10 @@ const NavBar: React.FC = () => {
             </div>
             {/* 使用者 登入 */}
             <div className="">
-              <button
-                className="focus:outline-none p-1"
-                onClick={handleMemberClick}
-              >
+              <button className={buttonStyle} onClick={handleMemberClick}>
                 <Image
                   src="/icons/user-icon.svg"
-                  alt="User"
+                  alt="展開更多會員選項"
                   width={24}
                   height={24}
                   className="w-6 h-6"

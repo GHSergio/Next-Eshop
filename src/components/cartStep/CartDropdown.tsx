@@ -3,7 +3,7 @@ import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 
-const CartDropdown: React.FC = () => {
+const CartDropdown: React.FC = React.memo(() => {
   const cart = useSelector((state: RootState) => state.user.cart);
 
   // 標題樣式
@@ -47,6 +47,9 @@ const CartDropdown: React.FC = () => {
       </div>
     </>
   );
-};
+});
+
+// 設置 displayName，方便在 React DevTools 中調試
+CartDropdown.displayName = "CartDropdown";
 
 export default CartDropdown;

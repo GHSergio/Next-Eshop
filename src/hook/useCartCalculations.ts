@@ -1,5 +1,5 @@
 import { useSelector, useDispatch } from "react-redux";
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
 import { RootState } from "@/store/store";
 import { setShippingCost } from "@/store/slice/userSlice";
 
@@ -50,7 +50,7 @@ const useCartCalculations = () => {
   const shippingCost = isFreeShipping ? 0 : baseShippingCost;
 
   // 寫入 Redux 狀態
-  useMemo(() => {
+  useEffect(() => {
     dispatch(setShippingCost(shippingCost));
   }, [shippingCost, dispatch]);
 

@@ -6,7 +6,7 @@ import StoreComponent from "./StoreComponent";
 
 interface UserStoreProps {
   stores: StoreItem[]; // 所有的門市資料
-  currentStoreId: string | null; // 當前選中的門市 ID
+  // currentStoreId: string | null; // 當前選中的門市 ID
   onSelectStore: (store: StoreItem) => void; // 選擇門市後的回調函數
   onClose: () => void; // 關閉 Modal 的回調函數
   isStoreModalOpen: boolean;

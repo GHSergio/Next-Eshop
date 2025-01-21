@@ -6,7 +6,7 @@ import MainContent from "../components/MainContent";
 // import SearchBar from "@/components/SearchBar";
 
 export const dynamic = "auto"; // 根據頁面設置自動選擇靜態或動態渲染
-export const revalidate = 300; // ISR，每 300 秒重新生成
+export const revalidate = 300; // ISR，整個頁面每 300 秒重新生成一次
 
 // `page.tsx` 是一個 Server Component
 const HomePage: React.FC = async () => {

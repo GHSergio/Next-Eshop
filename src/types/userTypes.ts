@@ -190,6 +190,11 @@ export interface UserState {
   currentOrderDetails: CurrentOrderDetails; // 使用明確類型
   addresses: AddressItem[]; // 存儲多個地址（需要關聯 addresses 表）
   stores: StoreItem[]; // 存儲多個門市（需要關聯 stores 表）
+
+  activeStep: number; // 當前步驟
+  isOrderSubmitted: boolean; // 訂單提交狀態
+  shouldReset: boolean; // 觸發reset
+
   // credit_card: string; // 預設擴充支付方式
   selectedItems: CartItem[] | [];
   selectedPayment: string;

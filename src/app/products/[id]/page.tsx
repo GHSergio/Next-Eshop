@@ -127,14 +127,14 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ params }) => {
       {/* <AuthModal /> */}
       <div className="flex flex-col md:flex-row gap-6">
         {/* Image */}
-        <div className="flex-1 flex justify-center items-center border-2 border-yellow-100 rounded-lg">
+        <div className="flex-1 flex justify-center items-center rounded-lg">
           <Image
             src={product.images[0] || "https://via.placeholder.com/150"}
             alt={product.title || "Default Title"}
             width={500}
             height={400}
             style={{ width: "auto", height: "100%" }}
-            className="object-contain bg-[#DDF0E9]"
+            className="object-contain bg-imageBgc"
             // priority // 優化圖片的加載 提高LCP性能
           />
         </div>
@@ -181,8 +181,9 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ params }) => {
           {/* Price */}
           <div className={commonStyles}>
             <span className={labelStyles}>Price</span>
-            <span className="text-red-500 text-xl">
-              ${product.price.toFixed()}
+            <span className="text-red-500 text-2xl mr-1">$</span>
+            <span className="text-red-500 text-2xl">
+              {product.price.toFixed()}
             </span>
           </div>
 
@@ -195,8 +196,8 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ params }) => {
           {/* Rating */}
           <div className={commonStyles}>
             <span className={labelStyles}>Rating</span>
-            <span className="text-yellow-500 text-xl">★</span>
-            <span className="text-black-500 text-xl">
+            <span className="text-yellow-500 text-xl mr-1">★</span>
+            <span className="text-secondary text-xl">
               {product.rating.toFixed(1)}
             </span>{" "}
           </div>

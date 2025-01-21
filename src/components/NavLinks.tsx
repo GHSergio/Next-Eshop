@@ -6,7 +6,9 @@ interface NavLinksProps {
   links: { id: number; title: string; rating: number }[];
 }
 
-const NavLinks: React.FC<NavLinksProps> = ({ links }) => {
+const NavLinks: React.FC<NavLinksProps> = React.memo(({ links }) => {
+  // console.log("NavLinks rendered");
+
   return (
     <div className="flex space-x-4">
       {links.map((link) => (
@@ -21,6 +23,9 @@ const NavLinks: React.FC<NavLinksProps> = ({ links }) => {
       ))}
     </div>
   );
-};
+});
+
+// 設置 displayName，方便在 React DevTools 中調試
+NavLinks.displayName = "NavLinks";
 
 export default NavLinks;

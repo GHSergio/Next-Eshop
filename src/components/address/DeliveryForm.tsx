@@ -22,21 +22,29 @@ const DeliveryForm: React.FC<DeliveryFormProps> = ({ info, setInfo }) => {
   const addresses = useSelector((state: RootState) => state.user.addresses);
 
   useEffect(() => {
-    if (addresses.length > 0) {
-      const firstAddress = addresses[0]; // 取得第一筆 store
-      setInfo({
-        id: info.id,
-        user_id: info.user_id || "", // 保留 user_id
-        recipient_name: firstAddress.recipient_name || "",
-        phone: firstAddress.phone || "",
-        city: firstAddress.city || "",
-        district: firstAddress.district || "",
-        address_line: firstAddress.address_line || "",
-        is_default: false,
-      });
+    // 如果用戶沒有選擇門市，初始化為第一筆門市
+    if (!info.id && addresses.length > 0) {
+      const firstAddress = addresses[0];
+      setInfo(firstAddress);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [addresses]);
+  }, [info.id, addresses, setInfo]); // 僅在 stores 或 info.id 發生變化時執行
+
+  // useEffect(() => {
+  //   if (addresses.length > 0) {
+  //     const firstAddress = addresses[0]; // 取得第一筆 store
+  //     setInfo({
+  //       id: info.id,
+  //       user_id: info.user_id || "", // 保留 user_id
+  //       recipient_name: firstAddress.recipient_name || "",
+  //       phone: firstAddress.phone || "",
+  //       city: firstAddress.city || "",
+  //       district: firstAddress.district || "",
+  //       address_line: firstAddress.address_line || "",
+  //       is_default: false,
+  //     });
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [addresses]);
 
   const handleOpenAddressModal = () => {
     setIsAddressModalOpen(true);

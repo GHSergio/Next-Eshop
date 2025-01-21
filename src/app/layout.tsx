@@ -1,7 +1,6 @@
 import { ReactNode } from "react";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
-// import SearchBar from "@/components/SearchBar";
 import "@/styles/globals.css";
 import ClientProvider from "@/components/ClientProvider"; // 使用客戶端的 Provider
 import ClientLayout from "@/components/ClientLayout";
@@ -21,7 +20,7 @@ export const metadata = {
 // 為 children 指定 ReactNode 類型
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning={true}>
       <head>
         {/* 添加視窗適配的 meta */}
         <meta

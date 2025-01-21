@@ -4,9 +4,13 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "../../store/store";
-import { logoutUserThunk, setShowMember } from "@/store/slice/userSlice";
+import {
+  logoutUserThunk,
+  setShowMember,
+  resetOrder,
+} from "@/store/slice/userSlice";
 
-const MemberDropdown: React.FC = () => {
+const MemberDropdown: React.FC = React.memo(() => {
   const isLoggedIn = useSelector((state: RootState) => state.user.isLoggedIn);
   const router = useRouter();
   const dispatch: AppDispatch = useDispatch();
@@ -15,6 +19,7 @@ const MemberDropdown: React.FC = () => {
   const handleLogout = () => {
     localStorage.removeItem("authToken");
     localStorage.removeItem("userInfo");
+    dispatch(resetOrder());
     dispatch(logoutUserThunk()).unwrap();
     try {
       dispatch(setShowMember(false));
@@ -69,6 +74,9 @@ const MemberDropdown: React.FC = () => {
       )}
     </>
   );
-};
+});
+
+// 設置 displayName，方便在 React DevTools 中調試
+MemberDropdown.displayName = "MemberDropdown";
 
 export default MemberDropdown;

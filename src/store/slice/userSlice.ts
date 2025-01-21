@@ -34,6 +34,11 @@ const initialState: UserState = {
   selectedItems: [],
   selectedPayment: "",
   shipping_cost: 0,
+
+  activeStep: 0, // 預設為第 0 步
+  isOrderSubmitted: false,
+  shouldReset: false,
+
   // 收件資訊表格
   delivery_info: {
     id: "",
@@ -832,6 +837,31 @@ const userSlice = createSlice({
     setSelectedItems(state, action: PayloadAction<CartItem[]>) {
       state.selectedItems = action.payload;
     },
+    // 結帳步驟
+    setActiveStep(state, action: PayloadAction<number>) {
+      console.log("Step現在到底是: ", action.payload);
+      state.activeStep = action.payload; // 強制轉為數字類型
+    },
+    // 重置Order
+    resetOrder(state) {
+      console.log("正在重置訂單狀態...");
+      state.activeStep = 0;
+      state.selectedItems = [];
+      state.selectedPayment = "";
+      state.store_info = initialState.store_info;
+      state.delivery_info = initialState.delivery_info;
+      state.creditCard_info = initialState.creditCard_info;
+      state.isOrderSubmitted = false;
+      console.log("狀態重置完成：", state);
+    },
+    // 控制是否需要在首頁執行 reset
+    setShouldReset(state, action: PayloadAction<boolean>) {
+      state.shouldReset = action.payload;
+    },
+    // 是否最後步驟
+    setIsOrderSubmitted(state, action: PayloadAction<boolean>) {
+      state.isOrderSubmitted = action.payload;
+    },
     // 選擇支付方式
     setSelectedPayment(state, action: PayloadAction<string>) {
       state.selectedPayment = action.payload;
@@ -848,19 +878,10 @@ const userSlice = createSlice({
     setDeliveryInfo(state, action: PayloadAction<AddressItem>) {
       state.delivery_info = action.payload;
     },
-    // // 設置超商取貨資訊
-    // setStoreInfo(state, action: PayloadAction<StoreInfo>) {
-    //   state.store_info = action.payload;
-    // },
-    // // 設置收件人資訊
-    // setDeliveryInfo(state, action: PayloadAction<DeliveryInfo>) {
-    //   state.delivery_info = action.payload;
-    // },
     // 設置信用卡資訊
     setCreditCardInfo(state, action: PayloadAction<CreditCardInfo>) {
       state.creditCard_info = action.payload;
     },
-
     // 設置驗證
     setErrors(state, action) {
       state.errors = {
@@ -1125,10 +1146,6 @@ const userSlice = createSlice({
       .addCase(fetchStoresThunk.fulfilled, (state, action) => {
         console.log("獲取常用門市成功", action.payload);
         state.stores = action.payload;
-        if (action.payload.length > 0) {
-          state.store_info = action.payload[0]; // 初始設置 store_info
-          console.log(state.store_info);
-        }
       })
       .addCase(fetchStoresThunk.rejected, (state, action) => {
         console.error("獲取常用門市失敗: ", action.payload);
@@ -1138,10 +1155,6 @@ const userSlice = createSlice({
       .addCase(fetchAddressesThunk.fulfilled, (state, action) => {
         console.log("獲取常用地址成功 ", action.payload);
         state.addresses = action.payload;
-        if (action.payload.length > 0) {
-          state.delivery_info = action.payload[0]; // 初始設置 delivery_info
-          console.log(state.delivery_info);
-        }
       })
       .addCase(fetchAddressesThunk.rejected, (state, action) => {
         console.error("獲取常用地址失敗: ", action.payload);
@@ -1188,6 +1201,12 @@ export const {
   clearUserInfo,
   setSelectedItems,
   setSelectedPayment,
+
+  setActiveStep,
+  resetOrder,
+  setIsOrderSubmitted,
+  setShouldReset,
+
   setShippingCost,
   setStoreInfo,
   setDeliveryInfo,

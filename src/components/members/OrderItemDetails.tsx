@@ -39,7 +39,8 @@ const OrderItemDetails: React.FC<OrderItemDetailsProps> = ({ item }) => {
           width={80}
           height={80}
           className="object-contain bg-[#DDF0E9] h-20 w-20 sm:h-20 sm:w-20"
-          priority
+          // priority
+          loading="lazy"
         />
       </div>
 

@@ -13,17 +13,20 @@ interface CategoryCardProps {
 const CategoryCard: React.FC<CategoryCardProps> = ({ name, slug, image }) => {
   return (
     <Link href={`/category/${slug}`} passHref title={name}>
-      <div className="bg-[#5D91A8] overflow-hidden hover:shadow-md border-2 border-yellow-100 rounded-lg ">
+      <div className="bg-categoryBgc hover:bg-categoryHoverBgc transition-bg duration-300 overflow-hidden border-2 border-yellow-100 rounded-lg">
         {/* 分類圖片 */}
         <div className="h-36 sm:h-48 lg:h-56 xl:h-64 overflow-hidden p-4 border-b-2 border-yellow-100">
           <Image
+            rel="preload"
             src={image || "https://via.placeholder.com/150?text=No+Image"}
             alt={name || "Default Title"}
-            width={500}
-            height={500}
+            width={233}
+            height={278}
             // style={{ width: "auto" }} // 添加自適應樣式
-            className="object-contain w-full h-full bg-[#DDF0E9]"
+            className="object-contain w-full h-full bg-imageBgc rounded-lg"
             priority
+            placeholder="blur" // 提供模糊占位符以提升用戶體驗
+            blurDataURL="data:image/svg+xml;base64,..."
           />
         </div>
         {/* 分類名稱 */}

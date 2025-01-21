@@ -2,59 +2,62 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  /* 顏色變數 */
-  --primary-color: #3490dc;
-  --secondary-color: #ffed4a;
-  --accent-color: #e3342f;
-  --button-bgc: #38c172;
-  --button-color: white;
-  --button-hover-color: #4cd38a;
-  --background: #ffffff;
-  --foreground: #171717;
-  --card-bgc: #e6f4ea;
-  --card-hover-bgc: #d6eadb;
-  --icon-color: #2b2b2b;
-  --text-color: #333333;
-  --step-color: #87bc56;
-  --border-color: #ccc;
-  --border-checked-color: #2ca84a;
-  --navbar-bgc: #f3f4f6;
-  --nav-link-hover-color: #38b1d4;
-  --nav-link-active-bgc: #4cc2e9;
-  --navLink-bgc: #f0f3f5;
-
-  /* 全局樣式變數 */
-  --font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
-  --border-radius: 8px;
+/* 淺色主題樣式 */
+.theme-light {
+  --primary-color: #4a90e2; /* 清新的藍色，與深色主題一致 */
+  --secondary-color: #f9c74f; /* 溫暖的黃色，適合淺色主題 */
+  --accent-color: #d9534f; /* 醒目的紅色，與深色主題一致 */
+  --background: #f5f5f5; /* 柔和的淺灰色背景，適合淺色主題 */
+  --foreground: #212121; /* 深灰色文字，增加對比度 */
+  --login-bgc: #ffffff; /* 登錄背景設置為純白，清晰明亮 */
+  --navbar-bgc: #5bbccd; /* 導覽列設置為純白，保持整潔 */
+  --nav-link-hover-color: #4a90e2; /* 懸停連結時顯示藍色，保持與主題一致 */
+  --nav-link-active-bgc: #cfe4fc; /* 當前連結背景設置為淡藍色 */
+  --navLink-bgc: #f1f5f9; /* 導覽連結背景為柔和的灰白色 */
+  --button-bgc: #28a745; /* 穩重的綠色 */
+  --button-color: #ffffff; /* 白色文字 */
+  --button-hover-color: #5cb85c; /* 按鈕懸停時亮綠色 */
+  --card-bgc: #ffffff; /* 卡片背景設置為純白，清晰整潔 */
+  --card-hover-bgc: #f8f9fa; /* 卡片懸停時設置為淺灰色 */
+  --icon-color: #333333; /* 深灰色圖標，增強清晰度 */
+  --title-color: #4a90e2; /* 標題文字設置為主題藍色 */
+  --text-color: #212529; /* 深灰文字，適合淺色主題 */
+  --step-color: #4a90e2; /* 主題一致的藍色步驟顯示 */
+  --border-color: #dcdcdc; /* 輕柔的灰色邊框 */
+  --border-checked-color: #4a90e2; /* 主題一致的藍色勾選邊框 */
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #3c3b3b;
-    --foreground: #302a2a;
-    --primary-color: #1e3a8a;
-    --secondary-color: #fbbf24;
-    --accent-color: #ef4444;
-    --login-bgc: #3f5592;
-    --navbar-bgc: #6faed3;
-    --nav-link-hover-color: #92e15d;
-    --nav-link-active-bgc: #4bc5c1;
-    --navLink-bgc: #d1c3c3;
-    /* --button-bgc: #d1c62a; */
-    --button-bgc: #35d650;
-    --button-color: #ffffff;
-    --button-hover-color: #e2d84e;
-    --card-bgc: #488b7d;
-    --card-hover-bgc: #2e8567;
-    --icon-color: #3b371f;
-    --title-color: #e2e88d;
-    /* --text-color: #d3e1d1; */
-    --text-color: #f1f6f0;
-    --step-color: #c3d442;
-    --border-color: #35bb8c;
-    --border-checked-color: #9eba23;
-  }
+/* 深色主題樣式 */
+.theme-dark {
+  --primary-color: #1e3a8a; /* 深藍色，沉穩的主題色 */
+  --secondary-color: #fbbf24; /* 醒目的黃色 */
+  --accent-color: #ef4444; /* 鮮紅色，吸引注意 */
+  --background: #3c3b3b; /* 深灰色背景 */
+  --foreground: #302a2a; /* 比背景稍深的灰色文字 */
+  --login-bgc: #3f5592; /* 深藍色背景，適合深色主題 */
+  /* navbar */
+  --navbar-bgc: #6faed3; /* 柔和的淺藍色 */
+  --nav-link-hover-color: #92e15d; /* 懸停時綠色 */
+  --nav-link-active-bgc: #4bc5c1; /* 當前連結背景設置為淡藍綠色 */
+  --navLink-bgc: #d1c3c3; /* 導覽連結背景為灰白色 */
+  /* button */
+  --button-bgc: #35d650; /* 穩重的綠色 */
+  --button-color: #ffffff; /* 白色文字 */
+  --button-hover-color: #e2d84e; /* 按鈕懸停時亮黃色 */
+  /* card */
+  --product-bgc: #488b7d; /* 深綠色卡片背景 */
+  --product-hover-bgc: #2e8567; /* 卡片懸停時更深的綠色 */
+  --category-bgc: #5d91a8;
+  --category-hover-bgc: #0d5b75;
+  --image-bgc: #bfddd2;
+
+  --icon-color: #3b371f; /* 深棕色圖標 */
+  --title-color: #e2e88d; /* 柔和的黃綠色 */
+  --price-color: #def3ef;
+  --text-color: #f1f6f0; 
+  --step-color: #c3d442; /* 黃綠色步驟顯示 */
+  --border-color: #35bb8c; /* 輕柔的綠色邊框 */
+  --border-checked-color: #9eba23; /* 黃綠色勾選邊框 */
 }
 
 body {
@@ -102,6 +105,10 @@ button:hover {
   background-color: var(--button-hover-color);
 }
 
+* {
+  outline: none;
+}
+
 /* input */
 input,
 select {
@@ -114,8 +121,8 @@ input[type="checkbox"] {
 
 /* 卡片樣式 */
 .card {
-  background-color: var(--card-bgc);
-  color: var(--foreground);
+  background-color: var(--product-bgc);
+  /* color: var(--foreground); */
 }
 
 /* 標頭（標題）樣式 */
