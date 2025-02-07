@@ -257,7 +257,7 @@ export const initializeUserThunk = createAsyncThunk<
       {
         auth_id: authId,
         membership_type: "普通會員",
-        user_name: "",
+        user_name: null,
         avatar_url: "",
         phone: null,
         default_shipping_address: null,
