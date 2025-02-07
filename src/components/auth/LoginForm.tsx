@@ -8,8 +8,7 @@ import { useDispatch } from "react-redux";
 // import { setAlert } from "@/store/slice/userSlice";
 import { AppDispatch } from "@/store/store";
 // import { RootState, AppDispatch } from "@/store/store";
-import { loginUserThunk } from "@/store/slice/userSlice";
-// import { loginWithGoogleThunk } from "@/store/slice/userSlice";
+import { loginUserThunk, loginWithGoogleThunk } from "@/store/slice/userSlice";
 const LoginForm: React.FC = () => {
   // const [email, setEmail] = useState("");
   // const [password, setPassword] = useState("");
@@ -47,18 +46,18 @@ const LoginForm: React.FC = () => {
   // };
 
   // Google 登入
-  // const handleGoogleLogin = async () => {
-  //   try {
-  //     await dispatch(loginWithGoogleThunk()).unwrap();
-  //     router.push("/");
-  //   } catch (error) {
-  //     if (error instanceof Error) {
-  //       console.error("Google 登入失敗：", error.message);
-  //     } else {
-  //       console.error("未知錯誤：", error);
-  //     }
-  //   }
-  // };
+  const handleGoogleLogin = async () => {
+    try {
+      await dispatch(loginWithGoogleThunk()).unwrap();
+      router.push("/");
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error("Google 登入失敗：", error.message);
+      } else {
+        console.error("未知錯誤：", error);
+      }
+    }
+  };
 
   // 遊客(固定)登入
   const handleGuestLogin = async (e: React.FormEvent) => {
@@ -256,15 +255,6 @@ const LoginForm: React.FC = () => {
         </button>
       </form> */}
 
-      {/* Google 登入按鈕 */}
-      {/* <div className="mt-4">
-        <button
-          onClick={handleGoogleLogin}
-          className={`${labelStyle} w-full bg-blue-500 text-white py-2 rounded-lg mb-4 hover:bg-blue-600 transition-all duration-300`}
-        >
-          使用 Google 登入
-        </button>
-      </div> */}
       {/* 訪客登入按鈕 */}
       <div>
         <button
@@ -272,6 +262,16 @@ const LoginForm: React.FC = () => {
           className={`${labelStyle} w-full bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-400 transition-all duration-300`}
         >
           以訪客身份登入
+        </button>
+      </div>
+
+      {/* Google 登入按鈕 */}
+      <div className="mt-4">
+        <button
+          onClick={handleGoogleLogin}
+          className={`${labelStyle} w-full bg-blue-500 text-white py-2 rounded-lg mb-4 hover:bg-blue-600 transition-all duration-300`}
+        >
+          使用 Google 登入
         </button>
       </div>
 
