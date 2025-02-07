@@ -183,78 +183,33 @@ export const loginWithGoogleThunk = createAsyncThunk<
 });
 
 // 定義初始化用戶數據的 thunk
-// export const initializeUserThunk = createAsyncThunk<
-//   void,
-//   string,
-//   { rejectValue: string }
-// >("user/initializeUserThunk", async (authId, { rejectWithValue }) => {
-//   try {
-//     // 檢查用戶是否已存在於 table 中
-//     const { data, error } = await supabase
-//       .from("users")
-//       .select("*")
-//       .eq("auth_id", authId)
-//       .maybeSingle();
-
-//     if (error) {
-//       console.error("檢查用戶數據失敗：", error.message);
-//       return rejectWithValue("檢查用戶數據失敗");
-//     }
-
-//     // 如果數據不存在，插入新數據
-//     if (!data) {
-//       const { error: insertError } = await supabase.from("users").insert({
-//         auth_id: authId,
-//         membership_type: "普通會員",
-//         user_name: "",
-//         avatar_url: "",
-//         phone: null,
-//         default_shipping_address: null,
-//         default_pickup_store: null,
-//         // preferred_payment_method: null,
-//       });
-
-//       if (insertError) {
-//         console.error("初始化用戶數據失敗：", insertError.message);
-//         return rejectWithValue("初始化用戶數據失敗");
-//       } else {
-//         console.log("用戶數據已初始化");
-//       }
-//     } else {
-//       // table數據已存在，
-//       console.log("用戶數據已存在，跳過初始化");
-//     }
-//   } catch (error: unknown) {
-//     console.error("初始化用戶數據時發生錯誤：", error);
-//     return rejectWithValue("初始化用戶數據時發生錯誤");
-//   }
-// });
-
 export const initializeUserThunk = createAsyncThunk<
   void,
   string,
   { rejectValue: string }
 >("user/initializeUserThunk", async (authId, { rejectWithValue }) => {
   try {
-    const { data, error: fetchError } = await supabase
+    // 檢查用戶是否已存在於 table 中
+    const { data, error } = await supabase
       .from("users")
-      .select("id")
+      .select("*")
       .eq("auth_id", authId)
       .maybeSingle();
 
-    if (fetchError) {
-      console.error("檢查用戶數據失敗：", fetchError.message);
+    console.log("🔍 API 查詢結果：", data, error);
+
+    if (error) {
+      console.error("檢查用戶數據失敗：", error.message);
       return rejectWithValue("檢查用戶數據失敗");
     }
 
-    if (data) {
-      console.log("用戶數據已存在，跳過初始化");
-      return;
-    }
-
-    // **使用 upsert() 來確保不會發生 409 Conflict**
-    const { error: insertError } = await supabase.from("users").upsert([
-      {
+    // 如果數據不存在，插入新數據
+    // 改用 .single() 或手動檢查 null -> 避免 maybeSingle() 無法確認 data === null，導致誤判
+    if (data === null) {
+      console.log("🚀 插入新用戶...");
+      // .insert() 在競爭條件下導致錯誤 -> 409 Conflict
+      // 使用 upsert()，確保 auth_id 已存在時不會發生衝突
+      const { error: insertError } = await supabase.from("users").upsert({
         auth_id: authId,
         membership_type: "普通會員",
         user_name: null,
@@ -262,15 +217,19 @@ export const initializeUserThunk = createAsyncThunk<
         phone: null,
         default_shipping_address: null,
         default_pickup_store: null,
-      },
-    ]);
+        // preferred_payment_method: null,
+      });
 
-    if (insertError) {
-      console.error("初始化用戶數據失敗：", insertError.message);
-      return rejectWithValue("初始化用戶數據失敗");
+      if (insertError) {
+        console.error("初始化用戶數據失敗：", insertError.message);
+        return rejectWithValue("初始化用戶數據失敗");
+      } else {
+        console.log("用戶數據已初始化");
+      }
+    } else {
+      // table數據已存在，
+      console.log("用戶數據已存在，跳過初始化");
     }
-
-    console.log("用戶數據已初始化");
   } catch (error: unknown) {
     console.error("初始化用戶數據時發生錯誤：", error);
     return rejectWithValue("初始化用戶數據時發生錯誤");

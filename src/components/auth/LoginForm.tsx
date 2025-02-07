@@ -255,10 +255,10 @@ const LoginForm: React.FC = () => {
         </button>
       </form> */}
 
-      <div>
+      {/* <div>
         <p>Google登入初始化異常，正在修改</p>
         <p>請先使用訪客身份登入</p>
-      </div>
+      </div> */}
 
       {/* 訪客登入按鈕 */}
       <div>

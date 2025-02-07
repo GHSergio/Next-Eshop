@@ -55,51 +55,19 @@ const ClientLayout: React.FC<{ children: React.ReactNode }> = ({
   }, [shouldReset, dispatch]);
 
   // 檢查是否需要初始化 & 調用初始化
-  // const handleInitialization = useCallback(
-  //   async (authId: string) => {
-  //     const cacheKey = `initialized_${authId}`;
-  //     const isInitialized = localStorage.getItem(cacheKey);
-
-  //     if (isInitialized) {
-  //       console.log("該用戶不需再次初始化");
-  //       return;
-  //     }
-
-  //     try {
-  //       await dispatch(initializeUserThunk(authId)).unwrap();
-  //       localStorage.setItem(cacheKey, "true");
-  //     } catch (error) {
-  //       console.error("初始化用戶數據失敗：", error);
-  //     }
-  //   },
-  //   [dispatch]
-  // );
-
   const handleInitialization = useCallback(
     async (authId: string) => {
+      const cacheKey = `initialized_${authId}`;
+      const isInitialized = localStorage.getItem(cacheKey);
+
+      if (isInitialized) {
+        console.log("該用戶不需再次初始化");
+        return;
+      }
+
       try {
-        // **步驟 1：先查詢用戶是否已經存在於 Supabase**
-        const { data: existingUser, error: fetchError } = await supabase
-          .from("users")
-          .select("id")
-          .eq("id", authId)
-          .single();
-
-        if (fetchError && fetchError.code !== "PGRST116") {
-          console.error("檢查用戶是否存在時發生錯誤：", fetchError.message);
-          return;
-        }
-
-        // **步驟 2：如果用戶已經存在，則不需要初始化**
-        if (existingUser) {
-          console.log("用戶已存在，跳過初始化");
-          return;
-        }
-
-        // **步驟 3：用戶不存在時，才初始化用戶**
         await dispatch(initializeUserThunk(authId)).unwrap();
-        localStorage.setItem(`initialized_${authId}`, "true");
-        console.log("用戶初始化成功");
+        localStorage.setItem(cacheKey, "true");
       } catch (error) {
         console.error("初始化用戶數據失敗：", error);
       }
