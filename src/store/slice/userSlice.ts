@@ -170,9 +170,26 @@ export const loginWithGoogleThunk = createAsyncThunk<
     });
 
     if (error) {
-      console.error("Google 登入失敗：", error.message);
+      // console.error("Google 登入失敗：", error.message);
       return rejectWithValue({ message: error.message, severity: "error" });
     }
+
+    console.log("Google OAuth 流程啟動成功，等待用戶完成登入...");
+
+    // **等待 Supabase session 更新**
+    await new Promise<void>((resolve) => {
+      const checkSession = async () => {
+        const { data } = await supabase.auth.getSession();
+        if (data.session?.user) {
+          resolve();
+        } else {
+          setTimeout(checkSession, 500); // 每 500ms 檢查一次
+        }
+      };
+      checkSession();
+    });
+
+    return; // fulfilled 會觸發
   } catch (error) {
     console.error("Google 登入失敗：", error);
     return rejectWithValue({
@@ -186,7 +203,8 @@ export const loginWithGoogleThunk = createAsyncThunk<
 export const initializeUserThunk = createAsyncThunk<
   void,
   string,
-  { rejectValue: string }
+  // { rejectValue: string }
+  { rejectValue: RejectValue }
 >("user/initializeUserThunk", async (authId, { rejectWithValue }) => {
   try {
     // 檢查用戶是否已存在於 table 中
@@ -200,7 +218,10 @@ export const initializeUserThunk = createAsyncThunk<
 
     if (error) {
       console.error("檢查用戶數據失敗：", error.message);
-      return rejectWithValue("檢查用戶數據失敗");
+      return rejectWithValue({
+        message: "檢查用戶數據失敗，請稍後再試。",
+        severity: "error",
+      });
     }
 
     // 如果數據不存在，插入新數據
@@ -222,7 +243,11 @@ export const initializeUserThunk = createAsyncThunk<
 
       if (insertError) {
         console.error("初始化用戶數據失敗：", insertError.message);
-        return rejectWithValue("初始化用戶數據失敗");
+        // return rejectWithValue("初始化用戶數據失敗");
+        return rejectWithValue({
+          message: "初始化用戶數據失敗，請稍後再試。",
+          severity: "error",
+        });
       } else {
         console.log("用戶數據已初始化");
       }
@@ -232,7 +257,11 @@ export const initializeUserThunk = createAsyncThunk<
     }
   } catch (error: unknown) {
     console.error("初始化用戶數據時發生錯誤：", error);
-    return rejectWithValue("初始化用戶數據時發生錯誤");
+    // return rejectWithValue("初始化用戶數據時發生錯誤");
+    return rejectWithValue({
+      message: "初始化用戶數據 發生未知錯誤，請稍後再試。",
+      severity: "error",
+    });
   }
 });
 
@@ -402,7 +431,8 @@ export const fetchUserData = createAsyncThunk<
 export const fetchCartThunk = createAsyncThunk<
   CartItem[], // 返回的數據類型
   string, // 傳入的用戶 ID
-  { rejectValue: string }
+  // { rejectValue: string }
+  { rejectValue: RejectValue }
 >("cart/fetchCart", async (authId, { rejectWithValue }) => {
   try {
     const { data, error } = await supabase
@@ -411,14 +441,22 @@ export const fetchCartThunk = createAsyncThunk<
       .eq("auth_id", authId);
 
     if (error) {
-      return rejectWithValue("獲取購物車數據失敗：" + error.message);
+      // return rejectWithValue("獲取購物車數據失敗：" + error.message);
+      return rejectWithValue({
+        message: `獲取購物車數據失敗，${error.message}！`,
+        severity: "error",
+      });
     }
     // 更新本地存儲
     localStorage.setItem("cart", JSON.stringify(data || []));
     return (data as CartItem[]) || [];
   } catch (error) {
     console.error("獲取購物車數據時發生錯誤：", error);
-    return rejectWithValue("獲取購物車數據時發生未知錯誤");
+    // return rejectWithValue("獲取購物車數據時發生未知錯誤");
+    return rejectWithValue({
+      message: `獲取購物車數據失敗，${error}！`,
+      severity: "error",
+    });
   }
 });
 
@@ -426,7 +464,8 @@ export const fetchCartThunk = createAsyncThunk<
 export const addToCartThunk = createAsyncThunk<
   CartItem, // 返回類型
   CartItem, // 傳入完整的商品數據
-  { rejectValue: string }
+  // { rejectValue: string }
+  { rejectValue: RejectValue }
 >("cart/addToCart", async (cartItem, { rejectWithValue }) => {
   try {
     const { data, error } = await supabase
@@ -446,13 +485,21 @@ export const addToCartThunk = createAsyncThunk<
       .single();
 
     if (error) {
-      return rejectWithValue("添加到購物車失敗：" + error.message);
+      // return rejectWithValue("添加到購物車失敗：" + error.message);
+      return rejectWithValue({
+        message: `添加到購物車失敗，${error.message}！`,
+        severity: "error",
+      });
     }
 
     return data as CartItem;
   } catch (error) {
-    console.error("添加購物車項目時發生錯誤：", error);
-    return rejectWithValue("添加購物車時發生未知錯誤");
+    // console.error("添加購物車項目時發生錯誤：", error);
+    // return rejectWithValue("添加購物車時發生未知錯誤");
+    return rejectWithValue({
+      message: `添加到購物車失敗，${error}！`,
+      severity: "error",
+    });
   }
 });
 
@@ -460,7 +507,8 @@ export const addToCartThunk = createAsyncThunk<
 export const updateCartItemThunk = createAsyncThunk<
   CartItem, // 返回的數據類型
   Partial<CartItem> & { id: string }, // 傳入的更新數據類型
-  { rejectValue: string }
+  // { rejectValue: string }
+  { rejectValue: RejectValue }
 >("cart/updateCartItem", async (updatedItem, { rejectWithValue }) => {
   try {
     const { id, ...updateData } = updatedItem;
@@ -472,13 +520,21 @@ export const updateCartItemThunk = createAsyncThunk<
       .single();
 
     if (error) {
-      return rejectWithValue("更新購物車項目失敗：" + error.message);
+      // return rejectWithValue("更新購物車項目失敗：" + error.message);
+      return rejectWithValue({
+        message: `更新購物車失敗，${error.message}！`,
+        severity: "error",
+      });
     }
 
     return data as CartItem;
   } catch (error) {
-    console.error("更新購物車項目時發生錯誤：", error);
-    return rejectWithValue("更新購物車項目時發生未知錯誤");
+    // console.error("更新購物車項目時發生錯誤：", error);
+    // return rejectWithValue("更新購物車項目時發生未知錯誤");
+    return rejectWithValue({
+      message: `更新購物車失敗，${error}！`,
+      severity: "error",
+    });
   }
 });
 
@@ -486,7 +542,8 @@ export const updateCartItemThunk = createAsyncThunk<
 export const deleteCartItemThunk = createAsyncThunk<
   string, // 返回刪除的項目 ID
   string, // 傳入的項目 ID
-  { rejectValue: string }
+  // { rejectValue: string }
+  { rejectValue: RejectValue }
 >("cart/deleteCartItem", async (cartItemId, { rejectWithValue }) => {
   try {
     const { error } = await supabase
@@ -495,13 +552,21 @@ export const deleteCartItemThunk = createAsyncThunk<
       .eq("id", cartItemId);
 
     if (error) {
-      return rejectWithValue("刪除購物車項目失敗：" + error.message);
+      // return rejectWithValue("刪除購物車項目失敗：" + error.message);
+      return rejectWithValue({
+        message: `刪除商品失敗，${error.message}！`,
+        severity: "error",
+      });
     }
 
     return cartItemId; // 返回已刪除的項目 ID
   } catch (error) {
-    console.error("刪除購物車項目時發生錯誤：", error);
-    return rejectWithValue("刪除購物車項目時發生未知錯誤");
+    // console.error("刪除購物車項目時發生錯誤：", error);
+    // return rejectWithValue("刪除購物車項目時發生未知錯誤");
+    return rejectWithValue({
+      message: `刪除商品失敗，${error}！`,
+      severity: "error",
+    });
   }
 });
 
@@ -509,7 +574,8 @@ export const deleteCartItemThunk = createAsyncThunk<
 export const saveOrderThunk = createAsyncThunk<
   Order, // 返回 Order 類型
   { newOrder: OrderInput; orderItems: OrderItem[] }, // 傳入的參數類型
-  { rejectValue: string }
+  // { rejectValue: string }
+  { rejectValue: RejectValue }
 >("orders/saveOrder", async ({ newOrder, orderItems }, { rejectWithValue }) => {
   try {
     // 插入到 `orders` 表
@@ -520,7 +586,11 @@ export const saveOrderThunk = createAsyncThunk<
       .single();
 
     if (orderError) {
-      return rejectWithValue("儲存訂單失敗：" + orderError.message);
+      // return rejectWithValue("儲存訂單失敗：" + orderError.message);
+      return rejectWithValue({
+        message: `儲存訂單失敗，${orderError.message}！`,
+        severity: "error",
+      });
     }
 
     // 將 `orderItems` 插入到 `order_items` 表
@@ -534,13 +604,21 @@ export const saveOrderThunk = createAsyncThunk<
       .insert(enrichedOrderItems);
 
     if (itemsError) {
-      return rejectWithValue("儲存訂單商品失敗：" + itemsError.message);
+      // return rejectWithValue("儲存訂單商品失敗：" + itemsError.message);
+      return rejectWithValue({
+        message: `儲存訂單商品失敗，${itemsError.message}！`,
+        severity: "error",
+      });
     }
 
     return orderData as Order;
   } catch (error) {
     console.log(error);
-    return rejectWithValue("儲存訂單時發生未知錯誤");
+    // return rejectWithValue("儲存訂單時發生未知錯誤");
+    return rejectWithValue({
+      message: `儲存訂單失敗，${error}！`,
+      severity: "error",
+    });
   }
 });
 
@@ -548,7 +626,8 @@ export const saveOrderThunk = createAsyncThunk<
 export const fetchOrdersThunk = createAsyncThunk<
   Order[], // 返回值類型
   string, // 傳入的 user_id
-  { rejectValue: string }
+  // { rejectValue: string }
+  { rejectValue: RejectValue }
 >("orders/fetchOrders", async (userId, { rejectWithValue }) => {
   try {
     const { data, error } = await supabase
@@ -557,13 +636,21 @@ export const fetchOrdersThunk = createAsyncThunk<
       .eq("auth_id", userId); // 在orders內 尋找auth_id 符合userId的項目
 
     if (error) {
-      return rejectWithValue("獲取訂單失敗：" + error.message);
+      // return rejectWithValue("獲取訂單失敗：" + error.message);
+      return rejectWithValue({
+        message: `獲取訂單失敗，${error.message}！`,
+        severity: "error",
+      });
     }
 
     return data as Order[];
   } catch (error) {
-    console.error("獲取歷史訂單時發生錯誤：", error);
-    return rejectWithValue("發生未知錯誤，無法獲取訂單");
+    // console.error("獲取歷史訂單時發生錯誤：", error);
+    // return rejectWithValue("發生未知錯誤，無法獲取訂單");
+    return rejectWithValue({
+      message: `添加到購物車失敗，${error}！`,
+      severity: "error",
+    });
   }
 });
 
@@ -571,7 +658,8 @@ export const fetchOrdersThunk = createAsyncThunk<
 export const fetchOrderDetailsThunk = createAsyncThunk<
   { order: Order; items: OrderItem[] }, // 返回訂單主檔和商品明細
   string, // 傳入 order_id
-  { rejectValue: string }
+  // { rejectValue: string }
+  { rejectValue: RejectValue }
 >("orders/fetchOrderDetails", async (orderId, { rejectWithValue }) => {
   try {
     // 獲取訂單主檔
@@ -582,7 +670,11 @@ export const fetchOrderDetailsThunk = createAsyncThunk<
       .single();
 
     if (orderError) {
-      return rejectWithValue("獲取訂單主檔失敗：" + orderError.message);
+      // return rejectWithValue("獲取訂單主檔失敗：" + orderError.message);
+      return rejectWithValue({
+        message: `獲取訂單主檔失敗，${orderError.message}！`,
+        severity: "error",
+      });
     }
 
     // 獲取訂單的商品明細
@@ -592,10 +684,14 @@ export const fetchOrderDetailsThunk = createAsyncThunk<
       .eq("order_id", orderId);
 
     if (itemsError || !itemsData) {
-      console.error("訂單商品明細查詢失敗：", itemsError?.message);
-      return rejectWithValue(
-        `獲取訂單商品失敗：${itemsError?.message || "未知錯誤"}`
-      );
+      // console.error("訂單商品明細查詢失敗：", itemsError?.message);
+      // return rejectWithValue(
+      //   `獲取訂單商品失敗：${itemsError?.message || "未知錯誤"}`
+      // );
+      return rejectWithValue({
+        message: `獲取訂單商品明細失敗，${itemsError.message}！`,
+        severity: "error",
+      });
     }
 
     // 返回訂單主檔和商品明細
@@ -604,8 +700,12 @@ export const fetchOrderDetailsThunk = createAsyncThunk<
       items: itemsData as OrderItem[],
     };
   } catch (error) {
-    console.log(error);
-    return rejectWithValue("發生未知錯誤，無法獲取訂單詳情");
+    // console.log(error);
+    // return rejectWithValue("發生未知錯誤，無法獲取訂單詳情");
+    return rejectWithValue({
+      message: `獲取訂單商品明細失敗，${error}！`,
+      severity: "error",
+    });
   }
 });
 
@@ -613,7 +713,8 @@ export const fetchOrderDetailsThunk = createAsyncThunk<
 export const saveAddressThunk = createAsyncThunk<
   AddressItem, // 返回值類型
   InsertAddressItem, // 傳入參數類型
-  { rejectValue: string }
+  // { rejectValue: string }
+  { rejectValue: RejectValue }
 >("addresses/save", async (addressData, { rejectWithValue }) => {
   try {
     const { data, error } = await supabase
@@ -633,13 +734,21 @@ export const saveAddressThunk = createAsyncThunk<
       .single();
 
     if (error) {
-      return rejectWithValue(`儲存地址失敗: ${error.message}`);
+      // return rejectWithValue(`儲存地址失敗: ${error.message}`);
+      return rejectWithValue({
+        message: `儲存地址失敗，${error.message}！`,
+        severity: "error",
+      });
     }
     console.log("常用地址儲存成功", data);
     return data as AddressItem;
   } catch (error) {
-    console.error(error);
-    return rejectWithValue("儲存地址時發生未知錯誤");
+    // console.error(error);
+    // return rejectWithValue("儲存地址時發生未知錯誤");
+    return rejectWithValue({
+      message: `儲存地址失敗，${error}！`,
+      severity: "error",
+    });
   }
 });
 
@@ -647,7 +756,8 @@ export const saveAddressThunk = createAsyncThunk<
 export const fetchAddressesThunk = createAsyncThunk<
   AddressItem[], // 返回值類型
   string, // user_id
-  { rejectValue: string }
+  // { rejectValue: string }
+  { rejectValue: RejectValue }
 >("addresses/fetch", async (userId, { rejectWithValue }) => {
   try {
     const { data, error } = await supabase
@@ -656,14 +766,22 @@ export const fetchAddressesThunk = createAsyncThunk<
       .eq("auth_id", userId);
 
     if (error) {
-      return rejectWithValue(`獲取地址失敗: ${error.message}`);
+      // return rejectWithValue(`獲取地址失敗: ${error.message}`);
+      return rejectWithValue({
+        message: `獲取地址失敗，${error.message}！`,
+        severity: "error",
+      });
     }
 
     // console.log("常用地址獲取成功", data);
     return data || [];
   } catch (error) {
-    console.error(error);
-    return rejectWithValue("獲取地址時發生未知錯誤");
+    // console.error(error);
+    // return rejectWithValue("獲取地址時發生未知錯誤");
+    return rejectWithValue({
+      message: `獲取地址失敗，${error}！`,
+      severity: "error",
+    });
   }
 });
 
@@ -671,14 +789,18 @@ export const fetchAddressesThunk = createAsyncThunk<
 export const deleteAddressThunk = createAsyncThunk<
   string, // 返回被刪除的地址 ID
   string, // 傳入的地址 ID 和用戶 ID
-  { dispatch: AppDispatch; rejectValue: string } //
+  { dispatch: AppDispatch; rejectValue: RejectValue } //
 >("user/deleteAddress", async (addressId, { dispatch, rejectWithValue }) => {
   try {
     // 從 localStorage 獲取 user_id
     const userData = localStorage.getItem("userData");
     const authId = userData ? JSON.parse(userData).id : null;
     if (!authId) {
-      return rejectWithValue("無法找到用戶 ID，請重新登入");
+      // return rejectWithValue("無法找到用戶 ID，請重新登入");
+      return rejectWithValue({
+        message: `無法找到用戶ID，請重新登入！`,
+        severity: "error",
+      });
     }
 
     const { error } = await supabase
@@ -687,14 +809,22 @@ export const deleteAddressThunk = createAsyncThunk<
       .eq("id", addressId);
 
     if (error) {
-      return rejectWithValue(`刪除地址失敗: ${error.message}`);
+      // return rejectWithValue(`刪除地址失敗: ${error.message}`);
+      return rejectWithValue({
+        message: `刪除地址失敗，${error.message}！`,
+        severity: "error",
+      });
     }
     // 刪除成功後重新獲取地址列表 -> 避免選擇地址時 未更新select
     dispatch(fetchAddressesThunk(authId));
     return addressId; // 成功返回刪除的地址 ID
   } catch (error) {
-    console.error("刪除地址時發生錯誤:", error);
-    return rejectWithValue("刪除地址時發生未知錯誤");
+    // console.error("刪除地址時發生錯誤:", error);
+    // return rejectWithValue("刪除地址時發生未知錯誤");
+    return rejectWithValue({
+      message: `刪除地址失敗，${error}！`,
+      severity: "error",
+    });
   }
 });
 
@@ -702,7 +832,8 @@ export const deleteAddressThunk = createAsyncThunk<
 export const saveStoreThunk = createAsyncThunk<
   StoreItem, // 返回值類型
   InsertStoreItem, // 傳入參數類型
-  { rejectValue: string }
+  // { rejectValue: string }
+  { rejectValue: RejectValue }
 >("stores/save", async (storeData, { rejectWithValue }) => {
   try {
     const { data, error } = await supabase
@@ -725,14 +856,22 @@ export const saveStoreThunk = createAsyncThunk<
       .single();
 
     if (error) {
-      return rejectWithValue(`儲存門市失敗: ${error.message}`);
+      // return rejectWithValue(`儲存門市失敗: ${error.message}`);
+      return rejectWithValue({
+        message: `儲存門市失敗，${error.message}！`,
+        severity: "error",
+      });
     }
 
     // console.log("常用門市儲存成功", data);
     return data as StoreItem;
   } catch (error) {
-    console.error(error);
-    return rejectWithValue("儲存門市時發生未知錯誤");
+    // console.error(error);
+    // return rejectWithValue("儲存門市時發生未知錯誤");
+    return rejectWithValue({
+      message: `儲存門市失敗，${error}！`,
+      severity: "error",
+    });
   }
 });
 
@@ -740,7 +879,7 @@ export const saveStoreThunk = createAsyncThunk<
 export const fetchStoresThunk = createAsyncThunk<
   StoreItem[], // 返回值類型
   string, // auth_id
-  { rejectValue: string }
+  { rejectValue: RejectValue }
 >("stores/fetch", async (userId, { rejectWithValue }) => {
   try {
     const { data, error } = await supabase
@@ -749,7 +888,11 @@ export const fetchStoresThunk = createAsyncThunk<
       .eq("auth_id", userId);
 
     if (error) {
-      return rejectWithValue(`獲取門市失敗: ${error.message}`);
+      // return rejectWithValue(`獲取門市失敗: ${error.message}`);
+      return rejectWithValue({
+        message: `獲取門市失敗，${error.message}！`,
+        severity: "error",
+      });
     }
 
     // 將資料轉換為應用程式所需的格式
@@ -761,7 +904,11 @@ export const fetchStoresThunk = createAsyncThunk<
     return storesData || [];
   } catch (error) {
     console.error(error);
-    return rejectWithValue("獲取門市時發生未知錯誤");
+    // return rejectWithValue("獲取門市時發生未知錯誤");
+    return rejectWithValue({
+      message: `獲取門市失敗，${error}！`,
+      severity: "error",
+    });
   }
 });
 
@@ -769,27 +916,39 @@ export const fetchStoresThunk = createAsyncThunk<
 export const deleteStoreThunk = createAsyncThunk<
   string, // 返回被刪除的門市 ID
   string, // 傳入的門市 ID
-  { dispatch: AppDispatch; rejectValue: string }
+  { dispatch: AppDispatch; rejectValue: RejectValue }
 >("user/deleteStore", async (storeId, { dispatch, rejectWithValue }) => {
   try {
     // 從 localStorage 獲取 user_id
     const userData = localStorage.getItem("userData");
     const authId = userData ? JSON.parse(userData).id : null;
     if (!authId) {
-      return rejectWithValue("無法找到用戶 ID，請重新登入");
+      // return rejectWithValue("無法找到用戶 ID，請重新登入");
+      return rejectWithValue({
+        message: `無法找到用戶ID，請重新登入！`,
+        severity: "error",
+      });
     }
 
     const { error } = await supabase.from("stores").delete().eq("id", storeId);
 
     if (error) {
-      return rejectWithValue(`刪除門市失敗: ${error.message}`);
+      // return rejectWithValue(`刪除門市失敗: ${error.message}`);
+      return rejectWithValue({
+        message: `刪除門市失敗，${error.message}！`,
+        severity: "error",
+      });
     }
     // 刪除成功後重新獲取地址列表 -> 避免選擇門市時 未更新select
     dispatch(fetchStoresThunk(authId));
     return storeId; // 成功返回刪除的門市 ID
   } catch (error) {
-    console.error("刪除門市時發生錯誤:", error);
-    return rejectWithValue("刪除門市時發生未知錯誤");
+    // console.error("刪除門市時發生錯誤:", error);
+    // return rejectWithValue("刪除門市時發生未知錯誤");
+    return rejectWithValue({
+      message: `刪除門市失敗，${error}！`,
+      severity: "error",
+    });
   }
 });
 
@@ -815,24 +974,24 @@ export const deleteStoreThunk = createAsyncThunk<
 // };
 
 // 通用的 Alert 處理函式
-const setAlertState = (
-  state: UserState,
-  severity: AlertState["severity"],
-  message: string
-) => {
-  state.alert = {
-    open: true,
-    severity,
-    message,
-  };
-};
+// const setAlertState = (
+//   state: UserState,
+//   severity: AlertState["severity"],
+//   message: string
+// ) => {
+//   state.alert = {
+//     open: true,
+//     severity,
+//     message,
+//   };
+// };
 
 const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
     // 設置使用者資訊和登入狀態
-    setUser(state, action: PayloadAction<UserInfo>) {
+    setUserInfo(state, action: PayloadAction<UserInfo>) {
       state.userInfo = action.payload;
     },
     // 設置是否顯示登入Modal
@@ -915,8 +1074,22 @@ const userSlice = createSlice({
       state.isCreditCardFormValid = action.payload;
     },
     // Alert
-    setAlert(state, action: PayloadAction<AlertState>) {
-      state.alert = action.payload;
+    // setAlert(state, action: PayloadAction<AlertState>) {
+    //   state.alert = action.payload;
+    // },
+    // alert
+    setAlert: (
+      state,
+      action: PayloadAction<{
+        severity: AlertState["severity"];
+        message: string;
+      }>
+    ) => {
+      state.alert = {
+        open: true,
+        severity: action.payload.severity,
+        message: action.payload.message,
+      };
     },
     clearAlert(state) {
       state.alert = { open: false, message: "", severity: "info" };
@@ -956,35 +1129,89 @@ const userSlice = createSlice({
     builder
       .addCase(loginUserThunk.fulfilled, (state) => {
         state.isLoggedIn = true;
-        setAlertState(state, "success", "用戶登入成功！");
+        state.alert = {
+          open: true,
+          severity: "success",
+          message: "用戶登入成功",
+        };
+
+        // setAlertState(state, "success", "用戶登入成功！");
       })
       .addCase(loginUserThunk.rejected, (state, action) => {
         console.log("rejected 收到什麼:", action.payload);
-        const { message, severity } = action.payload as RejectValue; // 明確告訴 TypeScript payload 是 RejectValue
-        setAlertState(state, severity, message);
+        // 明確告訴 TypeScript payload 是 RejectValue
+        // const { message, severity } = action.payload as RejectValue;
+        // setAlertState(state, severity, message);
+        state.alert = {
+          open: true,
+          severity: "success",
+          message: "用戶登入成功！",
+        };
       });
     // Google 登入
     builder
       .addCase(loginWithGoogleThunk.fulfilled, (state, action) => {
         console.log(action.payload);
         state.isLoggedIn = true;
-        setAlertState(state, "success", "用戶登入成功！");
+        // setAlertState(state, "success", "用戶登入成功！");
+        // state.alert = {
+        //   open: true,
+        //   severity: "success",
+        //   message: "用戶登入成功！",
+        // };
       })
       .addCase(loginWithGoogleThunk.rejected, (state, action) => {
-        console.log("rejected 收到什麼:", action.payload);
-        const { message, severity } = action.payload as RejectValue;
-        setAlertState(state, severity, message);
+        // console.log("rejected 收到什麼:", action.payload);
+        // const { message, severity } = action.payload as RejectValue;
+        // setAlertState(state, severity, message);
+        // 確保 action.payload 是 RejectValue 類型
+        if (action.payload) {
+          const { message, severity } = action.payload as RejectValue;
+          state.alert = {
+            open: true,
+            severity,
+            message,
+          };
+        } else {
+          // action.payload 可能是 undefined（例如非 `rejectWithValue` 產生的錯誤）
+          state.alert = {
+            open: true,
+            severity: "error",
+            message: "登入發生未知錯誤，請稍後再試。",
+          };
+        }
       });
     // 登出
     builder
       .addCase(logoutUserThunk.fulfilled, (state) => {
-        setAlertState(state, "success", "用戶登出成功！");
+        // setAlertState(state, "success", "用戶登出成功！");
         state.cart = [];
+        state.alert = {
+          open: true,
+          message: "已成功登出",
+          severity: "success",
+        };
       })
       .addCase(logoutUserThunk.rejected, (state, action) => {
-        console.log("logout rejected:", action.payload);
-        const { message, severity } = action.payload as RejectValue;
-        setAlertState(state, severity, message);
+        // console.log("logout rejected:", action.payload);
+        // const { message, severity } = action.payload as RejectValue;
+        // setAlertState(state, severity, message);
+        // 確保 action.payload 是 RejectValue 類型
+        if (action.payload) {
+          const { message, severity } = action.payload as RejectValue;
+          state.alert = {
+            open: true,
+            severity,
+            message,
+          };
+        } else {
+          // action.payload 可能是 undefined（例如非 `rejectWithValue` 產生的錯誤）
+          state.alert = {
+            open: true,
+            severity: "error",
+            message: "登出發生未知錯誤，請稍後再試。",
+          };
+        }
       });
     // 獲取使用者資訊
     builder
@@ -994,8 +1221,24 @@ const userSlice = createSlice({
         state.isLoggedIn = true;
       })
       .addCase(fetchUserData.rejected, (state, action) => {
-        const { message, severity } = action.payload as RejectValue;
-        setAlertState(state, severity, message);
+        // const { message, severity } = action.payload as RejectValue;
+        // setAlertState(state, severity, message);
+        // 確保 action.payload 是 RejectValue 類型
+        if (action.payload) {
+          const { message, severity } = action.payload as RejectValue;
+          state.alert = {
+            open: true,
+            severity,
+            message,
+          };
+        } else {
+          // action.payload 可能是 undefined（例如非 `rejectWithValue` 產生的錯誤）
+          state.alert = {
+            open: true,
+            severity: "error",
+            message: "獲取用戶資訊發生未知錯誤，請稍後再試。",
+          };
+        }
       });
     // 添加購物車項目
     builder
@@ -1005,6 +1248,22 @@ const userSlice = createSlice({
       .addCase(addToCartThunk.rejected, (state, action) => {
         // setAlertState(state, "error", "購物車商品添加失敗！");
         console.error("添加商品失敗", action.payload);
+        // 確保 action.payload 是 RejectValue 類型
+        if (action.payload) {
+          const { message, severity } = action.payload as RejectValue;
+          state.alert = {
+            open: true,
+            severity,
+            message,
+          };
+        } else {
+          // action.payload 可能是 undefined（例如非 `rejectWithValue` 產生的錯誤）
+          state.alert = {
+            open: true,
+            severity: "error",
+            message: "添加商品 發生未知錯誤，請稍後再試。",
+          };
+        }
       });
 
     // 獲取購物車項目
@@ -1013,9 +1272,25 @@ const userSlice = createSlice({
         console.log("購物車資訊", action.payload);
         state.cart = action.payload;
       })
-      .addCase(fetchCartThunk.rejected, (_, action) => {
+      .addCase(fetchCartThunk.rejected, (state, action) => {
         console.error("獲取購物車資訊失敗", action.payload);
         // setAlertState(state, "error", "購物車商品獲取失敗！");
+        // 確保 action.payload 是 RejectValue 類型
+        if (action.payload) {
+          const { message, severity } = action.payload as RejectValue;
+          state.alert = {
+            open: true,
+            severity,
+            message,
+          };
+        } else {
+          // action.payload 可能是 undefined（例如非 `rejectWithValue` 產生的錯誤）
+          state.alert = {
+            open: true,
+            severity: "error",
+            message: "獲取購物車資訊 發生未知錯誤，請稍後再試。",
+          };
+        }
       });
 
     // 更新購物車項目 && 也要更新被選中的商品 -> CartFooter是根據SelectedItems狀態變動
@@ -1039,12 +1314,33 @@ const userSlice = createSlice({
           if (selectedIndex !== -1) {
             state.selectedItems[selectedIndex] = action.payload;
           }
-          setAlertState(state, "success", "更改成功！");
+          // setAlertState(state, "success", "更改成功！");
+          state.alert = {
+            open: true,
+            severity: "error",
+            message: "更新購物車資訊 發生未知錯誤，請稍後再試。",
+          };
         }
       })
       .addCase(updateCartItemThunk.rejected, (state, action) => {
         // setAlertState(state, "error", "購物車商品更新失敗！");
         console.error("商品數量更新失敗", action.payload);
+        // 確保 action.payload 是 RejectValue 類型
+        if (action.payload) {
+          const { message, severity } = action.payload as RejectValue;
+          state.alert = {
+            open: true,
+            severity,
+            message,
+          };
+        } else {
+          // action.payload 可能是 undefined（例如非 `rejectWithValue` 產生的錯誤）
+          state.alert = {
+            open: true,
+            severity: "error",
+            message: "更新商品數量 發生未知錯誤，請稍後再試。",
+          };
+        }
       });
 
     // 刪除購物車項目
@@ -1055,8 +1351,24 @@ const userSlice = createSlice({
         console.log("移除商品成功");
       })
       .addCase(deleteCartItemThunk.rejected, (state, action) => {
-        console.error("移除商品失敗", action.payload);
+        // console.error("移除商品失敗", action.payload);
         // setAlertState(state, "error", "移除商品失敗！");
+        // 確保 action.payload 是 RejectValue 類型
+        if (action.payload) {
+          const { message, severity } = action.payload as RejectValue;
+          state.alert = {
+            open: true,
+            severity,
+            message,
+          };
+        } else {
+          // action.payload 可能是 undefined（例如非 `rejectWithValue` 產生的錯誤）
+          state.alert = {
+            open: true,
+            severity: "error",
+            message: "移除商品 發生未知錯誤，請稍後再試。",
+          };
+        }
       });
     // 獲取訂單紀錄
     builder
@@ -1065,7 +1377,23 @@ const userSlice = createSlice({
         state.ordersHistory = action.payload;
       })
       .addCase(fetchOrdersThunk.rejected, (state, action) => {
-        console.error("獲取訂單紀錄失敗", action.payload);
+        // console.error("獲取訂單紀錄失敗", action.payload);
+        // 確保 action.payload 是 RejectValue 類型
+        if (action.payload) {
+          const { message, severity } = action.payload as RejectValue;
+          state.alert = {
+            open: true,
+            severity,
+            message,
+          };
+        } else {
+          // action.payload 可能是 undefined（例如非 `rejectWithValue` 產生的錯誤）
+          state.alert = {
+            open: true,
+            severity: "error",
+            message: "獲取訂單 發生未知錯誤，請稍後再試。",
+          };
+        }
       });
     // 獲取訂單詳細資訊
     builder
@@ -1088,7 +1416,23 @@ const userSlice = createSlice({
         }
       )
       .addCase(fetchOrderDetailsThunk.rejected, (state, action) => {
-        console.error("獲取訂單詳細資訊失敗", action.payload);
+        // console.error("獲取訂單詳細資訊失敗", action.payload);
+        // 確保 action.payload 是 RejectValue 類型
+        if (action.payload) {
+          const { message, severity } = action.payload as RejectValue;
+          state.alert = {
+            open: true,
+            severity,
+            message,
+          };
+        } else {
+          // action.payload 可能是 undefined（例如非 `rejectWithValue` 產生的錯誤）
+          state.alert = {
+            open: true,
+            severity: "error",
+            message: "獲取訂單詳細資訊 發生未知錯誤，請稍後再試。",
+          };
+        }
       });
 
     // 儲存訂單
@@ -1127,7 +1471,23 @@ const userSlice = createSlice({
         };
       })
       .addCase(saveOrderThunk.rejected, (state, action) => {
-        console.error("儲存訂單失敗", action.payload);
+        // console.error("儲存訂單失敗", action.payload);
+        // 確保 action.payload 是 RejectValue 類型
+        if (action.payload) {
+          const { message, severity } = action.payload as RejectValue;
+          state.alert = {
+            open: true,
+            severity,
+            message,
+          };
+        } else {
+          // action.payload 可能是 undefined（例如非 `rejectWithValue` 產生的錯誤）
+          state.alert = {
+            open: true,
+            severity: "error",
+            message: "儲存訂單 發生未知錯誤，請稍後再試。",
+          };
+        }
       });
     // 新增常用門市
     builder
@@ -1136,7 +1496,23 @@ const userSlice = createSlice({
         state.stores = [...state.stores, action.payload];
       })
       .addCase(saveStoreThunk.rejected, (state, action) => {
-        console.error("新增門市失敗: ", action.payload);
+        // console.error("新增門市失敗: ", action.payload);
+        // 確保 action.payload 是 RejectValue 類型
+        if (action.payload) {
+          const { message, severity } = action.payload as RejectValue;
+          state.alert = {
+            open: true,
+            severity,
+            message,
+          };
+        } else {
+          // action.payload 可能是 undefined（例如非 `rejectWithValue` 產生的錯誤）
+          state.alert = {
+            open: true,
+            severity: "error",
+            message: "新增門市 發生未知錯誤，請稍後再試。",
+          };
+        }
       });
     // 新增常用地址
     builder
@@ -1145,7 +1521,23 @@ const userSlice = createSlice({
         state.addresses = [...state.addresses, action.payload];
       })
       .addCase(saveAddressThunk.rejected, (state, action) => {
-        console.error("新增地址失敗: ", action.payload);
+        // console.error("新增地址失敗: ", action.payload);
+        // 確保 action.payload 是 RejectValue 類型
+        if (action.payload) {
+          const { message, severity } = action.payload as RejectValue;
+          state.alert = {
+            open: true,
+            severity,
+            message,
+          };
+        } else {
+          // action.payload 可能是 undefined（例如非 `rejectWithValue` 產生的錯誤）
+          state.alert = {
+            open: true,
+            severity: "error",
+            message: "新增地址 發生未知錯誤，請稍後再試。",
+          };
+        }
       });
     // 獲取常用門市
     builder
@@ -1154,7 +1546,23 @@ const userSlice = createSlice({
         state.stores = action.payload;
       })
       .addCase(fetchStoresThunk.rejected, (state, action) => {
-        console.error("獲取常用門市失敗: ", action.payload);
+        // console.error("獲取常用門市失敗: ", action.payload);
+        // 確保 action.payload 是 RejectValue 類型
+        if (action.payload) {
+          const { message, severity } = action.payload as RejectValue;
+          state.alert = {
+            open: true,
+            severity,
+            message,
+          };
+        } else {
+          // action.payload 可能是 undefined（例如非 `rejectWithValue` 產生的錯誤）
+          state.alert = {
+            open: true,
+            severity: "error",
+            message: "獲取常用門市 發生未知錯誤，請稍後再試。",
+          };
+        }
       });
     // 獲取常用地址
     builder
@@ -1163,23 +1571,77 @@ const userSlice = createSlice({
         state.addresses = action.payload;
       })
       .addCase(fetchAddressesThunk.rejected, (state, action) => {
-        console.error("獲取常用地址失敗: ", action.payload);
+        // console.error("獲取常用地址失敗: ", action.payload);
+        // 確保 action.payload 是 RejectValue 類型
+        if (action.payload) {
+          const { message, severity } = action.payload as RejectValue;
+          state.alert = {
+            open: true,
+            severity,
+            message,
+          };
+        } else {
+          // action.payload 可能是 undefined（例如非 `rejectWithValue` 產生的錯誤）
+          state.alert = {
+            open: true,
+            severity: "error",
+            message: "獲取常用地址 發生未知錯誤，請稍後再試。",
+          };
+        }
       });
     // 移除常用地址
-    builder.addCase(deleteAddressThunk.fulfilled, (state, action) => {
-      state.addresses = state.addresses.filter(
-        (address) => address.id !== action.payload
-      );
-      console.log("地址移除成功");
-    });
+    builder
+      .addCase(deleteAddressThunk.fulfilled, (state, action) => {
+        state.addresses = state.addresses.filter(
+          (address) => address.id !== action.payload
+        );
+        console.log("地址移除成功");
+      })
+      .addCase(deleteAddressThunk.rejected, (state, action) => {
+        // 確保 action.payload 是 RejectValue 類型
+        if (action.payload) {
+          const { message, severity } = action.payload as RejectValue;
+          state.alert = {
+            open: true,
+            severity,
+            message,
+          };
+        } else {
+          // action.payload 可能是 undefined（例如非 `rejectWithValue` 產生的錯誤）
+          state.alert = {
+            open: true,
+            severity: "error",
+            message: "移除地址 發生未知錯誤，請稍後再試。",
+          };
+        }
+      });
 
     // 移除常用門市
-    builder.addCase(deleteStoreThunk.fulfilled, (state, action) => {
-      state.stores = state.stores.filter(
-        (store) => store.id !== action.payload
-      );
-      console.log("門市移除成功");
-    });
+    builder
+      .addCase(deleteStoreThunk.fulfilled, (state, action) => {
+        state.stores = state.stores.filter(
+          (store) => store.id !== action.payload
+        );
+        console.log("門市移除成功");
+      })
+      .addCase(deleteStoreThunk.rejected, (state, action) => {
+        // 確保 action.payload 是 RejectValue 類型
+        if (action.payload) {
+          const { message, severity } = action.payload as RejectValue;
+          state.alert = {
+            open: true,
+            severity,
+            message,
+          };
+        } else {
+          // action.payload 可能是 undefined（例如非 `rejectWithValue` 產生的錯誤）
+          state.alert = {
+            open: true,
+            severity: "error",
+            message: "移除門市 發生未知錯誤，請稍後再試。",
+          };
+        }
+      });
     // 修改使用者資訊
     // builder
     //   .addCase(updateUserDataThunk.fulfilled, (state, action) => {
@@ -1202,7 +1664,7 @@ const userSlice = createSlice({
 });
 
 export const {
-  setUser,
+  setUserInfo,
   setIsLoggedIn,
   clearUserInfo,
   setSelectedItems,

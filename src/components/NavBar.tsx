@@ -24,6 +24,7 @@ const NavBar: React.FC = () => {
     { id: number; title: string; rating: number }[]
   >([]);
 
+  const userInfo = useSelector((state: RootState) => state.user.userInfo);
   const showCart = useSelector((state: RootState) => state.user.showCart);
   const showMember = useSelector((state: RootState) => state.user.showMember);
   const isLoggedIn = useSelector((state: RootState) => state.user.isLoggedIn);
@@ -76,6 +77,10 @@ const NavBar: React.FC = () => {
     () => topRatedProducts,
     [topRatedProducts]
   );
+
+  const defaultAvatarText = userInfo?.email
+    ? userInfo.email.charAt(0).toUpperCase()
+    : "U";
 
   const buttonStyle = "buttonBgc rounded-lg p-1";
 
@@ -135,7 +140,6 @@ const NavBar: React.FC = () => {
                 />
               </button>
             </div> */}
-
             {/* Cart */}
             <div className="relative">
               <button
@@ -158,21 +162,46 @@ const NavBar: React.FC = () => {
                 )}
               </button>
             </div>
+
             {/* 使用者 登入 */}
-            <div className="">
-              <button className={buttonStyle} onClick={handleMemberClick}>
-                <Image
-                  src="/icons/user-icon.svg"
-                  alt="展開更多會員選項"
-                  width={24}
-                  height={24}
-                  className="w-6 h-6"
-                />
-              </button>
+            <div className="relative">
+              {/* 未登入：顯示預設使用者圖示 */}
+              {!isLoggedIn ? (
+                <button className={buttonStyle} onClick={handleMemberClick}>
+                  <Image
+                    src="/icons/user-icon.svg"
+                    alt="展開更多會員選項"
+                    width={24}
+                    height={24}
+                    className="w-6 h-6"
+                  />
+                </button>
+              ) : (
+                // 已登入：顯示 Email 第一個字母（大寫）+ 灰色圓形背景
+                <button
+                  className="w-8 h-8 flex items-center justify-center bg-gray-300 rounded-full space-x-2"
+                  onClick={handleMemberClick}
+                >
+                  {userInfo?.avatar_url ? (
+                    <Image
+                      src={userInfo.avatar_url}
+                      alt="會員頭像"
+                      width={32}
+                      height={32}
+                      className="rounded-full"
+                    />
+                  ) : (
+                    <div className="text-black font-bold">
+                      {defaultAvatarText}
+                    </div>
+                  )}
+                </button>
+              )}
             </div>
           </div>
         </div>
       </div>
+
       {/* dropdown 大螢幕才顯示 */}
       {showMember && (
         <div

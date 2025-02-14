@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store/store";
 import { addToCartThunk, setAlert } from "@/store/slice/userSlice";
 import Image from "next/image";
+import { AlertState } from "@/types";
 
 interface ProductDetailProps {
   params: {
@@ -61,7 +62,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ params }) => {
           open: true,
           message: "請先登入，才能添加至購物車",
           severity: "warning",
-        })
+        } as AlertState)
       );
       return;
     }

@@ -4,6 +4,7 @@ import { useDispatch } from "react-redux";
 import { setAlert } from "@/store/slice/userSlice";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/supabaseClient";
+import { AlertState } from "@/types";
 
 const RegisterForm: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -30,7 +31,7 @@ const RegisterForm: React.FC = () => {
             open: true,
             severity: "error",
             message: `發送失敗: ${error.message}`,
-          })
+          } as AlertState)
         );
         return;
       }
@@ -40,7 +41,7 @@ const RegisterForm: React.FC = () => {
           open: true,
           severity: "success",
           message: `驗證信已發送至 ${email}，請檢查信箱完成驗證。`,
-        })
+        } as AlertState)
       );
     } catch (error) {
       console.error("意外錯誤：", error);
@@ -49,7 +50,7 @@ const RegisterForm: React.FC = () => {
           open: true,
           severity: "error",
           message: "發送認證信時發生錯誤，請稍後再試。",
-        })
+        } as AlertState)
       );
     }
   };

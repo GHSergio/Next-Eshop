@@ -6,6 +6,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { AppDispatch, RootState } from "../store/store";
 import {
   setIsLoggedIn,
+  setUserInfo,
+  setAlert,
   // setShowCart,
   toggleMember,
   clearUserInfo,
@@ -25,12 +27,14 @@ import MemberDropdown from "./members/MemberDropdown";
 import Alert from "@/components/Alert";
 import { supabase } from "@/supabaseClient";
 import Image from "next/image";
+import { AlertState } from "@/types";
 
 const ClientLayout: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const router = useRouter();
   const dispatch: AppDispatch = useDispatch();
+  const userInfo = useSelector((state: RootState) => state.user.userInfo);
   const showMember = useSelector((state: RootState) => state.user.showMember);
   const isLoggedIn = useSelector((state: RootState) => state.user.isLoggedIn);
   const cart = useSelector((state: RootState) => state.user.cart);
@@ -39,20 +43,6 @@ const ClientLayout: React.FC<{ children: React.ReactNode }> = ({
   const totalItems = useMemo(() => {
     return cart && cart.reduce((sum, item) => sum + item.quantity, 0);
   }, [cart]);
-
-  // 加載分類和產品信息
-  useEffect(() => {
-    dispatch(fetchProductsAndCategories());
-  }, [dispatch]);
-
-  // 根據 shouldReset 執行 resetOrder
-  useEffect(() => {
-    if (shouldReset) {
-      dispatch(resetOrder()); // 重置訂單狀態
-      // console.log("reset訂單");
-      dispatch(setShouldReset(false)); // 清除 shouldReset 狀態
-    }
-  }, [shouldReset, dispatch]);
 
   // 檢查是否需要初始化 & 調用初始化
   const handleInitialization = useCallback(
@@ -95,6 +85,34 @@ const ClientLayout: React.FC<{ children: React.ReactNode }> = ({
     }
   }, [dispatch, handleInitialization]);
 
+  // 監聽 Supabase 的 Auth 狀態：
+  useEffect(() => {
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (event === "SIGNED_IN" && session?.user) {
+          dispatch(setUserInfo(session.user)); // 更新 Redux 狀態
+          dispatch(
+            setAlert({ severity: "success", message: "用戶登入成功！" })
+          );
+        }
+
+        if (event === "SIGNED_OUT") {
+          dispatch(
+            setAlert({
+              open: true,
+              severity: "info",
+              message: "用戶登出成功",
+            } as AlertState)
+          );
+        }
+      }
+    );
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
+  }, [dispatch]);
+
   useEffect(() => {
     checkSessionAndInitialize();
 
@@ -120,6 +138,20 @@ const ClientLayout: React.FC<{ children: React.ReactNode }> = ({
     };
   }, [dispatch, checkSessionAndInitialize, handleInitialization]);
 
+  // 加載分類和產品信息
+  useEffect(() => {
+    dispatch(fetchProductsAndCategories());
+  }, [dispatch]);
+
+  // 根據 shouldReset 執行 resetOrder
+  useEffect(() => {
+    if (shouldReset) {
+      dispatch(resetOrder()); // 重置訂單狀態
+      // console.log("reset訂單");
+      dispatch(setShouldReset(false)); // 清除 shouldReset 狀態
+    }
+  }, [shouldReset, dispatch]);
+
   // console.log("userInfo state: ", userInfo);
 
   const handleCartClick = () => {
@@ -136,6 +168,12 @@ const ClientLayout: React.FC<{ children: React.ReactNode }> = ({
   }, [dispatch]);
 
   // console.log("alert state內容", alert);
+
+  const defaultAvatarText = userInfo?.email
+    ? userInfo.email.charAt(0).toUpperCase()
+    : "U";
+
+  const buttonStyle = "buttonBgc rounded-lg p-1";
 
   return (
     <div className="min-h-screen flex flex-col relative">
@@ -154,10 +192,7 @@ const ClientLayout: React.FC<{ children: React.ReactNode }> = ({
       <div className="sticky bottom-0 left-0 w-full bg-[#9EF7D9] flex sm:hidden justify-around items-center shadow-md z-20 h-12">
         {/* Home Button */}
         <div className="flex flex-col items-center">
-          <button
-            onClick={() => router.push("/")}
-            className="text-inherit p-0 text-lg mb-[-1px]"
-          >
+          <button onClick={() => router.push("/")} className={buttonStyle}>
             {/* Home Icon */}
             <Image
               src="/icons/home-icon.svg"
@@ -167,15 +202,11 @@ const ClientLayout: React.FC<{ children: React.ReactNode }> = ({
               className="w-6 h-6"
             />
           </button>
-          <span className="text-xs">首頁</span>
         </div>
 
         {/* Cart Icon */}
         <div className="flex flex-col items-center relative">
-          <button
-            onClick={handleCartClick}
-            className="text-inherit p-0 text-lg mb-[-1px] relative"
-          >
+          <button onClick={handleCartClick} className={buttonStyle}>
             {/* Shopping Cart Icon */}
             <Image
               src="/icons/cart-icon.svg"
@@ -190,25 +221,41 @@ const ClientLayout: React.FC<{ children: React.ReactNode }> = ({
               </span>
             )}
           </button>
-          <span className="text-xs">購物車</span>
         </div>
 
         {/* User Icon */}
-        <div className="flex flex-col items-center">
-          <button
-            onClick={handleMemberClick}
-            className="text-inherit p-0 text-lg mb-[-1px]"
-          >
-            {/* User Icon */}
-            <Image
-              src="/icons/user-icon.svg"
-              alt="Cart"
-              width={24}
-              height={24}
-              className="w-6 h-6"
-            />
-          </button>
-          <span className="text-xs">個人</span>
+
+        <div className="relative">
+          {/* 未登入：顯示預設使用者圖示 */}
+          {!isLoggedIn ? (
+            <button className={buttonStyle} onClick={handleMemberClick}>
+              <Image
+                src="/icons/user-icon.svg"
+                alt="展開更多會員選項"
+                width={24}
+                height={24}
+                className="w-6 h-6"
+              />
+            </button>
+          ) : (
+            // 已登入：顯示 Email 第一個字母（大寫）+ 灰色圓形背景
+            <button
+              className="w-8 h-8 flex items-center justify-center bg-gray-300 rounded-full space-x-2"
+              onClick={handleMemberClick}
+            >
+              {userInfo?.avatar_url ? (
+                <Image
+                  src={userInfo.avatar_url}
+                  alt="會員頭像"
+                  width={32}
+                  height={32}
+                  className="rounded-full"
+                />
+              ) : (
+                <div className="text-black font-bold">{defaultAvatarText}</div>
+              )}
+            </button>
+          )}
         </div>
       </div>
       {/* Member dropdown 小螢幕才顯示 */}

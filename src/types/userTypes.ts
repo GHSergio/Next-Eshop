@@ -149,7 +149,7 @@ export interface AlertState {
 export interface UserInfo {
   // Supabase auth.user 提供的屬性
   id: string; // 用戶唯一識別 ID
-  email: string | undefined; // 用戶電子郵件
+  email?: string | undefined; // 用戶電子郵件
   role?: string; // 用戶角色
   created_at?: string; // 註冊時間
   lastSignIn_at?: string; // 上次登入時間

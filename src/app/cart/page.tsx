@@ -21,6 +21,7 @@ import {
   setShouldReset,
 } from "@/store/slice/userSlice";
 import useCartCalculations from "@/hook/useCartCalculations";
+import { AlertState } from "@/types";
 
 const steps = ["購物車內容", "選擇付費方式", "填寫詳細資料", "確認訂單內容"];
 
@@ -184,7 +185,7 @@ const CartPage: React.FC = () => {
             open: true,
             message: "請選擇取貨門市",
             severity: "info",
-          })
+          } as AlertState)
         );
         return;
       }
@@ -196,7 +197,7 @@ const CartPage: React.FC = () => {
             open: true,
             message: "請選擇收件地址",
             severity: "info",
-          })
+          } as AlertState)
         );
         return;
       }
@@ -212,7 +213,7 @@ const CartPage: React.FC = () => {
             message:
               addresses.length === 0 ? "請選擇收件地址" : "請確認填寫所有資訊",
             severity: "info",
-          })
+          } as AlertState)
         );
         return;
       }
