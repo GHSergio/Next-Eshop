@@ -1326,8 +1326,8 @@ const userSlice = createSlice({
           // setAlertState(state, "success", "更改成功！");
           state.alert = {
             open: true,
-            severity: "error",
-            message: "更新購物車資訊 發生未知錯誤，請稍後再試。",
+            severity: "success",
+            message: "更改商品數量成功。",
           };
         }
       })
