@@ -15,6 +15,7 @@ import CartDropdown from "./cartStep/CartDropdown";
 import MemberDropdown from "./members/MemberDropdown";
 import { fetchTopRatedProducts } from "@/api";
 import NavLinks from "./NavLinks";
+import { UserInfo } from "@/types";
 
 const NavBar: React.FC = () => {
   const router = useRouter();
@@ -24,7 +25,9 @@ const NavBar: React.FC = () => {
     { id: number; title: string; rating: number }[]
   >([]);
 
-  const userInfo = useSelector((state: RootState) => state.user.userInfo);
+  const userInfo = useSelector(
+    (state: RootState) => state.user.userInfo as UserInfo
+  );
   const showCart = useSelector((state: RootState) => state.user.showCart);
   const showMember = useSelector((state: RootState) => state.user.showMember);
   const isLoggedIn = useSelector((state: RootState) => state.user.isLoggedIn);
