@@ -45,26 +45,6 @@ const MemberDropdown: React.FC = React.memo(() => {
     }
   };
 
-  // // 登出處理
-  // const handleLogout = () => {
-  //   localStorage.removeItem("authToken");
-  //   localStorage.removeItem("userInfo");
-  //   dispatch(resetOrder());
-  //   dispatch(logoutUserThunk()).unwrap();
-  //   try {
-  //     dispatch(setShowMember(false));
-  //     router.push("/");
-  //   } catch (error) {
-  //     dispatch(
-  //       setAlert({
-  //         open: true,
-  //         severity: "error",
-  //         message: `登出失敗，${error}！`,
-  //       } as AlertState)
-  //     );
-  //   }
-  // };
-
   const ulStyled =
     "xs:fixed sm:absolute xs:right-[35px] sm:right-[15px] flex flex-col justify-center items-center text-center bg-[#C4FAE8] shadow-lg z-10 rounded-md";
 

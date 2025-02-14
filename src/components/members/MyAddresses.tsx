@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store/store";
 import { deleteAddressThunk, deleteStoreThunk } from "@/store/slice/userSlice";
@@ -17,37 +17,44 @@ const MyAddresses: React.FC = () => {
   const [isStoreModalOpen, setIsStoreModalOpen] = useState(false);
 
   // 開啟 Addres Modal
-  const handleOpenAddressModal = () => {
+  const handleOpenAddressModal = useCallback(() => {
     setIsAddressModalOpen(true);
-  };
+  }, []);
 
   // 關閉 Addres Modal
-  const handleCloseAddressModal = () => {
+  const handleCloseAddressModal = useCallback(() => {
     setIsAddressModalOpen(false);
-  };
+  }, []);
 
   // 開啟 Store Modal
-  const handleOpenStoreModal = () => {
+  const handleOpenStoreModal = useCallback(() => {
     setIsStoreModalOpen(true);
-  };
+  }, []);
 
   // 關閉 Addres Modal
-  const handleCloseStoreModal = () => {
+  const handleCloseStoreModal = useCallback(() => {
     setIsStoreModalOpen(false);
-  };
+  }, []);
 
-  // 移除
-  const handleDeleteAddress = async (addressId: string) => {
-    if (confirm("確認刪除此地址？")) {
-      await dispatch(deleteAddressThunk(addressId));
-    }
-  };
+  // 刪除地址
+  const handleDeleteAddress = useCallback(
+    async (addressId: string) => {
+      if (confirm("確認刪除此地址？")) {
+        await dispatch(deleteAddressThunk(addressId));
+      }
+    },
+    [dispatch]
+  );
 
-  const handleDeleteStore = (storeId: string) => {
-    if (confirm("確認刪除此門市？")) {
-      dispatch(deleteStoreThunk(storeId));
-    }
-  };
+  // 刪除門市
+  const handleDeleteStore = useCallback(
+    (storeId: string) => {
+      if (confirm("確認刪除此門市？")) {
+        dispatch(deleteStoreThunk(storeId));
+      }
+    },
+    [dispatch]
+  );
 
   const addButtonStyle =
     "bg-blue-500 text-white font-semibold px-4 py-2 rounded xs:text-[0.8rem] sm:text-[1.2rem]";
