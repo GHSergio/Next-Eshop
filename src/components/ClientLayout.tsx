@@ -68,8 +68,6 @@ const ClientLayout: React.FC<{ children: React.ReactNode }> = ({
   // 檢查使用者 登入狀態
   const checkSessionAndInitialize = useCallback(async () => {
     const { data } = await supabase.auth.getSession();
-    console.log("User Session:", data);
-
     const session = data?.session;
 
     if (session?.user) {
