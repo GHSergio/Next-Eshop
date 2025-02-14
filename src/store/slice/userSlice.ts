@@ -742,6 +742,8 @@ export const saveAddressThunk = createAsyncThunk<
       .select("*")
       .single();
 
+    console.log("新增地址-auth_id", addressData.user_id);
+
     if (error) {
       // return rejectWithValue(`儲存地址失敗: ${error.message}`);
       return rejectWithValue({
@@ -863,6 +865,7 @@ export const saveStoreThunk = createAsyncThunk<
       })
       .select("*")
       .single();
+    console.log("新增門市-auth_id", storeData.user_id);
 
     if (error) {
       // return rejectWithValue(`儲存門市失敗: ${error.message}`);
