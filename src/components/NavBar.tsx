@@ -185,7 +185,7 @@ const NavBar: React.FC = () => {
                   {userInfo?.avatar_url ? (
                     <Image
                       src={userInfo.avatar_url}
-                      alt="會員頭像"
+                      alt="展開更多會員選項"
                       width={32}
                       height={32}
                       className="rounded-full"
