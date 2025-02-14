@@ -1323,12 +1323,12 @@ const userSlice = createSlice({
           if (selectedIndex !== -1) {
             state.selectedItems[selectedIndex] = action.payload;
           }
-          // setAlertState(state, "success", "更改成功！");
-          state.alert = {
-            open: true,
-            severity: "success",
-            message: "更改商品數量成功。",
-          };
+          // console.log("更改商品數量成功");
+          // state.alert = {
+          //   open: true,
+          //   severity: "success",
+          //   message: "更改商品數量成功。",
+          // };
         }
       })
       .addCase(updateCartItemThunk.rejected, (state, action) => {
@@ -1357,7 +1357,7 @@ const userSlice = createSlice({
       .addCase(deleteCartItemThunk.fulfilled, (state, action) => {
         state.cart = state.cart?.filter((item) => item.id !== action.payload);
         // setAlertState(state, "success", "移除商品成功！");
-        console.log("移除商品成功");
+        // console.log("移除商品成功");
       })
       .addCase(deleteCartItemThunk.rejected, (state, action) => {
         // console.error("移除商品失敗", action.payload);
