@@ -964,40 +964,6 @@ export const deleteStoreThunk = createAsyncThunk<
   }
 });
 
-// 格式化 axios errorResponse
-// export const formatErrorResponse = (error: unknown) => {
-//   if (axios.isAxiosError(error) && error.response) {
-//     const status = error.response.status;
-//     const message = error.response.data?.message || "發生未知錯誤";
-//     const severity = error.response.data?.severity || "error";
-//     return {
-//       status,
-//       message,
-//       severity,
-//     };
-//   } else {
-//     // 處理非 Axios 錯誤
-//     return {
-//       status: 500,
-//       message: "伺服器發生錯誤，請稍後再試",
-//       severity: "error",
-//     };
-//   }
-// };
-
-// 通用的 Alert 處理函式
-// const setAlertState = (
-//   state: UserState,
-//   severity: AlertState["severity"],
-//   message: string
-// ) => {
-//   state.alert = {
-//     open: true,
-//     severity,
-//     message,
-//   };
-// };
-
 const userSlice = createSlice({
   name: "user",
   initialState,
