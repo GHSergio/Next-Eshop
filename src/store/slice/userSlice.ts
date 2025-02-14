@@ -625,15 +625,24 @@ export const saveOrderThunk = createAsyncThunk<
 // 獲取訂單紀錄
 export const fetchOrdersThunk = createAsyncThunk<
   Order[], // 返回值類型
-  string, // 傳入的 user_id
+  string | null, // 允許 userId 為 null
   // { rejectValue: string }
   { rejectValue: RejectValue }
 >("orders/fetchOrders", async (userId, { rejectWithValue }) => {
   try {
-    const { data, error } = await supabase
-      .from("orders")
-      .select("*")
-      .eq("auth_id", userId); // 在orders內 尋找auth_id 符合userId的項目
+    // const { data, error } = await supabase
+    //   .from("orders")
+    //   .select("*")
+    //   .eq("auth_id", userId); // 在orders內 尋找auth_id 符合userId的項目
+    let query = supabase.from("orders").select("*");
+
+    if (userId) {
+      query = query.eq("auth_id", userId); // userId 存在，正常查詢
+    } else {
+      query = query.is("auth_id", null); // userId 為 null，使用 .is()
+    }
+
+    const { data, error } = await query;
 
     if (error) {
       // return rejectWithValue("獲取訂單失敗：" + error.message);
@@ -648,7 +657,7 @@ export const fetchOrdersThunk = createAsyncThunk<
     // console.error("獲取歷史訂單時發生錯誤：", error);
     // return rejectWithValue("發生未知錯誤，無法獲取訂單");
     return rejectWithValue({
-      message: `添加到購物車失敗，${error}！`,
+      message: `獲取歷史訂單失敗，${error}！`,
       severity: "error",
     });
   }
